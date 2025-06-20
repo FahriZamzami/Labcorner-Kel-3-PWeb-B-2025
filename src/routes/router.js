@@ -7,6 +7,8 @@ const assignmentsController = require('../controllers/assignment.controller');
 router.get('/assignments', assignmentsController.getAllAssignments);
 router.post('/assignments', upload.single('fileTugas'), assignmentsController.createAssignment);
 router.patch('/assignments/:id/toggle-status', assignmentsController.toggleStatusAssignments);
+router.get('/assignments/:id/pengumpulan', assignmentsController.getPengumpulanByTugasId);
+router.get('/assignments/:id/files', assignmentsController.getFilesByTugasId);
 
 // === Auth Routes ===
 const authenticationController = require('../controllers/authentication.controller');
