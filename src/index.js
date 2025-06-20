@@ -3,13 +3,24 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const router = require('./routes/router');
-const { getAllAssignments } = require('./controllers/assignment.controller');
+
+const {
+    getAllAssignments,
+    editAssignmentForm,
+    updateAssignment,
+    deleteAssignment,
+    detailAssignment  // ✅ tambahkan ini
+} = require('./controllers/assignment.controller');
+
 const { login } = require('./controllers/authentication.controller');
-const { isAuthenticated } = require('./middlewares/auth'); // Middleware auth
+const { isAuthenticated } = require('./middlewares/auth');
+const upload = require('./middlewares/upload');
+
+const { labPage, showHomeClassPage } = require('./controllers/lab.controller');
 
 const app = express();
 
-// Session config
+// ===== Middleware & Config =====
 app.use(session({
     secret: 'rahasia_super_aman',
     resave: false,
@@ -17,55 +28,49 @@ app.use(session({
     cookie: { secure: false }
 }));
 
-// Middleware parsing JSON dan form
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Setup view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Serve static files
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// const methodOverride = require('method-override');
-// app.use(methodOverride('_method'));
+// Scheduler (penutup otomatis tugas)
+require('./scheduler');
 
-// Route login (GET dan POST)
-app.get('/login', (req, res) => {
-    res.render('login');
-});
+// ===== ROUTES =====
+
+// === Auth ===
+app.get('/login', (req, res) => res.render('login'));
 app.post('/login', login);
 
-// Proteksi route berikutnya
+// Middleware auth (proteksi semua route di bawah ini)
 app.use(isAuthenticated);
 
-// Routing API (setelah login)
-app.use('/api', router);
-
-// Halaman form tambah penugasan (hanya jika login)
+// === Assignment Routes ===
+app.get('/assignments', getAllAssignments);
 app.get('/assignments/create', (req, res) => {
     res.render('addAssignment', { user: req.session.user });
 });
+app.get('/assignments/:id/edit', editAssignmentForm);
+app.get('/penugasan/detail/:id', detailAssignment);  // ✅ tambahkan ini
+app.post('/penugasan/edit/:id', upload.single('fileTugas'), updateAssignment);
+app.post('/penugasan/delete/:id', deleteAssignment);
 
-const { labPage } = require('./controllers/lab.controller');
-
+// === Lab & Kelas ===
 app.get('/lab', labPage);
-
-const { showHomeClassPage } = require('./controllers/lab.controller');
 app.get('/kelas/:id', showHomeClassPage);
 
-// Halaman daftar penugasan (juga perlu login)
-app.get('/assignments', getAllAssignments);
+// === API Routes (REST-style) ===
+app.use('/api', router);
 
-// Logout
+// === Logout ===
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
-        res.redirect('/login');
+    res.redirect('/login');
     });
 });
 
-// Start server
+// ===== START SERVER =====
 app.listen(3000, () => {
     console.log('🚀 Server berjalan di http://localhost:3000');
 });

@@ -97,17 +97,18 @@ model modul {
 }
 
 model tugas {
-  id            Int            @id @default(autoincrement())
-  praktikum_id  Int
-  judul         String
-  deskripsi     String?
-  fileTugas     String?
-  batas_waktu   DateTime
-  dibuat_pada   DateTime       @default(now())
-  status        StatusTugas    @default(open)
+  id               Int            @id @default(autoincrement())
+  praktikum_id     Int
+  judul            String
+  deskripsi        String?
+  fileTugas        String?
+  batas_waktu      DateTime
+  dibuat_pada      DateTime       @default(now())
+  status           StatusTugas    @default(open)
+  tutup_penugasan  Boolean        @default(false)
 
-  praktikum     praktikum      @relation(fields: [praktikum_id], references: [id])
-  pengumpulan   pengumpulan[]
+  praktikum        praktikum      @relation(fields: [praktikum_id], references: [id])
+  pengumpulan      pengumpulan[]
 }
 
 model pengumpulan {
