@@ -24,25 +24,38 @@ enum StatusAbsensi {
 }
 
 model user {
-  id           String          @id
-  username     String          @unique
+  id           String       @id
+  username     String       @unique
   kata_sandi   String
   peran        Peran
-  dibuat_pada  DateTime        @default(now())
+  dibuat_pada  DateTime     @default(now())
 
-  pendaftaran  pendaftaran[]
+  mahasiswa    mahasiswa[]  // ← sebelumnya pendaftaran
   jadwal       jadwal[]
   modul        modul[]
   pengumpulan  pengumpulan[]
-  pengumuman   pengumuman[]    @relation("PengumumanPembuat")
+  pengumuman   pengumuman[] @relation("PengumumanPembuat")
   absensi      absensi[]
+  asistenLab   asistenLab[]
 }
 
 model lab {
-  id        Int         @id @default(autoincrement())
-  nama_lab  String
+  id          Int           @id @default(autoincrement())
+  nama_lab    String
 
-  praktikum praktikum[]
+  praktikum   praktikum[]
+  asistenLab  asistenLab[]
+}
+
+model asistenLab {
+  id      Int    @id @default(autoincrement())
+  user_id String
+  lab_id  Int
+
+  user    user   @relation(fields: [user_id], references: [id])
+  lab     lab    @relation(fields: [lab_id], references: [id])
+
+  @@unique([user_id, lab_id])
 }
 
 model praktikum {
@@ -52,21 +65,23 @@ model praktikum {
   dibuat_pada    DateTime      @default(now())
 
   lab            lab           @relation(fields: [lab_id], references: [id])
-  pendaftaran    pendaftaran[]
+  mahasiswa      mahasiswa[]   // ← sebelumnya pendaftaran
   jadwal         jadwal[]
   modul          modul[]
   tugas          tugas[]
   pengumuman     pengumuman[]
 }
 
-model pendaftaran {
-  id           Int       @id @default(autoincrement())
-  user_id      String
-  praktikum_id Int
-  waktu_daftar DateTime?
+model mahasiswa {
+  id             Int       @id @default(autoincrement())
+  user_id        String
+  praktikum_id   Int
+  waktu_daftar   DateTime?
 
-  user         user      @relation(fields: [user_id], references: [id])
-  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+  user           user      @relation(fields: [user_id], references: [id])
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
+
+  @@unique([user_id, praktikum_id])
 }
 
 model jadwal {

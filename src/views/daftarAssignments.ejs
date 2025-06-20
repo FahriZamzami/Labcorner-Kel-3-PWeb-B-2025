@@ -95,43 +95,46 @@
                             const jam = deadline.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace('.', ':');
                             const isClosed = deadline < new Date();
                         %>
-                            <a href="/penugasan/detail/<%= a.id %>">
-                                <div class="bg-white p-5 rounded-xl shadow-md flex justify-between items-center group-hover:bg-gray-50 transition">
+                        
+                            <div 
+                                class="bg-white p-5 rounded-xl shadow-md flex justify-between items-center hover:bg-gray-50 transition cursor-pointer" onclick="window.location.href='/penugasan/detail/<%= a.id %>'">
+                                <div>
+                                    <div class="font-semibold text-lg text-gray-800"><%= a.judul %></div>
+                                    <div class="text-sm text-gray-500"><%= hari %>, <%= tanggal.replace(' ', ' ') %>&nbsp;&nbsp;&nbsp;<%= jam %></div>
+                                </div>
 
-                                    <div>
-                                        <div class="font-semibold text-lg text-gray-800"><%= a.judul %></div>
-                                        <div class="text-sm text-gray-500"><%= hari %>, <%= tanggal.replace(' ', ' ') %>&nbsp;&nbsp;&nbsp;<%= jam %></div>
-                                    </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-md
+                                        <%= a.status === 'close' ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#D1FAE5] text-[#065F46]' %>">
+                                        <%= a.status === 'close' ? 'Penugasan Ditutup' : 'Penugasan Dibuka' %>
+                                    </span>
 
-                                    <div class="flex items-center gap-4">
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-md
-                                            <%= a.status === 'close' ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#D1FAE5] text-[#065F46]' %>">
-                                            <%= a.status === 'close' ? 'Penugasan Ditutup' : 'Penugasan Dibuka' %>
-                                        </span>
-
-                                        <div class="relative dropdown">
-                                            <button tabindex="0" class="text-gray-500 hover:text-gray-800 p-2">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                            </button>
-                                            <ul class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-lg z-10 overflow-hidden">
-                                                <li>
-                                                    <button 
-                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 toggle-status-btn"
-                                                        data-id="<%= a.id %>">
-                                                        <%= a.status === 'close' ? 'Buka Penugasan' : 'Tutup Penugasan' %>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <a href="/assignments/<%= a.id %>/edit" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                        Edit
-                                                    </a>
-                                                </li>
-                                                <li><a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</a></li>
-                                            </ul>
-                                        </div>
+                                    <div class="relative dropdown" onclick="event.stopPropagation()">
+                                        <button tabindex="0" class="text-gray-500 hover:text-gray-800 p-2">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                            </svg>
+                                        </button>
+                                        <ul class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-lg z-10 overflow-hidden">
+                                            <li>
+                                                <button 
+                                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 toggle-status-btn"
+                                                    data-id="<%= a.id %>">
+                                                    <%= a.status === 'close' ? 'Buka Penugasan' : 'Tutup Penugasan' %>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <a href="/assignments/<%= a.id %>/edit" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         <% }) %>
                     <% } else { %>
                         <p class="text-center text-gray-500 mt-8">Belum ada penugasan.</p>
@@ -143,32 +146,59 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-        const buttons = document.querySelectorAll('.toggle-status-btn');
+            const buttons = document.querySelectorAll('.toggle-status-btn');
+            const dropdownToggles = document.querySelectorAll('.dropdown > button');
 
-        buttons.forEach(button => {
-            button.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const id = button.dataset.id;
-
-            try {
-                const response = await fetch(`/api/assignments/${id}/toggle-status`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+            // Toggle dropdown visibility dan tutup dropdown lain
+            dropdownToggles.forEach(button => {
+                button.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const menu = button.nextElementSibling;
+                    document.querySelectorAll('.dropdown-menu').forEach(m => {
+                        if (m !== menu) m.classList.add('hidden');
+                    });
+                    menu.classList.toggle('hidden');
                 });
-
-                if (response.ok) {
-                location.reload(); // reload halaman setelah toggle
-                } else {
-                const error = await response.json();
-                alert('Gagal mengubah status: ' + (error.message || 'Terjadi kesalahan.'));
-                }
-            } catch (err) {
-                alert('Gagal mengirim permintaan: ' + err.message);
-            }
             });
-        });
+
+            // Hindari penutupan saat klik di dalam menu
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.addEventListener('click', e => {
+                    e.stopPropagation();
+                });
+            });
+
+            // Tombol toggle status
+            buttons.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // ← agar tidak trigger klik parent
+                    const id = button.dataset.id;
+
+                    try {
+                        const response = await fetch(`/api/assignments/${id}/toggle-status`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            const error = await response.json();
+                            alert('Gagal mengubah status: ' + (error.message || 'Terjadi kesalahan.'));
+                        }
+                    } catch (err) {
+                        alert('Gagal mengirim permintaan: ' + err.message);
+                    }
+                });
+            });
+
+            // Tutup dropdown jika klik di luar
+            window.addEventListener('click', () => {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+            });
         });
     </script>
 
