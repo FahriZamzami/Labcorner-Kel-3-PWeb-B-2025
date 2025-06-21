@@ -6,7 +6,6 @@ const router = require('./routes/router');
 const { getAllAssignments } = require('./controllers/assignment.controller');
 const { login } = require('./controllers/authentication.controller');
 const { isAuthenticated } = require('./middlewares/auth'); // Middleware auth
-const indexRouter = require('./routes/router.js');
 const port = 3000;
 
 const app = express();
@@ -67,6 +66,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/mahasiswa', (req, res) => res.redirect('/api/mahasiswa'));
+app.get('/mahasiswa/rekap', (req,res) => res.redirect('/api/daftarmahasiswa'))
 
 // Start server
 app.listen(3000, () => {

@@ -1,20 +1,15 @@
-<table class="table-auto w-full mt-6 bg-white rounded-lg shadow-md">
-  <thead class="bg-purple-700 text-white">
+<h2>Daftar Kehadiran Mahasiswa</h2>
+<table border="1" cellpadding="8">
     <tr>
-      <th class="p-3">No</th>
-      <th class="p-3 text-left">Nama Mahasiswa</th>
-      <th class="p-3 text-center">Hadir</th>
-      <th class="p-3 text-center">Tidak Hadir</th>
+        <th>Nama Mahasiswa</th>
+        <th>Jumlah Hadir</th>
+        <th>Jumlah Tidak Hadir</th>
     </tr>
-  </thead>
-  <tbody>
-    <% data.forEach((mhs, i) => { %>
-      <tr class="border-b hover:bg-purple-50">
-        <td class="p-3 text-center"><%= i + 1 %></td>
-        <td class="p-3"><%= mhs.nama %></td>
-        <td class="p-3 text-center"><%= mhs.Hadir %></td>
-        <td class="p-3 text-center"><%= mhs.Tidak_Hadir %></td>
-      </tr>
+    <% data.forEach(mhs => { %>
+    <tr>
+        <td><%= mhs.nama %></td>
+        <td><%= mhs.hadir %></td>
+        <td><%= mhs.tidak_hadir %></td>
+    </tr>
     <% }) %>
-  </tbody>
 </table>
