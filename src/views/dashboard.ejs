@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard LabCorner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: '#6366f1',
+            soft: '#eef2ff',
+            dark: '#1e1b4b'
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    @keyframes scaleIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .animate-scale-in {
+      animation: scaleIn 0.25s ease-out;
+    }
+    ::selection {
+      background: #c7d2fe;
+      color: #1e3a8a;
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out both;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-800 via-purple-900 to-indigo-800 min-h-screen text-white font-sans">
+
+<!-- Header -->
+<nav class="flex justify-between items-center px-10 py-6 bg-white/10 backdrop-blur-md shadow-xl sticky top-0 z-50">
+  <h1 class="text-3xl font-extrabold text-white">🔧 LabCorner Dashboard</h1>
+  <div class="flex items-center gap-6">
+    <div class="text-right text-white text-base">
+      <div id="dateTime" class="font-semibold"></div>
+      <div class="text-white/70 text-sm">👤 Admin Aktif</div>
+    </div>
+    <button onclick="toggleMenu()" class="w-12 h-12 grid grid-cols-3 gap-1 bg-white/20 hover:bg-white/30 rounded-full p-1 shadow-inner transition-transform transform hover:scale-105">
+      <% for (let i = 0; i < 9; i++) { %>
+        <span class="w-2 h-2 bg-white rounded-full"></span>
+      <% } %>
+    </button>
+  </div>
+</nav>
+
+<!-- Popup Menu -->
+<div id="overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+  <div class="bg-white/90 text-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl p-10 animate-scale-in border border-white/30">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-4xl font-extrabold text-indigo-700">📂 Panel Admin</h3>
+      <button onclick="toggleMenu()" class="text-gray-500 hover:text-red-500 text-4xl font-bold transition hover:scale-125">&times;</button>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 text-lg font-semibold">
+      <% const menus = [
+        { link: '/user', icon: '👥', label: 'Semua User' },
+        { link: '/pengumuman', icon: '📢', label: 'Pengumuman' },
+        { link: '/user/tambah', icon: '➕', label: 'Tambah User' },
+        { link: '/user/hapus', icon: '➖', label: 'Hapus User' },
+        { link: '/maintenance', icon: '🛠️', label: 'Maintenance' },
+        { link: '/matikan', icon: '🛑', label: 'Matikan Website', danger: true }
+      ]; %>
+      <% menus.forEach(menu => { %>
+        <a href="<%= menu.link %>" class="group p-6 rounded-xl transition-all duration-300 shadow hover:shadow-xl text-center transform hover:scale-105 
+          <%= menu.danger ? 'bg-red-100 hover:bg-red-200 text-red-600' : 'bg-indigo-100 hover:bg-indigo-200 text-gray-900' %>">
+          <div class="text-3xl"><%= menu.icon %></div>
+          <div class="mt-2 text-base"><%= menu.label %></div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<!-- Welcome Section -->
+<section class="text-center my-10 px-10">
+  <div class="bg-white/10 backdrop-blur-lg rounded-2xl py-16 px-6 shadow-xl border border-white/20">
+    <h2 class="text-5xl font-extrabold tracking-tight mb-4">👋 Selamat Datang di Pusat Kontrol LabCorner</h2>
+    <p class="text-indigo-200 text-xl max-w-3xl mx-auto leading-relaxed">Kelola seluruh kegiatan laboratorium secara efisien dan terintegrasi melalui satu dashboard modern dan responsif.</p>
+  </div>
+</section>
+
+<!-- Lab Cards -->
+<section class="px-10 pb-16">
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+    <% const labs = [
+      { nama: 'LEA', deskripsi: 'Laboratorium Enterprise Application', icon: '🧪', link: '/lab/lea', bg: 'from-indigo-300 to-indigo-500' },
+      { nama: 'LABGIS', deskripsi: 'Laboratorium Geographic Information System', icon: '🗺️', link: '/lab/labgis', bg: 'from-green-300 to-teal-500' },
+      { nama: 'LBI', deskripsi: 'Laboratorium Business Intelligence', icon: '📊', link: '/lab/lbi', bg: 'from-pink-300 to-rose-500' },
+      { nama: 'LDKOM', deskripsi: 'Laboratorium Dasar Komputasi', icon: '💡', link: '/lab/ldkom', bg: 'from-yellow-300 to-orange-400' }
+    ]; %>
+
+    <% labs.forEach(lab => { %>
+      <div class="bg-gradient-to-br <%= lab.bg %> text-white rounded-3xl shadow-xl p-10 flex flex-col justify-between group transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="text-7xl mb-5 transition-transform duration-300 group-hover:scale-125"><%= lab.icon %></div>
+          <h3 class="text-2xl font-bold mb-2 uppercase tracking-widest"><%= lab.nama %></h3>
+          <p class="text-base text-white/90 leading-relaxed max-w-[90%] mx-auto"><%= lab.deskripsi %></p>
+        </div>
+        <div class="mt-8 text-center">
+          <a href="<%= lab.link %>" class="inline-block bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-full text-base font-medium shadow transition-all transform hover:scale-105 active:scale-95">
+            🔍 Lihat Detail
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- Script -->
+<script>
+  function toggleMenu() {
+    const overlay = document.getElementById('overlay');
+    overlay.classList.toggle('hidden');
+    overlay.classList.toggle('flex');
+  }
+
+  function updateDateTime() {
+    const now = new Date();
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    };
+    document.getElementById('dateTime').textContent = now.toLocaleDateString('id-ID', options);
+  }
+
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+// Prisma schema based on your ERD
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Peran {
+  admin
+  mahasiswa
+  asisten
+}
+
+enum StatusAbsensi {
+  Hadir
+  Tidak_Hadir
+}
+
+model user {
+  id          String         @id
+  username    String         @unique
+  kata_sandi  String
+  peran       Peran
+  dibuat_pada DateTime       @default(now())
+
+  pendaftaran     pendaftaran[]
+  jadwal          jadwal[]
+  modul           modul[]        @relation("Uploader")
+  tugas           tugas[]        @relation("TugasPembuat")
+  pengumpulan     pengumpulan[]
+  pengumuman      pengumuman[]   @relation("PengumumanPembuat")
+  absensi         absensi[]
+}
+
+model lab {
+  id_lab    String       @id
+  nama_lab  String
+  praktikum praktikum[]
+}
+
+model praktikum {
+  id             Int           @id @default(autoincrement())
+  nama_praktikum String
+  lab_id         String
+  dibuat_pada    DateTime      @default(now())
+
+  lab            lab           @relation(fields: [lab_id], references: [id_lab])
+  pendaftaran    pendaftaran[]
+  jadwal         jadwal[]
+  modul          modul[]
+  tugas          tugas[]
+  pengumuman     pengumuman[]
+}
+
+model pendaftaran {
+  id           Int       @id @default(autoincrement())
+  user_id      String
+  praktikum_id Int
+  waktu_daftar DateTime?
+
+  user         user      @relation(fields: [user_id], references: [id])
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+}
+
+model jadwal {
+  id             Int       @id @default(autoincrement())
+  praktikum_id   Int
+  tanggal        DateTime
+  jam            DateTime
+  ruangan        String?
+  user_id        String
+  nama_pengajar  String?
+  dibuat_pada    DateTime?
+
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
+  user           user      @relation(fields: [user_id], references: [id])
+  absensi        absensi[]
+}
+
+model modul {
+  id             Int       @id @default(autoincrement())
+  praktikum_id   Int
+  judul          String
+  file_path      String
+  diunggah_oleh  String
+  diunggah_pada  DateTime?
+
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
+  uploader       user      @relation("Uploader", fields: [diunggah_oleh], references: [id])
+}
+
+model tugas {
+  id            Int       @id @default(autoincrement())
+  praktikum_id  Int
+  judul         String
+  deskripsi     String?
+  batas_waktu   DateTime?
+  dibuat_oleh   String
+  dibuat_pada   DateTime?
+
+  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
+  pembuat       user      @relation("TugasPembuat", fields: [dibuat_oleh], references: [id])
+  pengumpulan   pengumpulan[]
+}
+
+model pengumpulan {
+  id           Int       @id @default(autoincrement())
+  tugas_id     Int
+  user_id      String
+  file_path    String?
+  waktu_kirim  DateTime?
+  nilai        Float?
+  catatan      String?
+
+  tugas        tugas     @relation(fields: [tugas_id], references: [id])
+  user         user      @relation(fields: [user_id], references: [id])
+}
+
+model pengumuman {
+  id            Int       @id @default(autoincrement())
+  praktikum_id  Int
+  isi           String
+  dibuat_oleh   String
+  dibuat_pada   DateTime?
+
+  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
+  pembuat       user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
+}
+
+model absensi {
+  id        Int            @id @default(autoincrement())
+  user_id   String
+  jadwal_id Int
+  status    StatusAbsensi
+
+  user      user           @relation(fields: [user_id], references: [id])
+  jadwal    jadwal         @relation(fields: [jadwal_id], references: [id])
+}

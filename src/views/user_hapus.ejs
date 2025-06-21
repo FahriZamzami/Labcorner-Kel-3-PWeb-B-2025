@@ -1,0 +1,100 @@
+<body class="bg-gradient-to-br from-rose-500 via-purple-600 to-indigo-700 min-h-screen text-gray-800 font-[Inter]">
+  <div class="max-w-4xl mx-auto px-6 py-12 fade-in">
+    <h2 class="text-5xl font-extrabold text-white drop-shadow mb-10">🗑️ Hapus User</h2>
+
+    <form id="formHapus" action="/user/hapus" method="POST" class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 space-y-8 border border-white/20 transition-all duration-300 hover:shadow-3xl">
+      <div>
+        <label for="username" class="block text-xl font-semibold text-gray-700 mb-2">🆔 Username yang ingin dihapus</label>
+        <select name="username" id="username" class="form-input text-lg transition-all duration-300" required>
+          <option value="">-- Pilih User --</option>
+          <option value="aufa123">aufa123 - Aufa Lubis</option>
+          <option value="nabil456">nabil456 - Nabil Hakim</option>
+        </select>
+      </div>
+
+      <div class="flex justify-between items-center pt-4">
+        <button type="button" onclick="showConfirmModal()" id="hapusBtn"
+          class="bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out transform text-white text-lg font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled>
+          🚫 Hapus User
+        </button>
+        <span id="loader" class="hidden animate-spin border-4 border-red-300 border-t-white rounded-full w-8 h-8"></span>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal Konfirmasi -->
+  <div id="confirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+    <div class="bg-white w-[90%] max-w-md p-8 rounded-2xl text-center space-y-6 shadow-2xl animate-pop">
+      <h3 class="text-2xl font-bold text-red-600">⚠️ Konfirmasi Penghapusan</h3>
+      <p class="text-lg text-gray-700">Yakin ingin menghapus user ini? Tindakan ini tidak bisa dibatalkan.</p>
+      <div class="flex justify-center gap-6">
+        <button onclick="confirmDelete()" class="bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 text-white px-6 py-3 rounded-full font-semibold text-lg shadow-lg transition-all">🗑️ Hapus</button>
+        <button onclick="hideConfirmModal()" class="bg-gray-300 hover:bg-gray-400 active:scale-95 text-gray-800 px-6 py-3 rounded-xl font-semibold text-lg shadow hover:shadow-md transition-all">❌ Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg hidden opacity-0 transition-opacity duration-500 z-50 text-lg">
+    ✅ User berhasil dihapus!
+  </div>
+
+  <style>
+    .form-input {
+      @apply w-full mt-1 px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 bg-white;
+    }
+    @keyframes popUp {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-pop {
+      animation: popUp 0.3s ease-out;
+    }
+    #toast {
+      transition: opacity 0.4s ease-in-out;
+    }
+  </style>
+
+  <script>
+    const select = document.getElementById("username");
+    const hapusBtn = document.getElementById("hapusBtn");
+    const loader = document.getElementById("loader");
+
+    select.addEventListener("change", function () {
+      hapusBtn.disabled = this.value === "";
+    });
+
+    function showConfirmModal() {
+      document.getElementById("confirmModal").classList.remove("hidden");
+    }
+
+    function hideConfirmModal() {
+      document.getElementById("confirmModal").classList.add("hidden");
+    }
+
+    function confirmDelete() {
+      hideConfirmModal();
+      loader.classList.remove("hidden");
+      hapusBtn.disabled = true;
+
+      setTimeout(() => {
+        loader.classList.add("hidden");
+        showToast("✅ User berhasil dihapus!");
+        document.getElementById("formHapus").reset();
+        hapusBtn.disabled = true;
+      }, 1200);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.classList.remove("hidden");
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.classList.add("hidden"), 400);
+      }, 2500);
+    }
+  </script>
+</body>

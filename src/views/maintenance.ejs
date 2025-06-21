@@ -1,0 +1,117 @@
+<body class="bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 min-h-screen text-gray-800 font-[Inter]">
+
+  <div class="max-w-6xl mx-auto px-6 py-14 fade-in">
+    <h1 class="text-5xl font-extrabold text-white drop-shadow-xl mb-12 animate-bounce-slow">
+      🛠️ Pengaturan Maintenance Website
+    </h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <!-- Status Saat Ini -->
+      <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/30 hover:scale-[1.01] transition-all duration-300">
+        <h2 class="text-2xl font-bold text-yellow-700 mb-4">📊 Status Saat Ini</h2>
+        <div class="space-y-3 text-lg">
+          <p><strong>Status:</strong> 
+            <span class="inline-block bg-red-100 text-red-600 px-3 py-1 rounded-full font-semibold text-sm animate-pulse">Nonaktif</span>
+          </p>
+          <p><strong>Jadwal Berikutnya:</strong> <span class="text-gray-700">Belum dijadwalkan</span></p>
+        </div>
+      </div>
+
+      <!-- Form Maintenance -->
+      <form id="formMaint" action="/maintenance" method="POST" class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 space-y-6 border border-white/30 hover:shadow-yellow-300 transition-all duration-300">
+        <!-- Checkbox Aktifkan -->
+        <div>
+          <label class="inline-flex items-center cursor-pointer hover:scale-105 transition-transform duration-200">
+            <input type="checkbox" name="status" value="on" class="form-checkbox text-yellow-600 w-6 h-6 rounded focus:ring-2 focus:ring-yellow-500 transition" />
+            <span class="ml-3 font-semibold text-gray-800 text-lg">Aktifkan Mode Maintenance Sekarang</span>
+          </label>
+        </div>
+
+        <!-- Alasan -->
+        <div>
+          <label for="pesan" class="block font-semibold text-gray-800 text-lg mb-1">📝 Alasan Maintenance</label>
+          <textarea id="pesan" name="pesan" rows="4" class="form-input resize-none" placeholder="Contoh: Upgrade server untuk peningkatan performa..." required></textarea>
+        </div>
+
+        <!-- Jadwal -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label for="mulai" class="block font-semibold text-gray-800 text-lg mb-1">🕒 Waktu Mulai</label>
+            <input type="datetime-local" id="mulai" name="mulai" class="form-input" required />
+          </div>
+          <div>
+            <label for="selesai" class="block font-semibold text-gray-800 text-lg mb-1">🕔 Waktu Selesai</label>
+            <input type="datetime-local" id="selesai" name="selesai" class="form-input" required />
+          </div>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="text-right pt-4">
+          <button type="submit"
+            class="bg-yellow-600 hover:bg-yellow-700 active:scale-95 focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 text-white font-semibold text-lg px-7 py-3 rounded-full shadow-lg transition duration-200 ease-in-out">
+            💾 Simpan Pengaturan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-xl hidden transition-opacity duration-500 z-50 text-base">
+    ✅ Pengaturan maintenance berhasil disimpan!
+  </div>
+
+  <!-- Style -->
+  <style>
+    .form-input {
+      @apply w-full mt-1 px-5 py-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500 text-base transition;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .animate-bounce-slow {
+      animation: bounce 3s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+
+  <!-- Script -->
+  <script>
+    const form = document.getElementById("formMaint");
+    const toast = document.getElementById("toast");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // Simulasi pengiriman (ganti dengan fetch kalau pakai backend)
+      setTimeout(() => {
+        toast.classList.remove("hidden");
+        setTimeout(() => {
+          toast.classList.add("hidden");
+          form.reset();
+        }, 2500);
+      }, 800);
+    });
+  </script>
+</body>

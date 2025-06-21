@@ -1,0 +1,121 @@
+<body class="bg-gradient-to-br from-purple-300 to-indigo-600 min-h-screen text-gray-900 font-[Inter]">
+
+  <div class="max-w-7xl mx-auto px-6 md:px-12 py-16 bg-white/90 rounded-3xl shadow-2xl mt-12 mb-16 backdrop-blur-sm fade-in">
+    
+    <!-- Judul -->
+    <div class="mb-12 text-center">
+      <h1 class="text-5xl font-extrabold text-purple-800 drop-shadow mb-3 animate-bounce-slow"><%= lab.icon %> <%= lab.nama %></h1>
+      <p class="text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in-slow"><%= lab.deskripsi %></p>
+    </div>
+
+    <!-- Info Jadwal & Dosen -->
+    <div class="grid md:grid-cols-2 gap-8 mb-14">
+      <div class="bg-purple-100/90 p-8 rounded-2xl shadow-lg border border-purple-200 transform hover:scale-[1.02] transition duration-300 ease-in-out">
+        <h3 class="text-2xl font-bold text-purple-800 mb-2">📅 Jadwal Kelas Praktikum</h3>
+        <p class="text-lg text-gray-800"><%= lab.jadwal %></p>
+      </div>
+      <div class="bg-purple-100/90 p-8 rounded-2xl shadow-lg border border-purple-200 transform hover:scale-[1.02] transition duration-300 ease-in-out">
+        <h3 class="text-2xl font-bold text-purple-800 mb-2">👨‍🏫 Dosen Penanggung Jawab</h3>
+        <p class="text-lg text-gray-800"><%= lab.dosen %></p>
+      </div>
+    </div>
+
+    <!-- Statistik -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 text-center">
+      <div class="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-3xl shadow-xl border border-purple-300 hover:scale-105 transition-transform duration-300 ease-out">
+        <h4 class="text-xl font-semibold text-purple-900 mb-2">👥 Jumlah Asisten</h4>
+        <p class="text-4xl font-extrabold animate-count"><%= lab.jumlahAsisten %></p>
+      </div>
+      <div class="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-3xl shadow-xl border border-purple-300 hover:scale-105 transition-transform duration-300 ease-out">
+        <h4 class="text-xl font-semibold text-purple-900 mb-2">📚 Modul Praktikum</h4>
+        <p class="text-4xl font-extrabold animate-count"><%= lab.jumlahModul %></p>
+      </div>
+      <div class="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-3xl shadow-xl border border-purple-300 hover:scale-105 transition-transform duration-300 ease-out">
+        <h4 class="text-xl font-semibold text-purple-900 mb-2">🏫 Kelas Praktikum</h4>
+        <p class="text-4xl font-extrabold animate-count"><%= lab.jumlahKelas %></p>
+      </div>
+    </div>
+
+    <!-- Daftar Asisten -->
+    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-300 mb-12 hover:shadow-xl transition duration-300">
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">👨‍🔬 Daftar Asisten</h3>
+      <ul class="list-disc pl-6 text-gray-700 space-y-2 text-base">
+        <% lab.asisten.forEach(asisten => { %>
+          <li class="hover:translate-x-2 transition-all duration-200"><%= asisten %></li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <!-- Daftar Mahasiswa -->
+    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-300 mb-14 hover:shadow-xl transition duration-300">
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">🎓 Mahasiswa Terdaftar</h3>
+      <ul class="list-decimal pl-6 text-gray-700 space-y-2 text-base">
+        <% lab.mahasiswa.forEach(mhs => { %>
+          <li class="hover:translate-x-2 transition-all duration-200"><%= mhs %></li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <!-- Tombol Kembali -->
+    <div class="text-center">
+      <a href="/" class="inline-block bg-purple-700 hover:bg-purple-800 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition duration-200 hover:scale-105 active:scale-95">
+        ← Kembali ke Dashboard
+      </a>
+    </div>
+
+  </div>
+
+  <style>
+    .fade-in {
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-bounce-slow {
+      animation: bounce 3s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .animate-fade-in-slow {
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+
+    .animate-count {
+      animation: countUp 1s ease-out;
+    }
+
+    @keyframes countUp {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+</body>
