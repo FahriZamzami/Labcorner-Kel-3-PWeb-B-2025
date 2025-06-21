@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4); /* Fallback for older browsers */
+        padding-top: 60px;
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-purple-700 to-purple-500 font-sans">
+
+    <div class="flex min-h-screen justify-center items-center py-10">
+      <!-- Halaman Pilih Lab -->
+      <div class="text-white p-8 rounded-xl shadow-lg max-w-5xl w-full">
+        <h2 class="text-3xl font-bold mb-8 text-center">Pilih Lab dan Masukkan Kode Akses</h2>
+        
+        <!-- Daftar Lab -->
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Lab 1 -->
+          <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratory of Enterprise Application</h4>
+            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(1)">Masuk Kelas</button>
+          </div>
+
+          <!-- Lab 2 -->
+          <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratory of Geographic Information System</h4>
+            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(2)">Masuk Kelas</button>
+          </div>
+
+          <!-- Lab 3 -->
+          <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratorium Dasar Komputasi</h4>
+            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(3)">Masuk Kelas</button>
+          </div>
+
+          <!-- Lab 4 -->
+          <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratorium Business Intelligence</h4>
+            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(4)">Masuk Kelas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal untuk kode akses -->
+    <div id="modal-1" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal(1)">&times;</span>
+        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 1</h2>
+        <form action="/pilihLab/joinLab" method="POST">
+          <input type="hidden" name="labId" value="1" />
+          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
+          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-2" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal(2)">&times;</span>
+        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 2</h2>
+        <form action="/pilihLab/joinLab" method="POST">
+          <input type="hidden" name="labId" value="2" />
+          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
+          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-3" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal(3)">&times;</span>
+        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 3</h2>
+        <form action="/pilihLab/joinLab" method="POST">
+          <input type="hidden" name="labId" value="3" />
+          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
+          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-4" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal(4)">&times;</span>
+        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 4</h2>
+        <form action="/pilihLab/joinLab" method="POST">
+          <input type="hidden" name="labId" value="4" />
+          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
+          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Function to open the modal for the specific lab
+      function openModal(labId) {
+        document.getElementById('modal-' + labId).style.display = 'block';
+      }
+
+      // Function to close the modal for the specific lab
+      function closeModal(labId) {
+        document.getElementById('modal-' + labId).style.display = 'none';
+      }
+
+      // Close modal when clicking anywhere outside the modal content
+      window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+          event.target.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>

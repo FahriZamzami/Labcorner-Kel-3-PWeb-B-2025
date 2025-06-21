@@ -1,0 +1,41 @@
+<!-- src/views/tugas.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Labcorner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside class="w-60 bg-purple-900 text-white p-4">
+        <h1 class="text-xl font-bold mb-6">LABCORNER</h1>
+        <ul class="space-y-2">
+          <li><a href="#" class="block py-2">📘 Modul Materi</a></li>
+          <li><a href="#" class="block py-2 bg-purple-700 rounded px-2">📝 Tugas</a></li>
+          <li><a href="#" class="block py-2">📬 Kontak Lab</a></li>
+          <li><a href="#" class="block py-2">📤 Pengumpulan</a></li>
+          <li><a href="#" class="block py-2">📅 Jadwal Praktikum</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-8">
+        <h2 class="text-xl font-semibold mb-4">📘 Daftar Tugas</h2>
+
+        <div class="space-y-4">
+          <% daftarTugas.forEach((tugas) => { %>
+            <div class="bg-purple-100 p-4 rounded shadow flex justify-between items-center">
+              <div>
+                <h3 class="font-semibold text-purple-800"><%= tugas.judul %></h3>
+                <p class="text-sm text-gray-600">Jatuh Tempo: <%= tugas.deadline %></p>
+              </div>
+              <a href="/tugas/<%= tugas.id %>" class="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800">Lihat & Kumpulkan</a>
+            </div>
+          <% }) %>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
