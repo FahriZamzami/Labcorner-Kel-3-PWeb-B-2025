@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jadwal Praktikum</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-300 to-purple-600 min-h-screen font-sans">
+  <div class="flex">
+       <aside class="w-60 bg-gradient-to-b from-purple-900 to-purple-700 text-white p-4 space-y-6 rounded-r-3xl shadow-lg">
+      <div class="text-2xl font-bold mb-6">LABCORNER</div>
+      <ul class="space-y-4">
+         <a href="/lab" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-semibold">Home Lab</span>
+                </a>
+        <li class="hover:text-purple-200 cursor-pointer"> Modul Materi</li>
+        <li class="hover:text-purple-200 cursor-pointer"> Penugasan</li>
+        <li class="hover:text-purple-200 cursor-pointer font-bold"> Jadwal Praktikum</li>
+        <li class="hover:text-purple-200 cursor-pointer"> Daftar Mahasiswa</li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <!-- Search -->
+        <form method="GET" action="/api/mahasiswa" class="w-full md:w-1/2">
+          <input type="text" name="q" placeholder="Cari Nama Mahasiswa"
+            class="w-full p-3 rounded-full border border-gray-300 shadow-md" />
+        </form>
+
+        <!-- Filter & Export Controls -->
+        <div class="flex items-center space-x-2">
+          <select id="semesterSelect"
+            class="px-4 py-2 rounded-full shadow bg-white border border-gray-300 text-gray-800">
+            <option value="">Pilih Kelas</option>
+            <option value="Kelas A">Kelas A</option>
+            <option value="Kelas B">Kelas B</option>
+          </select>
+
+          <button id="rekapBtn" type="button"
+            class="bg-purple-800 text-white px-4 py-2 rounded-full shadow hover:bg-purple-900">
+            Rekap Absen
+          </button>
+
+          <div id="rekapOptions" class="hidden flex gap-2">
+            <a href="/api/export/pdf"
+              class="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700">PDF</a>
+            <a href="/api/export/excel"
+              class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700">Excel</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daftar Mahasiswa -->
+      <div class="bg-white p-6 rounded-xl shadow-xl">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Nama Anggota Kelas</h2>
+        <div class="space-y-3">
+          <% if (mahasiswa && mahasiswa.length === 0) { %>
+            <p class="text-center text-gray-500">Belum ada data mahasiswa untuk semester ini.</p>
+          <% } else if (mahasiswa) { %>
+            <% mahasiswa.forEach((m) => { %>
+              <form action="/api/update-status/<%= m.id %>" method="POST">
+                <div class="flex flex-wrap justify-between items-center px-6 py-3 rounded-full bg-gray-100">
+                  <span class="text-gray-700 font-medium mb-2 md:mb-0"><%= m.nama %></span>
+                  <div class="flex items-center gap-2">
+                    <select name="status" class="rounded-full px-3 py-1 border border-gray-300">
+                      <option value="Hadir" <%= m.status === 'Hadir' ? 'selected' : '' %>>Hadir</option>
+                      <option value="Tidak Hadir" <%= m.status === 'Tidak Hadir' ? 'selected' : '' %>>Tidak Hadir</option>
+                    </select>
+                    <button type="submit"
+                      class="px-4 py-1 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700">Update</button>
+                  </div>
+                </div>
+              </form> 
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Handle semester filter
+    document.getElementById('semesterSelect').addEventListener('change', function () {
+      if (this.value) {
+        window.location.href = `/api/filter-semester?semester=${this.value}`;
+      }
+    });
+
+    // Show export buttons on Rekap click
+    const rekapBtn = document.getElementById('rekapBtn');
+    const rekapOptions = document.getElementById('rekapOptions');
+    rekapBtn?.addEventListener('click', () => {
+      rekapOptions.classList.remove('hidden');
+      rekapBtn.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

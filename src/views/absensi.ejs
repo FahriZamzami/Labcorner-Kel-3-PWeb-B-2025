@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Mahasiswa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-300 to-purple-600 min-h-screen font-sans">
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-60 bg-gradient-to-b from-purple-900 to-purple-700 text-white p-4 space-y-6 rounded-r-3xl shadow-lg">
+      <div class="text-2xl font-bold mb-6">LABCORNER</div>
+      <ul class="space-y-4">
+         <a href="/lab" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-semibold">Home Lab</span>
+                </a>
+        <li class="hover:text-purple-200 cursor-pointer"> Modul Materi</li>
+        <li class="hover:text-purple-200 cursor-pointer"> Penugasan</li>
+        <li class="hover:text-purple-200 cursor-pointer"> Jadwal Praktikum</li>
+        <li class="hover:text-purple-200 cursor-pointer"> Daftar Mahasiswa</li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+      <div class="flex items-center justify-between mb-6">
+        <input type="text" placeholder="Cari Nama Mahasiswa" class="w-1/2 p-3 rounded-full border border-gray-300 shadow-md" />
+        <div class="flex items-center space-x-2">
+          <form action="/api/filter-semester" method="GET">
+            <select name="semester" onchange="this.form.submit()" class="px-4 py-2 rounded-full shadow bg-white">
+              <option disabled selected>Semester</option>
+              <option value="Genap 2025">Genap 2025</option>
+              <option value="Ganjil 2025">Ganjil 2025</option>
+              <option value="Genap 2024">Genap 2024</option>
+              <option value="Ganjil 2024">Ganjil 2024</option>
+              <option value="Genap 2023">Genap 2023</option>
+              <option value="Ganjil 2023">Ganjil 2023</option>
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow-xl">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Nama Anggota Kelas</h2>
+        <div class="space-y-3">
+          <% if (mahasiswa.length === 0) { %>
+            <p class="text-center text-gray-500">Belum ada data mahasiswa untuk semester ini.</p>
+          <% } else { %>
+            <% mahasiswa.forEach((m, index) => { %>
+              <form action="/api/update-status/<%= index %>" method="POST">
+                <div class="flex justify-between items-center px-6 py-2 rounded-full bg-gray-100">
+                  <span class="text-gray-700"><%= m.nama %></span>
+                  <select name="status" class="rounded-full px-3 py-1 border border-gray-300">
+                    <option value="Hadir" <%= m.status === 'Hadir' ? 'selected' : '' %>>Hadir</option>
+                    <option value="Alfa" <%= m.status === 'Alfa' ? 'selected' : '' %>>Alfa</option>
+                    <option value="Sakit" <%= m.status === 'Sakit' ? 'selected' : '' %>>Sakit</option>
+                    <option value="Izin" <%= m.status === 'Izin' ? 'selected' : '' %>>Izin</option>
+                  </select>
+                  <button type="submit" class="ml-2 px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Update</button>
+                </div>
+              </form>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
