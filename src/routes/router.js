@@ -25,7 +25,6 @@ router.get('/lab/:id', labController.showHomeClassPage);
 router.get('/mahasiswa', mahasiswa.searchMahasiswa);
 router.get('/filter-semester', mahasiswa.getMahasiswaBySemester);
 router.post('/update-status/:id', mahasiswa.updateStatusMahasiswa);
-router.get('/mahasiswa/rekap', mahasiswa.getDaftarMahasiswa);
 
 // === Export Routes ===
 router.get('/export/pdf', ekspor.exportPDF);
