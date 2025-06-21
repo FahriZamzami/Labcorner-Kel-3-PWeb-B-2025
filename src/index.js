@@ -6,6 +6,7 @@ const { getAllAssignments } = require('./controllers/assignment.controller');
 const { login } = require('./controllers/authentication.controller');
 const { isAuthenticated } = require('./middlewares/auth');
 const { labPage, showHomeClassPage } = require('./controllers/lab.controller');
+const mahasiswaRouter = require('./routes/mahasiswa');
 
 const app = express();
 const port = 3000;
@@ -37,6 +38,7 @@ app.post('/login', login);
 
 // Proteksi semua route selanjutnya
 app.use(isAuthenticated);
+app.use('/mahasiswa', mahasiswaRouter);
 
 // API route utama
 app.use('/api', router);
@@ -60,9 +62,9 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// Redirect shortcut (tanpa prefix /api)
-app.get('/mahasiswa', (req, res) => res.redirect('/api/mahasiswa'));
-app.get('/mahasiswa/rekap', (req, res) => res.redirect('/api/mahasiswa/rekap'));
+// // Redirect shortcut (tanpa prefix /api)
+// app.get('/mahasiswa', (req, res) => res.redirect('/api/mahasiswa'));
+// app.get('/mahasiswa/rekap', (req, res) => res.redirect('/api/mahasiswa/rekap'));
 
 // Start server
 app.listen(port, () => {

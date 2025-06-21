@@ -1,0 +1,19 @@
+<h2><%= lab.namaLab %> — Semester <%= lab.semester %></h2>
+
+<h3>Absensi</h3>
+<ul>
+  <li>Hadir: <%= absensi.hadir %></li>
+  <li>Izin: <%= absensi.izin %></li>
+  <li>Sakit: <%= absensi.sakit %></li>
+  <li>Alfa: <%= absensi.alfa %></li>
+</ul>
+
+<h3>Nilai</h3>
+<ul>
+  <% ['Responsi', 'Kuis', 'Instruksi'].forEach(jenis => { %>
+    <li>
+      <%= jenis %>: 
+      <%= nilai.find(n => n.jenis === jenis)?.skor ?? '-' %>
+    </li>
+  <% }) %>
+</ul>

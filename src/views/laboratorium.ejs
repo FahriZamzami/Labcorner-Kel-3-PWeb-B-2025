@@ -1,0 +1,10 @@
+<h1 class="text-xl">Pilih Laboratorium</h1>
+<ul>
+  <% jadwal.forEach(j => { %>
+    <li>
+      <a href="/mahasiswa/laboratorium/<%= j.id %>">
+        <%= j.namaLab %> — <%= j.semester %>
+      </a>
+    </li>
+  <% }) %>
+</ul>
