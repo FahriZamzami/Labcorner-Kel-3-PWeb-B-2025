@@ -6,8 +6,25 @@ const fs = require('fs');
 const createAssignment = async (req, res) => {
     try {
         const { judul, deskripsi, tanggal, jam, otomatis } = req.body;
+
+        console.log('📅 tanggal:', tanggal);
+        console.log('⏰ jam:', jam);
+
+
+        const dateStr = `${tanggal}T${jam}`;
+        console.log('🧪 dateStr:', dateStr);
+
+        const parsedDate = new Date(dateStr);
+        console.log('🎯 parsedDate:', parsedDate);
+        console.log('🧯 getTime:', parsedDate.getTime());
+
+        if (isNaN(parsedDate.getTime())) {
+            return res.status(400).send('Format tanggal/jam tidak valid.');
+        }
+
+        const batas_waktu = parsedDate;
+
         const praktikum_id = parseInt(req.body.praktikum_id || req.session.idKelasDipilih);
-        const batas_waktu = new Date(`${tanggal}T${jam}`);
         let fileTugas = null;
 
         if (req.file) {
@@ -110,36 +127,84 @@ const toggleStatusAssignments = async (req, res) => {
 const editAssignmentForm = async (req, res) => {
     const id = Number(req.params.id);
     const assignment = await prisma.tugas.findUnique({ where: { id } });
+
     if (!assignment) return res.status(404).send('Penugasan tidak ditemukan');
+
+    console.log("🧪 tutup_penugasan dari DB:", assignment.tutup_penugasan); // 👈 CEK INI
 
     const praktikum = await prisma.praktikum.findUnique({
         where: { id: assignment.praktikum_id }
     });
 
-    res.render('editAssignment', { assignment, praktikum });
+    // Format tanggal & jam untuk input form
+    const batasWaktu = new Date(assignment.batas_waktu);
+    const tgl = batasWaktu.toISOString().split('T')[0]; // Format YYYY-MM-DD
+    const jam = batasWaktu.toTimeString().slice(0, 5);   // Format HH:MM
+
+    res.render('editAssignment', {
+        assignment,
+        praktikum,
+        tgl,
+        jam
+    });
+
 };
 
+// Update assignment
 // Update assignment
 const updateAssignment = async (req, res) => {
     const id = Number(req.params.id);
     const { judul, deskripsi, tanggal, jam, otomatis } = req.body;
 
-    const batas_waktu = new Date(`${tanggal}T${jam}`);
-    const fileTugas = req.file ? req.file.filename : undefined;
+    const dateStr = `${tanggal}T${jam}`;
+    const parsedDate = new Date(dateStr);
 
-    await prisma.tugas.update({
-        where: { id },
-        data: {
-            judul,
-            deskripsi,
-            batas_waktu,
-            tutup_penugasan: otomatis === 'on',
-            ...(fileTugas && { fileTugas })
+    if (isNaN(parsedDate.getTime())) {
+        return res.status(400).send('Format tanggal/jam tidak valid.');
+    }
+
+    const batas_waktu = parsedDate;
+    let fileTugas = req.file ? req.file.filename : undefined;
+
+    // Jika user ingin menghapus file
+    if (req.body.hapusFile === 'true') {
+        const old = await prisma.tugas.findUnique({ where: { id } });
+        if (old?.fileTugas) {
+            const oldPath = path.join(__dirname, '../../public/uploads', old.fileTugas);
+            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
         }
-    });
+        fileTugas = null;
+    }
 
-    res.redirect(`/penugasan/detail/${id}`);
+    try {
+        // Hapus file lama kalau ada file baru
+        if (fileTugas && req.file) {
+            const old = await prisma.tugas.findUnique({ where: { id } });
+            if (old?.fileTugas) {
+                const oldPath = path.join(__dirname, '../../public/uploads', old.fileTugas);
+                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+            }
+        }
+
+        // ✅ Bagian ini yang kamu ganti
+        await prisma.tugas.update({
+            where: { id },
+            data: {
+                judul,
+                deskripsi,
+                batas_waktu,
+                tutup_penugasan: otomatis === 'on',
+                fileTugas: typeof fileTugas !== 'undefined' ? fileTugas : undefined
+            }
+        });
+
+        res.redirect(`/penugasan/detail/${id}`);
+    } catch (err) {
+        console.error('Gagal update assignment:', err);
+        res.status(500).send('Gagal memperbarui assignment.');
+    }
 };
+
 
 // Hapus assignment
 const deleteAssignment = async (req, res) => {
@@ -294,6 +359,92 @@ const getFilesByTugasId = async (req, res) => {
     }
 };
 
+const beriNilaiForm = async (req, res) => {
+    const pengumpulanId = Number(req.params.id);
+
+    try {
+        const pengumpulan = await prisma.pengumpulan.findUnique({
+            where: { id: pengumpulanId },
+            include: {
+                user: true,
+                tugas: true
+            }
+        });
+
+        if (!pengumpulan) return res.status(404).send('Data pengumpulan tidak ditemukan');
+
+        const praktikum = await prisma.praktikum.findUnique({
+            where: { id: pengumpulan.tugas.praktikum_id }
+        });
+
+        pengumpulan.dikumpulkan_pada = pengumpulan.waktu_kirim;
+
+        // ✅ Tambahkan path dan nama file untuk digunakan di EJS
+        pengumpulan.nama_file = pengumpulan.file_path;
+        pengumpulan.path_file = pengumpulan.file_path;
+
+        res.render('beriNilai', {
+            pengumpulan,
+            praktikum,
+            user: req.session.user
+        });
+    } catch (err) {
+        console.error('❌ Gagal render form nilai:', err);
+        res.status(500).send('Terjadi kesalahan saat mengambil data untuk penilaian');
+    }
+};
+
+// Proses simpan nilai dan catatan
+const simpanNilai = async (req, res) => {
+    const id = Number(req.params.id);
+    const { nilai, catatan } = req.body;
+
+    // Validasi input nilai
+    if (!nilai || isNaN(nilai) || nilai < 0 || nilai > 100) {
+        return res.status(400).send('Nilai harus berupa angka antara 0 - 100');
+    }
+
+    try {
+        const pengumpulan = await prisma.pengumpulan.update({
+            where: { id },
+            data: {
+                nilai: parseFloat(nilai),
+                catatan: catatan?.trim() || null
+            }
+        });
+
+        res.redirect(`/assignments/${pengumpulan.tugas_id}/pengumpulan`);
+    } catch (err) {
+        console.error('❌ Gagal menyimpan nilai:', err);
+        res.status(500).send('Gagal menyimpan nilai');
+    }
+};
+
+const hapusFile = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const tugas = await prisma.tugas.findUnique({ where: { id: parseInt(id) } });
+
+        if (tugas?.fileTugas) {
+            const filePath = path.join(__dirname, '../../public/uploads', tugas.fileTugas);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+
+            await prisma.tugas.update({
+                where: { id: parseInt(id) },
+                data: { fileTugas: null },
+            });
+        }
+
+        res.redirect(`/penugasan/edit/${id}`);
+    } catch (error) {
+        console.error('Gagal hapus file:', error);
+        res.status(500).send('Terjadi kesalahan saat menghapus file.');
+    }
+};
+
 // Ekspor fungsi
 module.exports = {
     createAssignment,
@@ -305,5 +456,8 @@ module.exports = {
     detailAssignment,
     autoCloseAssignments,
     getPengumpulanByTugasId,
-    getFilesByTugasId
+    getFilesByTugasId,
+    beriNilaiForm,
+    simpanNilai,
+    hapusFile
 };

@@ -17,32 +17,49 @@
 <body class="bg-[#F9F5FF]">
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4 flex-shrink-0">
-            <div class="flex items-center justify-between p-4">
-                <h1 class="text-2xl font-bold tracking-wider">LABCORNER</h1>
+        <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold mb-8 tracking-wider">LABCORNER</h1>
             </div>
-            <nav class="flex-1 px-2 mt-8 space-y-3">
-                <a href="/lab" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span class="font-medium">Home Lab</span>
-                </a>
-                <a href="/kelas/<%= praktikum.id %>" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10H6C4.89543 10 4 10.8954 4 12V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V12C20 10.8954 19.1046 10 18 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10V4M9 4H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span class="font-medium">Praktikum Data Mining B 2024</span>
-                </a>
-                <a href="/kelas/<%= praktikum.id %>/materi" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10 ml-6">
-                    <span class="font-medium">Modul Materi</span>
-                </a>
-                <!-- Item Aktif -->
-                <a href="/kelas/<%= praktikum.id %>/penugasan" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20 ml-6">
-                    <span class="font-semibold">Penugasan</span>
-                </a>
-                <a href="/kelas/<%= praktikum.id %>/jadwal" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10 ml-6">
-                    <span class="font-medium">Jadwal Praktikum</span>
-                </a>
-                <a href="/kelas/<%= praktikum.id %>/mahasiswa" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10 ml-6">
-                    <span class="font-medium">Daftar Mahasiswa</span>
-                </a>
+            <nav class="flex-1 px-2">
+                <ul class="space-y-3">
+                    <li>
+                        <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="font-medium">Home Lab</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10H6C4.89543 10 4 10.8954 4 12V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V12C20 10.8954 19.1046 10 18 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10V4M9 4H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="font-medium">Praktikum Data Mining B 2024</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="font-medium">Modul Materi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/assignments" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.25 2H8.75C8.05964 2 7.5 2.55964 7.5 3.25V20.75C7.5 21.4404 8.05964 22 8.75 22H15.25C15.9404 22 16.5 21.4404 16.5 20.75V3.25C16.5 2.55964 15.9404 2 15.25 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 18.5H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="font-semibold">Penugasan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2V5M16 2V5M3 8H21M5 22H19C20.1046 22 21 21.1046 21 20V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V20C3 21.1046 3.89543 22 5 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="font-medium">Jadwal Praktikum</span>
+                        </a>
+                    </li>
+                        <li>
+                        <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21V19C22.9992 18.1137 22.7094 17.2523 22.1812 16.5518C21.653 15.8512 20.9202 15.3552 20 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13C16.9205 3.35519 17.6535 3.85101 18.1818 4.55149C18.7099 5.25197 19.0001 6.11361 19 7C19 8.24354 18.4111 9.38831 17.4332 10.1638" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="font-medium">Daftar Mahasiswa</span>
+                        </a>
+                    </li>
+                </ul>
             </nav>
         </aside>
 
@@ -69,30 +86,48 @@
                         <%# Pastikan Anda mengirim objek 'assignment' dan 'praktikum' dari controller %>
                         <% if (assignment) { %>
                             <form action="/penugasan/edit/<%= assignment.id %>" method="POST" enctype="multipart/form-data">
+                                <!-- Input Judul -->
                                 <div class="mb-5">
                                     <label class="block text-gray-700 text-sm font-bold mb-2" for="judul">Judul</label>
                                     <input name="judul" id="judul" class="appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" value="<%= assignment.judul %>" required>
                                 </div>
 
+                                <!-- Input Deskripsi -->
                                 <div class="mb-5">
                                     <label class="block text-gray-700 text-sm font-bold mb-2" for="deskripsi">Deskripsi</label>
                                     <textarea name="deskripsi" id="deskripsi" rows="4" class="appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500"><%= assignment.deskripsi %></textarea>
                                 </div>
 
+                                <!-- Tambah File -->
                                 <div class="mb-8">
                                     <label class="block text-gray-700 text-sm font-bold mb-2">Tambah File</label>
                                     <div class="flex items-center gap-4">
                                         <div class="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-3 flex items-center gap-3">
                                             <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                            <span class="text-gray-700" id="file-name"><%= assignment.nama_file || 'Tidak ada file terunggah' %></span>
+                                            <div id="file-display" class="flex items-center gap-3">
+                                                <% if (assignment.fileTugas) { %>
+                                                    <a href="/uploads/<%= assignment.fileTugas %>" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                                        <%= assignment.fileTugas %>
+                                                    </a>
+                                                    <button type="button" class="text-red-500 hover:text-red-700" onclick="hapusFileTugas()">
+                                                        Hapus File
+                                                    </button>
+                                                <% } else { %>
+                                                    <span class="text-gray-700" id="file-name">Tidak ada file terunggah</span>
+                                                <% } %>
+                                            </div>
                                         </div>
                                         <label for="fileTugas" class="cursor-pointer bg-purple-200 text-purple-700 p-3 rounded-lg hover:bg-purple-300">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path></svg>
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path></svg>
                                         </label>
                                         <input name="fileTugas" id="fileTugas" type="file" class="hidden">
                                     </div>
                                 </div>
 
+                                <!-- Hidden input untuk hapus file -->
+                                <input type="hidden" name="hapusFile" id="hapusFile" value="false">
+
+                                <!-- Tenggat waktu dan toggle -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-6 mb-5">
                                     <div>
                                         <label class="block text-gray-700 text-sm font-bold mb-2">Tenggat Waktu</label>
@@ -105,13 +140,14 @@
                                         </div>
                                     </div>
                                     <div class="flex items-end mt-4 md:mt-0">
-                                            <label class="inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" name="otomatis" class="form-checkbox h-5 w-5 rounded text-purple-600 border-gray-400 focus:ring-purple-500" <%= assignment.otomatis ? 'checked' : '' %>>
-                                            <span class="ml-3 text-gray-700">Waktu Tutup Penugasan</span>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="otomatis" class="form-checkbox h-5 w-5 rounded text-purple-600 border-gray-400 focus:ring-purple-500" <%= assignment.tutup_penugasan ? 'checked' : '' %>>
+                                            <span class="ml-3 text-gray-700">Otomatis Tutup Penugasan</span>
                                         </label>
                                     </div>
                                 </div>
-                                
+
+                                <!-- Tombol Simpan / Batal -->
                                 <div class="flex items-center justify-between mt-10">
                                     <button type="button" onclick="document.getElementById('deleteForm').submit()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Hapus</button>
                                     <div class="flex items-center gap-4">
@@ -140,6 +176,14 @@
                 fileNameDisplay.textContent = this.files[0].name;
             }
         });
+    }
+
+    function hapusFileTugas() {
+        const confirmDelete = confirm('Yakin ingin menghapus file ini?');
+        if (confirmDelete) {
+            document.getElementById('hapusFile').value = "true";
+            document.getElementById('file-display').innerHTML = '<span class="text-gray-700">Tidak ada file terunggah</span>';
+        }
     }
 </script>
 </body>

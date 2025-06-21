@@ -90,13 +90,15 @@
                                 <textarea name="deskripsi" id="deskripsi" rows="4" class="appearance-none bg-white border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
                             </div>
 
-                                <div class="mb-6">
-                                <label class="block text-gray-800 text-sm font-semibold mb-2">Tambah File</label>
-                                <label for="fileTugas" class="cursor-pointer text-sm text-blue-600 hover:text-blue-800 font-medium">
-                                    Impor dari Penyimpanan lokal
+                            <div class="mb-6">
+                                <label class="block text-gray-800 text-sm font-semibold mb-2">File Penugasan</label>
+                                <label for="fileTugas" class="cursor-pointer inline-flex items-center gap-3 bg-purple-100 border border-purple-300 rounded-lg px-4 py-3 hover:bg-purple-200 transition-colors">
+                                    <svg class="h-6 w-6 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span id="fileLabel" class="text-purple-800 font-medium">Impor dari Penyimpanan Lokal</span>
                                 </label>
                                 <input name="fileTugas" id="fileTugas" type="file" class="hidden">
-                                <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-6">
@@ -127,10 +129,10 @@
     </div>
 
     <script>
-    document.getElementById('fileTugas').addEventListener('change', function () {
-        const fileName = this.files[0]?.name || "Tidak ada file yang dipilih";
-        document.getElementById('fileName').textContent = `File dipilih: ${fileName}`;
-    });
-</script>
+        document.getElementById('fileTugas').addEventListener('change', function () {
+            const fileName = this.files[0]?.name || "Impor dari Penyimpanan Lokal";
+            document.getElementById('fileLabel').textContent = `${fileName}`;
+        });
+    </script>
 </body>
 </html>

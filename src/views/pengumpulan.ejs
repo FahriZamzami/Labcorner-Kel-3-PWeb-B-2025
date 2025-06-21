@@ -124,10 +124,18 @@
                                             <p class="text-sm text-gray-500"><%= sub.hari %>, <%= sub.tanggal %> <%= sub.jam %></p>
                                         </div>
                                     </div>
-                                    <span class="px-4 py-1.5 text-sm font-semibold rounded-full 
-                                        <%= terlambat ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' %>">
-                                        <%= terlambat ? 'Terlambat' : 'Tepat Waktu' %>
-                                    </span>
+                                    <div class="flex items-center gap-4">
+                                        <span class="px-4 py-1.5 text-sm font-semibold rounded-full 
+                                            <%= terlambat ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' %>">
+                                            <%= terlambat ? 'Terlambat' : 'Tepat Waktu' %>
+                                        </span>
+
+                                        <!-- Tombol Beri Nilai -->
+                                        <a href="/assignments/nilai/<%= sub.id %>" 
+                                            class="text-sm text-purple-700 hover:underline font-medium">
+                                            Beri Nilai
+                                        </a>
+                                    </div>
                                 </div>
                             <% }) %>
                         <% } else { %>

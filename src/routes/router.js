@@ -9,6 +9,9 @@ router.post('/assignments', upload.single('fileTugas'), assignmentsController.cr
 router.patch('/assignments/:id/toggle-status', assignmentsController.toggleStatusAssignments);
 router.get('/assignments/:id/pengumpulan', assignmentsController.getPengumpulanByTugasId);
 router.get('/assignments/:id/files', assignmentsController.getFilesByTugasId);
+router.get('/assignments/nilai/:id', assignmentsController.beriNilaiForm);
+router.post('/assignments/nilai/:id', assignmentsController.simpanNilai);
+router.post('/penugasan/:id/hapus-file', assignmentsController.hapusFile);
 
 // === Auth Routes ===
 const authenticationController = require('../controllers/authentication.controller');

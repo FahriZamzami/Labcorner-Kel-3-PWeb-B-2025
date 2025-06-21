@@ -12,7 +12,9 @@ const {
     deleteAssignment,
     detailAssignment,
     getPengumpulanByTugasId,
-    getFilesByTugasId
+    getFilesByTugasId,
+    beriNilaiForm,
+    simpanNilai
 } = require('./controllers/assignment.controller');
 
 const { login } = require('./controllers/authentication.controller');
@@ -30,6 +32,22 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
+
+const fs = require('fs');
+
+// Route download file aman
+app.get('/download/:filename', (req, res) => {
+    const filename = decodeURIComponent(req.params.filename);
+    const filePath = path.join(__dirname, '..', 'public', 'uploads', filename);
+
+    console.log("🔽 File path requested:", filePath);
+
+    if (fs.existsSync(filePath)) {
+        res.download(filePath, filename);
+    } else {
+        res.status(404).send('File tidak ditemukan');
+    }
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -64,6 +82,8 @@ app.post('/penugasan/delete/:id', deleteAssignment);
 // === Pengumpulan (Submissions) ===
 app.get('/assignments/:id/pengumpulan', getPengumpulanByTugasId);
 app.get('/assignments/:id/files', getFilesByTugasId);
+app.get('/assignments/nilai/:id', beriNilaiForm);  // ✅ Tambah ini
+app.post('/assignments/nilai/:id', simpanNilai); // ✅ Tambah ini juga
 
 // === Lab & Kelas ===
 app.get('/lab', labPage);

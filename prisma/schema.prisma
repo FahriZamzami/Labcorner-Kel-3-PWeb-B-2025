@@ -61,6 +61,7 @@ model asistenLab {
 model praktikum {
   id             Int           @id @default(autoincrement())
   nama_praktikum String
+  kode_masuk     String        @unique
   lab_id         Int
   dibuat_pada    DateTime      @default(now())
 

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beri Nilai - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4 flex-shrink-0">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold mb-8 tracking-wider">LABCORNER</h1>
+            </div>
+            <nav class="flex-1 px-2">
+                <!-- Sidebar navigation should be dynamically generated based on user role and context -->
+                <a href="/lab" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">Home Lab</a>
+                <a href="/kelas/<%= praktikum.id %>" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">Praktikum Data Mining B 2024</a>
+                <a href="/kelas/<%= praktikum.id %>/penugasan" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 ml-6">Penugasan</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Header -->
+            <header class="flex items-center justify-between py-3 px-6 bg-white shadow-sm sticky top-0 z-20">
+                <h2 class="text-xl font-semibold text-gray-800">LABCORNER</h2>
+                <div class="flex items-center space-x-5">
+                    <svg class="h-9 w-9" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="#E2D9FE" stroke="#6D28D9" stroke-width="4"/><path d="M50 10 L90 50 L50 90 L10 50 Z" fill="#C4B5FD"/><path d="M50 30 L70 50 L50 70 L30 50 Z" fill="#8B5CF6"/><circle cx="50" cy="50" r="10" fill="#F0F9FF"/></svg>
+                    <svg class="h-6 w-6 text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="relative">
+                        <svg class="h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.33 4 18V20H20V18C20 15.33 14.67 14 12 14Z"/></svg>
+                        <span class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#A855F7] text-xs font-bold text-white ring-2 ring-white">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="flex-1 p-10">
+                <% if (pengumpulan) { %>
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <h1 class="text-2xl font-bold text-gray-800 mb-6"><%= pengumpulan.tugas.judul %></h1>
+
+                        <div class="bg-[#F3E8FF] rounded-xl p-6">
+                            <!-- Info Mahasiswa dan Waktu -->
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-gray-200 p-2 rounded-full">
+                                        <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-800"><%= pengumpulan.user.username %></p>
+                                        <p class="text-sm text-gray-500"><%= pengumpulan.user.id %></p> <!-- atau info lain dari kolom user -->
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <% const submissionDate = new Date(pengumpulan.dikumpulkan_pada); %>
+                                    <p class="text-sm font-medium text-gray-600"><%= submissionDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+                                    <p class="text-sm text-gray-500"><%= submissionDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace('.',':') %></p>
+                                </div>
+                            </div>
+
+                            <!-- File yang Dikumpulkan -->
+                            <% if (pengumpulan.path_file) { %>
+                                <div class="mb-8">
+                                    <h3 class="text-lg font-bold text-gray-700 mb-2">File yang Dikumpulkan</h3>
+                                    <a href="/download/<%= encodeURIComponent(pengumpulan.path_file) %>" class="inline-flex items-center gap-3 bg-purple-100 border border-purple-300 rounded-lg px-4 py-3 hover:bg-purple-200 transition-colors">
+                                        <svg class="h-6 w-6 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <span class="text-purple-800 font-medium"><%= pengumpulan.nama_file %></span>
+                                    </a>
+                                </div>
+                            <% } %>
+
+                            <!-- Form Penilaian -->
+                            <form action="/assignments/nilai/<%= pengumpulan.id %>" method="POST">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <div class="md:col-span-1">
+                                        <label for="nilai" class="block text-sm font-bold text-gray-700 mb-2">Nilai</label>
+                                        <input type="number" id="nilai" name="nilai" value="<%= pengumpulan.nilai ?? '' %>" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" min="0" max="100">
+                                    </div>
+                                    <div class="md:col-span-3">
+                                        <label for="catatan" class="block text-sm font-bold text-gray-700 mb-2">Komentar</label>
+                                        <textarea id="catatan" name="catatan" rows="4" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Beri masukan atau komentar..."><%= pengumpulan.catatan ?? '' %></textarea>
+                                    </div>
+                                </div>
+                                <div class="mt-8 flex justify-end gap-4">
+                                    <a href="/assignments/<%= pengumpulan.tugas.id %>/pengumpulan" class="px-8 py-3 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300">Batal</a>
+                                    <button type="submit" class="px-8 py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-black border border-gray-300">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <p class="text-center text-gray-600">Data pengumpulan tidak ditemukan.</p>
+                <% } %>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
