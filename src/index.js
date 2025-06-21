@@ -14,8 +14,16 @@ const {
     getPengumpulanByTugasId,
     getFilesByTugasId,
     beriNilaiForm,
-    simpanNilai
+    simpanNilai,
+    createAssignmentForm
 } = require('./controllers/assignment.controller');
+
+const {
+  // ... sebelumnya
+    exportRekapPDF,
+    exportRekapExcel,
+    tampilkanRekapNilai
+} = require('./controllers/praktikum.controller');
 
 const { login } = require('./controllers/authentication.controller');
 const { isAuthenticated } = require('./middlewares/auth');
@@ -67,13 +75,14 @@ app.post('/login', login);
 
 // 🔒 Auth middleware untuk semua route setelah login
 app.use(isAuthenticated);
+const setCurrentPath = require('./middlewares/currentPage');
+app.use(setCurrentPath);
 
 
+app.get('/assignments/create', createAssignmentForm);
 // === Assignment Routes ===
 app.get('/assignments', getAllAssignments);
-app.get('/assignments/create', (req, res) => {
-    res.render('addAssignment', { user: req.session.user });
-});
+
 app.get('/assignments/:id/edit', editAssignmentForm);
 app.get('/penugasan/detail/:id', detailAssignment);
 app.post('/penugasan/edit/:id', upload.single('fileTugas'), updateAssignment);
@@ -84,6 +93,10 @@ app.get('/assignments/:id/pengumpulan', getPengumpulanByTugasId);
 app.get('/assignments/:id/files', getFilesByTugasId);
 app.get('/assignments/nilai/:id', beriNilaiForm);  // ✅ Tambah ini
 app.post('/assignments/nilai/:id', simpanNilai); // ✅ Tambah ini juga
+
+app.get('/praktikum/:id/rekap-nilai', tampilkanRekapNilai);
+app.get('/praktikum/:id/rekap-nilai/pdf', exportRekapPDF);     // ✅ route PDF
+app.get('/praktikum/:id/rekap-nilai/excel', exportRekapExcel); // ✅ route Excel
 
 // === Lab & Kelas ===
 app.get('/lab', labPage);

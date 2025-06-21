@@ -89,9 +89,14 @@ const getAllAssignments = async (req, res) => {
             orderBy: { dibuat_pada: 'asc' }
         });
 
+        const praktikum = await prisma.praktikum.findUnique({
+            where: { id: praktikumId }
+        });
+
         res.render('daftarAssignments', {
             assignments,
-            user: req.session.user
+            user: req.session.user,
+            praktikum // ⬅️ dikirim ke EJS
         });
     } catch (error) {
         console.error('Gagal mengambil assignment:', error);
@@ -445,6 +450,28 @@ const hapusFile = async (req, res) => {
     }
 };
 
+// Tambah: Menampilkan form tambah assignment
+const createAssignmentForm = async (req, res) => {
+    try {
+        const praktikumId = parseInt(req.session.idKelasDipilih);
+        if (!praktikumId) {
+        return res.status(400).send('Kelas belum dipilih');
+        }
+
+        const praktikum = await prisma.praktikum.findUnique({
+        where: { id: praktikumId }
+        });
+
+        res.render('../views/addAssignment', {
+        praktikum,
+        user: req.session.user
+        });
+    } catch (err) {
+        console.error('❌ Gagal render form tambah assignment:', err);
+        res.status(500).send('Terjadi kesalahan.');
+    }
+};
+
 // Ekspor fungsi
 module.exports = {
     createAssignment,
@@ -459,5 +486,6 @@ module.exports = {
     getFilesByTugasId,
     beriNilaiForm,
     simpanNilai,
-    hapusFile
+    hapusFile,
+    createAssignmentForm
 };

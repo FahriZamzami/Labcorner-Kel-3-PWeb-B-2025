@@ -1,0 +1,56 @@
+<aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4">
+    <div class="p-4">
+        <h1 class="text-2xl font-bold mb-8 tracking-wider">LABCORNER</h1>
+    </div>
+    <nav class="flex-1 px-2">
+        <ul class="space-y-3">
+        <li>
+            <a href="/lab"
+            class="<%= currentPath.startsWith('/lab') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+            <!-- ICON -->
+            <span class="font-medium">Home Lab</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="/kelas/<%= praktikum?.id || '' %>" class="<%= currentPath.startsWith('/kelas') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+            <!-- ICON -->
+            <span class="font-medium"><%= praktikum?.nama_praktikum || 'Praktikum' %></span>
+            </a>
+        </li>
+
+        <li>
+            <a href="/modul"
+            class="<%= currentPath.startsWith('/modul') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+            <!-- ICON -->
+            <span class="font-medium">Modul Materi</span>
+            </a>
+        </li>
+
+        <li>
+            <% const isAssignmentPage = currentPath.startsWith('/assignments') || currentPath.startsWith('/penugasan'); %>
+            <a href="/assignments"
+                class="<%= isAssignmentPage ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                <!-- ICON -->
+                <span class="font-semibold">Penugasan</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="/jadwal"
+            class="<%= currentPath.startsWith('/jadwal') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+            <!-- ICON -->
+            <span class="font-medium">Jadwal Praktikum</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="/mahasiswa"
+            class="<%= currentPath.startsWith('/mahasiswa') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+            <!-- ICON -->
+            <span class="font-medium">Daftar Mahasiswa</span>
+            </a>
+        </li>
+        </ul>
+    </nav>
+</aside>

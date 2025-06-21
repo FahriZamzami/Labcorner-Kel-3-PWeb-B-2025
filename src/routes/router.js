@@ -12,6 +12,12 @@ router.get('/assignments/:id/files', assignmentsController.getFilesByTugasId);
 router.get('/assignments/nilai/:id', assignmentsController.beriNilaiForm);
 router.post('/assignments/nilai/:id', assignmentsController.simpanNilai);
 router.post('/penugasan/:id/hapus-file', assignmentsController.hapusFile);
+router.get('/assignments/create', assignmentsController.createAssignmentForm);
+
+const praktikumController = require('../controllers/praktikum.controller');
+router.get('/praktikum/:id/rekap-nilai', praktikumController.tampilkanRekapNilai);
+router.get('/praktikum/:id/rekap-nilai/excel', praktikumController.exportRekapExcel);
+router.get('/praktikum/:id/rekap-nilai/pdf', praktikumController.exportRekapPDF);
 
 // === Auth Routes ===
 const authenticationController = require('../controllers/authentication.controller');

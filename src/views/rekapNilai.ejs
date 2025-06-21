@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Nilai - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Header -->
+            <header class="flex items-center justify-between py-3 px-6 bg-white shadow-sm sticky top-0 z-20">
+                <h2 class="text-xl font-semibold text-gray-800">LABCORNER</h2>
+                <div class="flex items-center space-x-5">
+                    <svg class="h-9 w-9" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="#E2D9FE" stroke="#6D28D9" stroke-width="4"/><path d="M50 10 L90 50 L50 90 L10 50 Z" fill="#C4B5FD"/><path d="M50 30 L70 50 L50 70 L30 50 Z" fill="#8B5CF6"/><circle cx="50" cy="50" r="10" fill="#F0F9FF"/></svg>
+                    <svg class="h-6 w-6 text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="relative">
+                        <svg class="h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.33 4 18V20H20V18C20 15.33 14.67 14 12 14Z"/></svg>
+                        <span class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#A855F7] text-xs font-bold text-white ring-2 ring-white">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="flex-1 p-10">
+                <div class="mt-6 text-left pl-9">
+                    <a href="/kelas/<%= praktikum?.id || '' %>" class="text-purple-600 hover:underline font-medium">
+                        ← Kembali
+                    </a>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Rekap Nilai Praktikum <%= praktikum.nama_praktikum %></h1>
+                        <div class="flex items-center gap-4">
+                            <a href="/praktikum/<%= praktikum.id %>/rekap-nilai/pdf" target="_blank" class="bg-red-100 text-red-700 font-semibold px-4 py-2 rounded-lg hover:bg-red-200 flex items-center gap-2">
+                                <img src="https://img.icons8.com/color/48/pdf.png" alt="PDF Icon" class="w-5 h-5">
+                                PDF
+                            </a>
+
+                            <a href="/praktikum/<%= praktikum.id %>/rekap-nilai/excel" class="bg-green-100 text-green-700 font-semibold px-4 py-2 rounded-lg hover:bg-green-200 flex items-center gap-2">
+                                <img src="https://img.icons8.com/color/48/ms-excel.png" alt="Excel Icon" class="w-5 h-5">
+                                Excel
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto relative rounded-lg">
+                        <table class="w-full text-sm text-center text-gray-600 border-2 border-gray-300">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                <th scope="col" class="px-6 py-3 border-2 border-gray-300">Mahasiswa</th>
+                                <th scope="col" class="px-6 py-3 border-2 border-gray-300">NIM</th> <!-- ✅ Tambahan NIM -->
+                                <% daftarTugas.forEach(tugas => { %>
+                                    <th scope="col" class="px-6 py-3 border-2 border-gray-300 whitespace-nowrap"><%= tugas.judul %></th>
+                                <% }) %>
+                                <th scope="col" class="px-6 py-3 border-2 border-gray-300 bg-gray-200">Rata-rata</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (daftarMahasiswa && daftarMahasiswa.length > 0) { %>
+                                <% daftarMahasiswa.forEach(mhs => { %>
+                                    <tr class="bg-white border-b border-gray-300">
+                                    <td class="px-6 py-4 border-2 border-gray-300 text-left font-semibold text-gray-800">
+                                        <%= mhs.nama %>
+                                    </td>
+                                    <td class="px-6 py-4 border-2 border-gray-300"><%= mhs.nim %></td> <!-- ✅ Baris NIM -->
+                                    <% daftarTugas.forEach(tugas => { %>
+                                        <td class="px-6 py-4 border-2 border-gray-300">
+                                        <%= mhs.nilai[tugas.judul] != null ? mhs.nilai[tugas.judul] : '-' %>
+                                        </td>
+                                    <% }) %>
+                                    <td class="px-6 py-4 border-2 border-gray-300 font-bold text-purple-700 bg-purple-50">
+                                        <%= mhs.rataRata != null ? mhs.rataRata.toFixed(2) : '-' %>
+                                    </td>
+                                    </tr>
+                                <% }) %>
+                                <% } else { %>
+                                <tr>
+                                    <td colspan="<%= daftarTugas.length + 3 %>" class="text-center py-8 text-gray-500 border-2 border-gray-300">
+                                    Belum ada mahasiswa di kelas ini untuk ditampilkan.
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                            </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
