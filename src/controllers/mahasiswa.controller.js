@@ -59,15 +59,25 @@ const searchMahasiswa = async (req, res) => {
   const keyword = req.query.q || '';
 
   try {
-    const result = await prisma.user.findMany({
-      where: {
-        peran: 'mahasiswa',
-        username: {
-          contains: keyword,
-          mode: 'insensitive'
+    const semester = req.query.semester;
+    
+const result = await prisma.user.findMany({
+  where: {
+    peran: 'mahasiswa',
+    username: {
+      contains: keyword,
+      mode: 'insensitive'
+    },
+    absensi: {
+      some: {
+        jadwal: {
+          semester: semester ? semester : undefined
         }
       }
-    });
+    }
+  },
+  include: { absensi: { include: { jadwal: true } } }
+});
 
     const mahasiswa = result.map((mhs) => ({
       id: mhs.id,
