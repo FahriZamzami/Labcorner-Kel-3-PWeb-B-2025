@@ -13,14 +13,12 @@ enum Peran {
   asisten
 }
 
-<<<<<<< HEAD
+
 enum StatusTugas {
   open
   close
 }
 
-=======
->>>>>>> d58c348 (new update)
 enum StatusAbsensi {
   Hadir
   Tidak_Hadir
@@ -100,26 +98,26 @@ model modul {
 }
 
 model tugas {
-<<<<<<< HEAD
+
   id            Int            @id @default(autoincrement())
 =======
   id            Int       @id @default(autoincrement())
->>>>>>> d58c348 (new update)
+
   praktikum_id  Int
   judul         String
   deskripsi     String?
   fileTugas     String?
   batas_waktu   DateTime
-<<<<<<< HEAD
+
   dibuat_pada   DateTime       @default(now())
   status        StatusTugas    @default(open)
 
   praktikum     praktikum      @relation(fields: [praktikum_id], references: [id])
-=======
+
   dibuat_pada   DateTime  @default(now())
 
   praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
->>>>>>> d58c348 (new update)
+
   pengumpulan   pengumpulan[]
 }
 

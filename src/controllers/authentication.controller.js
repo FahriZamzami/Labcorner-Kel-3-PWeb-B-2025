@@ -45,8 +45,4 @@ const login = async (req, res) => {
     }
 };
 
-<<<<<<< HEAD
 module.exports = { login };
-=======
-module.exports = { login };
->>>>>>> d58c348 (new update)

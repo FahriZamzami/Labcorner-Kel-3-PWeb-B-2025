@@ -18,7 +18,7 @@ app.use(session({
     cookie: { secure: false }
 }));
 
-app.use('/api', indexRouter);
+app.use('/api', router);
 
 // Middleware parsing JSON dan form
 app.use(express.json());
