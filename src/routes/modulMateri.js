@@ -4,7 +4,7 @@ const router = express.Router();
 
 // Route untuk halaman Modul Materi
 router.get('/', (req, res) => {
-  res.render('modulMateri');  // Mengarahkan ke halaman Modul Materi
+  res.render('modulMateri', { currentPage: 'modulMateri' });  // Mengarahkan ke halaman Modul Materi
 });
 
 module.exports = router;

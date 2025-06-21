@@ -49,87 +49,48 @@
   <body class="bg-gradient-to-br from-purple-700 to-purple-500 font-sans">
 
     <div class="flex min-h-screen justify-center items-center py-10">
-      <!-- Halaman Pilih Lab -->
       <div class="text-white p-8 rounded-xl shadow-lg max-w-5xl w-full">
         <h2 class="text-3xl font-bold mb-8 text-center">Pilih Lab dan Masukkan Kode Akses</h2>
         
-        <!-- Daftar Lab -->
-        <div class="grid grid-cols-2 gap-6">
-          <!-- Lab 1 -->
-          <div class="bg-white p-6 rounded-xl shadow-lg">
-            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratory of Enterprise Application</h4>
-            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(1)">Masuk Kelas</button>
+        <% if (error) { %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline"><%= error %></span>
           </div>
+        <% } %>
 
-          <!-- Lab 2 -->
-          <div class="bg-white p-6 rounded-xl shadow-lg">
-            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratory of Geographic Information System</h4>
-            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(2)">Masuk Kelas</button>
-          </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <% if (daftarLab && daftarLab.length > 0) { %>
+            <% daftarLab.forEach((lab) => { %>
+              <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h4 class="text-xl font-semibold mb-4 text-center text-purple-800"><%= lab.nama_praktikum %></h4>
+               <a href="/pilihLab/enterCode/<%= lab.id %>" class="block bg-purple-700 text-white text-center px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">
+                 Masuk Kelas</a>
+              </div>
 
-          <!-- Lab 3 -->
-          <div class="bg-white p-6 rounded-xl shadow-lg">
-            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratorium Dasar Komputasi</h4>
-            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(3)">Masuk Kelas</button>
-          </div>
-
-          <!-- Lab 4 -->
-          <div class="bg-white p-6 rounded-xl shadow-lg">
-            <h4 class="text-xl font-semibold mb-4 text-center text-purple-800">Laboratorium Business Intelligence</h4>
-            <button class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800" onclick="openModal(4)">Masuk Kelas</button>
-          </div>
+            <% }); %>
+          <% } else { %>
+            <p class="col-span-full text-center text-gray-200">Tidak ada praktikum yang tersedia saat ini.</p>
+          <% } %>
         </div>
       </div>
     </div>
 
-    <!-- Modal untuk kode akses -->
-    <div id="modal-1" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal(1)">&times;</span>
-        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 1</h2>
-        <form action="/pilihLab/joinLab" method="POST">
-          <input type="hidden" name="labId" value="1" />
-          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
-          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="modal-2" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal(2)">&times;</span>
-        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 2</h2>
-        <form action="/pilihLab/joinLab" method="POST">
-          <input type="hidden" name="labId" value="2" />
-          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
-          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="modal-3" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal(3)">&times;</span>
-        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 3</h2>
-        <form action="/pilihLab/joinLab" method="POST">
-          <input type="hidden" name="labId" value="3" />
-          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
-          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="modal-4" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal(4)">&times;</span>
-        <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk Lab 4</h2>
-        <form action="/pilihLab/joinLab" method="POST">
-          <input type="hidden" name="labId" value="4" />
-          <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full" placeholder="Masukkan Kode Akses" required />
-          <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
-        </form>
-      </div>
-    </div>
+    <% if (daftarLab && daftarLab.length > 0) { %>
+      <% daftarLab.forEach((lab) => { %>
+        <div id="modal-<%= lab.id %>" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal(<%= lab.id %>)">&times;</span>
+            <h2 class="text-center text-xl font-semibold mb-4">Masukkan Kode Akses untuk <%= lab.nama_praktikum %></h2>
+            <form action="/pilihLab/joinLab" method="POST">
+              <input type="hidden" name="labId" value="<%= lab.id %>" />
+              <input type="text" name="labCode" class="mt-2 px-4 py-2 border border-purple-400 rounded-md w-full text-gray-700" placeholder="Masukkan Kode Akses" required />
+              <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800">Gabung Lab</button>
+            </form>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
 
     <script>
       // Function to open the modal for the specific lab
@@ -144,10 +105,18 @@
 
       // Close modal when clicking anywhere outside the modal content
       window.onclick = function(event) {
-        if (event.target.className === 'modal') {
-          event.target.style.display = "none";
-        }
+        // Find all elements with class 'modal'
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+          if (event.target === modal) {
+            modal.style.display = "none";
+          }
+        });
       }
+
+      // Optional: Auto-open modal if there was an error related to a specific lab
+      // This would require passing the problematic labId back from the server with the error message
+      // For now, it just displays the error message at the top.
     </script>
   </body>
 </html>

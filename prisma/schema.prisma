@@ -122,17 +122,17 @@ model pengumpulan {
 
   tugas        tugas     @relation(fields: [tugas_id], references: [id])
   user         user      @relation(fields: [user_id], references: [id])
-}
+  }
 
 model pengumuman {
-  id            Int       @id @default(autoincrement())
-  praktikum_id  Int
-  isi           String
-  dibuat_oleh   String
-  dibuat_pada   DateTime?
+  id               Int        @id @default(autoincrement())
+  praktikum_id     Int?       // Nullable, jika pengumuman bisa umum tanpa praktikum
+  isi              String
+  dibuat_oleh      String     // String, karena mereferensi user.id yang String
+  dibuat_pada      DateTime   @default(now()) // Tidak nullable, default now()
 
-  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
-  pembuat       user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
+  praktikum        praktikum? @relation(fields: [praktikum_id], references: [id])
+  pembuat          user       @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
 }
 
 model absensi {

@@ -7,65 +7,96 @@ const fs = require('fs');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Tentukan ROOT_PROJECT_DIR sekali di awal
+// Asumsi: index.js ada di root, src/routes/tugas.js ada di src/routes/
+// ROOT_PROJECT_DIR akan menjadi /path/to/your_project_root
+const ROOT_PROJECT_DIR = path.join(__dirname, '..', '..');
+
 // Konfigurasi Multer untuk penyimpanan file
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '..', 'uploads'); // Pastikan path benar
+    // Path tujuan adalah ROOT_PROJECT_DIR/public/uploads
+    const uploadDir = path.join(ROOT_PROJECT_DIR, 'public', 'uploads'); // <--- PERUBAHAN DI SINI
+    console.log('[Multer] Upload directory:', uploadDir);
+
     // Buat direktori 'uploads' jika belum ada
     if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+      try {
+        fs.mkdirSync(uploadDir, { recursive: true });
+        console.log(`[Multer] Direktori 'uploads' dibuat: ${uploadDir}`);
+      } catch (mkdirError) {
+        console.error(`[Multer ERROR] Gagal membuat direktori 'uploads':`, mkdirError);
+        return cb(new Error('Gagal membuat direktori unggahan.'), false);
+      }
+    } else {
+      console.log(`[Multer] Direktori 'uploads' sudah ada: ${uploadDir}`);
     }
-    cb(null, uploadDir); // Menyimpan file di folder 'uploads' di root proyek
+    cb(null, uploadDir); // Menyimpan file di folder 'uploads' di public
   },
   filename: function (req, file, cb) {
-    // Memberi nama file unik dengan timestamp + nama asli
-    cb(null, Date.now() + '-' + file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const fileExtension = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, fileExtension);
+    const safeBaseName = baseName.replace(/[^a-zA-Z0-9-_\.]/g, '_');
+    const filename = `${safeBaseName}-${uniqueSuffix}${fileExtension}`;
+    
+    console.log('[Multer] Generated filename:', filename);
+    cb(null, filename);
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /pdf|doc|docx|zip|rar|jpg|jpeg|png/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Jenis file tidak diizinkan! Hanya PDF, DOC, DOCX, ZIP, RAR, JPG, JPEG, PNG.'), false);
+    }
+  }
+});
 
 // Middleware dummy untuk mendapatkan user_id (HARUS DIGANTI DENGAN AUTENTIKASI ASLI)
 router.use((req, res, next) => {
-  // Ini adalah placeholder. Di aplikasi nyata, Anda akan mendapatkan user_id dari sesi login.
-  // Contoh: req.user.id jika menggunakan Passport.js, atau dari session lain.
-  req.user = { id: 'dummyUser123' }; // <--- PENTING: GANTI INI DENGAN LOGIKA OTENTIKASI SESUNGGUHNYA!
+  // PENTING: Sesuaikan 'id' di sini dengan tipe data kolom user_id di tabel `pengumpulan` Anda!
+  req.user = { id: 'user1' }; // Contoh: string ID sesuai dengan schema Prisma
+  // req.user = { id: 1 }; // Contoh: integer ID
   next();
 });
 
-// Route utama: Menampilkan daftar tugas
+// Route utama: Menampilkan daftar tugas (tidak ada perubahan di sini)
 router.get('/', async (req, res) => {
   try {
     const daftarTugas = await prisma.tugas.findMany({
       orderBy: {
-        batas_waktu: 'asc' // Urutkan berdasarkan batas waktu
+        batas_waktu: 'asc'
       }
     });
 
-    // Format tanggal batas_waktu agar mudah dibaca di EJS
     const formattedTugas = daftarTugas.map(tugas => ({
       ...tugas,
       batas_waktu_formatted: tugas.batas_waktu.toLocaleString('id-ID', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false // Gunakan format 24 jam
+        day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
       }) + ' WIB'
     }));
 
-    res.render('tugas', { daftarTugas: formattedTugas });
+    res.render('tugas', { daftarTugas: formattedTugas, currentPage: 'tugas' });
   } catch (error) {
-    console.error('Error fetching tasks:', error);
+    console.error('[GET /] Error fetching tasks:', error);
     res.status(500).send('Terjadi kesalahan saat mengambil daftar tugas.');
   }
 });
 
-// Route untuk halaman detail tugas
+// Route untuk halaman detail tugas (tidak ada perubahan di sini)
 router.get('/:id', async (req, res) => {
   const tugasId = parseInt(req.params.id);
-  const userId = req.user.id; // Ambil user_id dari middleware
+  // Gunakan req.user.id dari middleware dummy, atau req.session.user.id jika tersedia
+  const userId = req.session.user ? req.session.user.id : req.user.id;
 
   if (isNaN(tugasId)) {
     return res.status(400).send('ID tugas tidak valid.');
@@ -73,69 +104,94 @@ router.get('/:id', async (req, res) => {
 
   try {
     const tugasDetail = await prisma.tugas.findUnique({
-      where: {
-        id: tugasId
-      },
-      include: {
-        pengumpulan: {
-          where: {
-            user_id: userId // Filter pengumpulan berdasarkan user_id yang sedang login
-          }
-        }
-      }
+      where: { id: tugasId },
+      include: { pengumpulan: { where: { user_id: userId } } }
     });
 
     if (tugasDetail) {
-      // Format batas_waktu untuk detail tugas
       tugasDetail.batas_waktu_formatted = tugasDetail.batas_waktu.toLocaleString('id-ID', {
-        weekday: 'long',
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
       }) + ' WIB';
-
-      // Cek apakah mahasiswa sudah mengumpulkan tugas ini
       const submittedFile = tugasDetail.pengumpulan.length > 0 ? tugasDetail.pengumpulan[0] : null;
-
-      res.render('detailTugas', { tugas: tugasDetail, submittedFile: submittedFile });
+      res.render('detailTugas', { tugas: tugasDetail, submittedFile: submittedFile, currentPage: 'tugas' });
     } else {
       res.status(404).send('Tugas tidak ditemukan');
     }
   } catch (error) {
-    console.error('Error fetching task detail:', error);
+    console.error(`[GET /:id] Error fetching task detail for ID ${tugasId}:`, error);
     res.status(500).send('Terjadi kesalahan saat mengambil detail tugas.');
   }
 });
 
 // Route untuk mengunggah file tugas
-router.post('/:id/upload', upload.single('file'), async (req, res) => {
+router.post('/:id/upload', (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      console.error('[POST /:id/upload] Multer error:', err);
+      return res.status(400).json({ 
+        message: err.message || 'Error saat upload file',
+        error: err.toString()
+      });
+    }
+    
+    // Lanjutkan ke handler utama
+    handleUpload(req, res);
+  });
+});
+
+async function handleUpload(req, res) {
+  console.log('[POST /:id/upload] Request received');
+  console.log('[POST /:id/upload] File:', req.file);
+  console.log('[POST /:id/upload] Body:', req.body);
+  
   const tugasId = parseInt(req.params.id);
-  const userId = req.user.id; // Ambil user_id dari middleware
+  const userId = req.session.user ? req.session.user.id : req.user.id;
+  
+  console.log('[POST /:id/upload] Tugas ID:', tugasId);
+  console.log('[POST /:id/upload] User ID:', userId);
+
+  if (req.fileValidationError) {
+      console.error('[POST /:id/upload] Multer File Validation Error:', req.fileValidationError);
+      return res.status(400).json({ message: req.fileValidationError });
+  }
 
   if (isNaN(tugasId)) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      try {
+        fs.unlinkSync(req.file.path);
+        console.log(`[POST /:id/upload] File sementara dihapus karena ID tugas tidak valid: ${req.file.path}`);
+      } catch (unlinkError) {
+        console.error(`[POST /:id/upload] Gagal menghapus file sementara: ${unlinkError.message}`);
+      }
+    }
     return res.status(400).json({ message: 'ID tugas tidak valid.' });
   }
 
   if (!req.file) {
+    console.error('[POST /:id/upload] No file uploaded');
     return res.status(400).json({ message: 'Tidak ada file yang diunggah.' });
   }
 
   try {
-    // Cek apakah tugasnya ada
+    console.log('[POST /:id/upload] Checking if tugas exists...');
     const tugasExists = await prisma.tugas.findUnique({
       where: { id: tugasId }
     });
 
     if (!tugasExists) {
-      // Hapus file yang sudah terlanjur diupload jika tugas tidak ditemukan
-      fs.unlinkSync(req.file.path);
+      console.error('[POST /:id/upload] Tugas not found');
+      if (fs.existsSync(req.file.path)) {
+        try {
+          fs.unlinkSync(req.file.path);
+          console.log(`[POST /:id/upload] File dihapus karena tugas tidak ditemukan: ${req.file.path}`);
+        } catch (unlinkError) {
+          console.error(`[POST /:id/upload] Gagal menghapus file setelah tugas tidak ditemukan: ${unlinkError.message}`);
+        }
+      }
       return res.status(404).json({ message: 'Tugas tidak ditemukan.' });
     }
 
-    // Cek apakah mahasiswa sudah pernah mengumpulkan tugas ini
+    console.log('[POST /:id/upload] Checking existing submission...');
     const existingSubmission = await prisma.pengumpulan.findFirst({
       where: {
         tugas_id: tugasId,
@@ -145,13 +201,19 @@ router.post('/:id/upload', upload.single('file'), async (req, res) => {
 
     let submission;
     if (existingSubmission) {
-      // Jika sudah ada, update pengumpulan yang sudah ada
-      // Hapus file lama jika ada
+      console.log('[POST /:id/upload] Updating existing submission...');
       if (existingSubmission.file_path) {
-        const oldFilePath = path.join(__dirname, '..', 'uploads', existingSubmission.file_path);
+        // Path ke file lama: ROOT_PROJECT_DIR/public/uploads/namafilelama.ext
+        const oldFilePath = path.join(ROOT_PROJECT_DIR, 'public', 'uploads', existingSubmission.file_path); // <--- PERUBAHAN DI SINI
         if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-          console.log(`File lama dihapus: ${oldFilePath}`);
+          try {
+            fs.unlinkSync(oldFilePath);
+            console.log(`[POST /:id/upload] File lama dihapus: ${oldFilePath}`);
+          } catch (unlinkError) {
+            console.error(`[POST /:id/upload] Gagal menghapus file lama ${oldFilePath}: ${unlinkError.message}`);
+          }
+        } else {
+          console.warn(`[POST /:id/upload] File lama tidak ditemukan di: ${oldFilePath}. Mungkin sudah dihapus secara manual atau path salah.`);
         }
       }
 
@@ -162,9 +224,9 @@ router.post('/:id/upload', upload.single('file'), async (req, res) => {
           waktu_kirim: new Date()
         }
       });
-      console.log('Pengumpulan diperbarui:', submission);
+      console.log('[POST /:id/upload] Pengumpulan diperbarui:', submission);
     } else {
-      // Jika belum ada, buat entri pengumpulan baru
+      console.log('[POST /:id/upload] Creating new submission...');
       submission = await prisma.pengumpulan.create({
         data: {
           tugas_id: tugasId,
@@ -173,29 +235,36 @@ router.post('/:id/upload', upload.single('file'), async (req, res) => {
           waktu_kirim: new Date()
         }
       });
-      console.log('Pengumpulan baru dibuat:', submission);
+      console.log('[POST /:id/upload] Pengumpulan baru dibuat:', submission);
     }
 
+    console.log('[POST /:id/upload] Success!');
     res.status(200).json({
       message: 'File berhasil diunggah dan disimpan.',
       submission: submission
     });
 
   } catch (error) {
-    console.error('Error uploading file and saving to DB:', error);
-    // Jika ada error, hapus file yang sudah terupload
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-      console.error(`File yang gagal diunggah dihapus: ${req.file.path}`);
+    console.error('[POST /:id/upload ERROR] Gagal mengunggah file atau menyimpan ke DB:', error);
+    if (req.file && fs.existsSync(req.file.path)) {
+      try {
+        fs.unlinkSync(req.file.path);
+        console.error(`[POST /:id/upload] File yang gagal diunggah dihapus: ${req.file.path}`);
+      } catch (unlinkError) {
+        console.error(`[POST /:id/upload] Gagal menghapus file yang gagal diunggah: ${unlinkError.message}`);
+      }
     }
-    res.status(500).json({ message: 'Gagal mengunggah file atau menyimpan ke database.' });
+    res.status(500).json({
+      message: 'Gagal mengunggah file atau menyimpan ke database.',
+      serverError: error.message
+    });
   }
-});
+}
 
 // Route untuk menghapus pengumpulan tugas (dan file fisik)
 router.delete('/:id/hapus', async (req, res) => {
   const tugasId = parseInt(req.params.id);
-  const userId = req.user.id; // Ambil user_id dari middleware
+  const userId = req.session.user ? req.session.user.id : req.user.id;
 
   if (isNaN(tugasId)) {
     return res.status(400).json({ message: 'ID tugas tidak valid.' });
@@ -210,36 +279,44 @@ router.delete('/:id/hapus', async (req, res) => {
     });
 
     if (submission) {
-      // Hapus file fisik jika ada
       if (submission.file_path) {
-        const filePath = path.join(__dirname, '..', 'uploads', submission.file_path);
+        // Path ke file: ROOT_PROJECT_DIR/public/uploads/namafile.ext
+        const filePath = path.join(ROOT_PROJECT_DIR, 'public', 'uploads', submission.file_path); // <--- PERUBAHAN DI SINI
         if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          console.log(`File fisik dihapus: ${filePath}`);
+          try {
+            fs.unlinkSync(filePath);
+            console.log(`[DELETE /:id/hapus] File fisik dihapus: ${filePath}`);
+          } catch (unlinkError) {
+            console.error(`[DELETE /:id/hapus] Gagal menghapus file fisik ${filePath}: ${unlinkError.message}`);
+          }
+        } else {
+          console.warn(`[DELETE /:id/hapus] File fisik tidak ditemukan di: ${filePath}. Mungkin sudah dihapus secara manual atau path salah.`);
         }
       }
 
-      // Hapus entri dari database
       await prisma.pengumpulan.delete({
         where: {
           id: submission.id
         }
       });
-      console.log('Pengumpulan dihapus dari database:', submission.id);
+      console.log('[DELETE /:id/hapus] Pengumpulan dihapus dari database:', submission.id);
       res.status(200).json({ message: 'File dan pengumpulan berhasil dihapus.' });
     } else {
       res.status(404).json({ message: 'Pengumpulan tidak ditemukan.' });
     }
   } catch (error) {
-    console.error('Error deleting submission:', error);
-    res.status(500).json({ message: 'Gagal menghapus file atau pengumpulan dari database.' });
+    console.error('[DELETE /:id/hapus ERROR] Gagal menghapus file atau pengumpulan dari database:', error);
+    res.status(500).json({
+      message: 'Gagal menghapus file atau pengumpulan dari database.',
+      serverError: error.message
+    });
   }
 });
 
 // Route untuk mengunduh file tugas yang dikumpulkan
 router.get('/:id/unduh', async (req, res) => {
   const tugasId = parseInt(req.params.id);
-  const userId = req.user.id; // Ambil user_id dari middleware
+  const userId = req.session.user ? req.session.user.id : req.user.id;
 
   if (isNaN(tugasId)) {
     return res.status(400).send('ID tugas tidak valid.');
@@ -254,20 +331,19 @@ router.get('/:id/unduh', async (req, res) => {
     });
 
     if (submission && submission.file_path) {
-      const filePath = path.join(__dirname, '..', 'uploads', submission.file_path);
-      // Pastikan file tersebut benar-benar ada di server sebelum dikirim
+      const filePath = path.join(ROOT_PROJECT_DIR, 'public', 'uploads', submission.file_path); // <--- PERUBAHAN DI SINI
       if (fs.existsSync(filePath)) {
-        res.download(filePath, submission.file_path); // Menambahkan nama file untuk unduhan
+        res.download(filePath, submission.file_path);
       } else {
-        console.warn(`File fisik tidak ditemukan di: ${filePath}`);
+        console.warn(`[GET /:id/unduh] File fisik tidak ditemukan di: ${filePath}`);
         res.status(404).send('File fisik tidak ditemukan di server.');
       }
     } else {
       res.status(404).send('Pengumpulan atau file tidak ditemukan.');
     }
   } catch (error) {
-    console.error('Error downloading file:', error);
-    res.status(500).send('Terjadi kesalahan saat mengunduh file.');
+    console.error('[GET /:id/unduh ERROR] Terjadi kesalahan saat mengunduh file:', error);
+    res.status(500).send('Terjadi kesalahan saat mengunduh file. Detail: ' + error.message);
   }
 });
 
