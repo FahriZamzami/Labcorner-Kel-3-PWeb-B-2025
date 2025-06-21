@@ -13,6 +13,8 @@ app.set('views', path.join(__dirname, 'views'));
 // Middleware untuk parsing form data
 app.use(express.urlencoded({ extended: true })); // Untuk menangani form data dari POST request
 
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Tambahkan ini
 // Menambahkan route untuk tugas
 app.use('/tugas', tugasRoutes);
 

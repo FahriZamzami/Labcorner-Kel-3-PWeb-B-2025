@@ -46,17 +46,18 @@ model lab {
 }
 
 model praktikum {
-  id             Int           @id @default(autoincrement())
-  nama_praktikum String
-  lab_id         Int
-  dibuat_pada    DateTime      @default(now())
+  id               Int            @id @default(autoincrement())
+  nama_praktikum   String
+  kode_masuk       String         @unique
+  lab_id           Int
+  dibuat_pada      DateTime       @default(now())
 
-  lab            lab           @relation(fields: [lab_id], references: [id])
-  pendaftaran    pendaftaran[]
-  jadwal         jadwal[]
-  modul          modul[]
-  tugas          tugas[]
-  pengumuman     pengumuman[]
+  lab              lab            @relation(fields: [lab_id], references: [id])
+  pendaftaran      pendaftaran[]  // <--- PASTIKAN SUDAH BERUBAH SEPERTI INI!
+  jadwal           jadwal[]
+  modul            modul[]
+  tugas            tugas[]
+  pengumuman       pengumuman[]
 }
 
 model pendaftaran {
