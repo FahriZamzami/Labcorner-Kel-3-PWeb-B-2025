@@ -10,26 +10,26 @@ const labController = require('../controllers/lab.controller');
 const mahasiswa = require('../controllers/mahasiswa.controller');
 const ekspor = require('../controllers/export.controller');
 
-// === Assignment Routes ===
+// Assignment Routes
 router.get('/assignments', assignmentsController.getAllAssignments);
 router.post('/assignments', upload.single('fileTugas'), assignmentsController.createAssignment);
 
-// === Auth Routes ===
+// Auth
 router.post('/login', authenticationController.login);
 
-// === Lab Routes ===
+// Lab
 router.get('/lab', labController.labPage);
 router.get('/lab/:id', labController.showHomeClassPage);
 
-// === Mahasiswa / Absensi Routes ===
+// Mahasiswa
 router.get('/mahasiswa', mahasiswa.searchMahasiswa);
 router.get('/filter-semester', mahasiswa.getMahasiswaBySemester);
 router.post('/update-status/:id', mahasiswa.updateStatusMahasiswa);
-router.get('/mahasiswa/rekap', mahasiswa.getDaftarMahasiswa); 
+router.get('/mahasiswa/rekap', mahasiswa.getDaftarMahasiswa);
+router.get('/mahasiswa/rekap/search', mahasiswa.searchMahasiswaRekap);
 
-// === Export Routes ===
+// Export
 router.get('/export/pdf', ekspor.exportPDF);
 router.get('/export/excel', ekspor.exportExcel);
 
-// === Export router ONLY ===
 module.exports = router;

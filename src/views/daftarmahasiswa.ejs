@@ -1,15 +1,107 @@
-<h2>Daftar Kehadiran Mahasiswa</h2>
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Nama Mahasiswa</th>
-        <th>Jumlah Hadir</th>
-        <th>Jumlah Tidak Hadir</th>
-    </tr>
-    <% data.forEach(mhs => { %>
-    <tr>
-        <td><%= mhs.nama %></td>
-        <td><%= mhs.hadir %></td>
-        <td><%= mhs.tidakHadir %></td>
-    </tr>
-    <% }) %>
-</table>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rekap Kehadiran Mahasiswa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .fade-slide {
+      animation: fadeSlide 0.5s ease-in-out;
+    }
+    @keyframes fadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#A188E3]">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4">
+      <div class="text-2xl font-bold tracking-wide mb-8">LABCORNER</div>
+      <nav class="flex flex-col gap-4">
+        <a href="/lab" class="flex items-center gap-3 p-3 text-white/80 hover:bg-white/10 rounded-lg">
+          <span>Home Lab</span>
+        </a>
+        <a href="/api/mahasiswa/rekap" class="flex items-center gap-3 p-3 bg-white/20 rounded-lg shadow ring-1 ring-white/20 font-semibold">
+          <span>Rekap Mahasiswa</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-y-auto">
+      <header class="flex justify-between items-center px-6 py-4 bg-white shadow">
+        <h1 class="text-xl font-bold text-[#6D28D9]">Rekap Kehadiran Mahasiswa</h1>
+      </header>
+
+      <main class="p-8">
+        <form method="GET" action="/api/mahasiswa/rekap/search" class="mb-6 flex flex-wrap items-center gap-3">
+          <input type="text" name="q" value="<%= keyword %>" placeholder="Cari nama..."
+            class="p-2 rounded-md border border-gray-300 focus:ring-purple-500 flex-1 min-w-[200px]"/>
+          <select name="sort" class="p-2 rounded-md border border-gray-300">
+            <option value="desc" <%= sort === 'desc' ? 'selected' : '' %>> Hadir Terbanyak</option>
+            <option value="asc" <%= sort === 'asc' ? 'selected' : '' %>> Hadir Tersedikit</option>
+          </select>
+          <button class="px-4 py-2 bg-[#6D28D9] text-white rounded-md hover:bg-[#5B21B6] transition">Cari</button>
+        </form>
+
+        <% if (keyword) { %>
+          <p class="mb-4 text-sm text-white">
+            Menampilkan hasil untuk "<span class="font-semibold"><%= keyword %></span>".
+            <a href="/api/mahasiswa/rekap" class="underline text-white/80 hover:text-white">Reset</a>
+          </p>
+        <% } %>
+
+        <div class="flex gap-3 mb-6">
+          <a href="/api/export/pdf" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 transition">
+            PDF
+          </a>
+          <a href="/api/export/excel" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition">
+            Excel
+          </a>
+        </div>
+
+        <!-- Transisi hanya pada tabel -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden fade-slide">
+          <table class="w-full table-auto text-sm text-gray-700">
+            <thead class="bg-[#8B5CF6] text-white">
+              <tr>
+                <th class="px-6 py-3 text-left">Nama</th>
+                <th class="px-6 py-3 text-left">Jumlah Hadir</th>
+                <th class="px-6 py-3 text-left">Jumlah Tidak Hadir</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (data.length === 0) { %>
+                <tr>
+                  <td colspan="3" class="px-6 py-4 text-center text-gray-400 italic">Tidak ditemukan data.</td>
+                </tr>
+              <% } else { %>
+                <% data.forEach(m => { %>
+                  <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-3"><%= m.nama %></td>
+                    <td class="px-6 py-3"><%= m.hadir %></td>
+                    <td class="px-6 py-3"><%= m.tidakHadir %></td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
