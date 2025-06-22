@@ -215,7 +215,7 @@ const updateAssignment = async (req, res) => {
 const deleteAssignment = async (req, res) => {
     const id = Number(req.params.id);
     const assignment = await prisma.tugas.delete({ where: { id } });
-    res.redirect(`/kelas/${assignment.praktikum_id}/penugasan`);
+    res.redirect(`/assignments`); // Kembali ke daftar penugasan
 };
 
 // Detail assignment (untuk mahasiswa submit)

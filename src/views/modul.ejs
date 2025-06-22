@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <title><%= title %></title>
+    
+    <style>
+        /* Gaya tambahan untuk backdrop modal */
+        #modal-toggle:checked ~ .modal-backdrop {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-purple-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { currentPath: currentPath, praktikum: praktikum }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            
+            <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg mb-8">
+                <div class="flex items-center mb-4">
+                    <i class="fa-solid fa-circle-info text-purple-600 mr-3"></i>
+                    <h2 class="text-lg font-semibold text-gray-700">Informasi</h2>
+                </div>
+                <form action="#" method="POST" class="relative mb-4">
+                    <input type="text" placeholder="Tambahkan informasi..." class="w-full p-3 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition">
+                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 hover:text-purple-800 text-2xl"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm">
+                    <p class="text-gray-800">Pertemuan Pertama - Senin, 9 Juni 2025</p>
+                    <div>
+                        <button class="text-blue-500 hover:text-blue-700 mr-2 font-medium">Edit</button>
+                        <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                <div class="flex items-center mb-4">
+                    <i class="fa-solid fa-book-bookmark text-purple-600 mr-3"></i>
+                    <h2 class="text-lg font-semibold text-gray-700">Modul</h2>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    <label for="modal-toggle" class="cursor-pointer group">
+                        <div class="aspect-square bg-white p-4 rounded-xl flex flex-col items-center justify-center text-gray-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ring-1 ring-gray-200">
+                            <i class="fa-solid fa-file-circle-plus text-4xl mb-2 text-gray-400 group-hover:text-purple-500 transition-colors"></i>
+                            <span class="font-medium text-center">Tambah Modul</span>
+                        </div>
+                    </label>
+
+                    <% if (modules && modules.length > 0) { %>
+                        <% modules.forEach(module => { %>
+                            <div class="aspect-square bg-white rounded-xl shadow-md p-4 flex flex-col justify-between group relative ring-1 ring-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                <a href="/download/<%= encodeURIComponent(module.file_path) %>" class="flex-grow flex flex-col items-center justify-center text-center">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png" alt="PDF Icon" class="w-12 h-auto mb-2">
+                                    <h3 class="font-semibold text-gray-800 break-words w-full mt-2"><%= module.judul %></h3>
+                                </a>
+                                <div class="absolute bottom-2 right-2 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <form action="/modul/delete/<%= module.id %>" method="POST" class="delete-form">
+                                        <button type="submit" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } %>
+                </div>
+                 <% if (modules && modules.length === 0) { %>
+                    <div class="text-center py-10"><p class="text-gray-500">Belum ada modul yang diunggah.</p></div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <input type="checkbox" id="modal-toggle" class="hidden">
+    
+    <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Unggah Modul Baru</h3>
+                <label for="modal-toggle" class="cursor-pointer text-2xl text-gray-500 hover:text-gray-800">&times;</label>
+            </div>
+            
+            <form action="/praktikum/<%= praktikum.id %>/modul/upload" method="POST" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label for="judul" class="block text-sm font-medium text-gray-700 mb-1">Judul Modul</label>
+                    <input type="text" name="judul" id="judul" required class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Contoh: Modul 1 - Instalasi">
+                </div>
+                <div class="mb-6">
+                    <label for="fileModul" class="block text-sm font-medium text-gray-700 mb-1">Pilih File (PDF, DOCX, PPTX)</label>
+                    <input type="file" name="fileModul" id="fileModul" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <label for="modal-toggle" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md cursor-pointer hover:bg-gray-300">Batal</label>
+                    <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">Unggah</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteForms = document.querySelectorAll('.delete-form');
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: "Modul yang dihapus tidak dapat dikembalikan!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#6D28D9',
+                        cancelButtonColor: '#6B7280',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

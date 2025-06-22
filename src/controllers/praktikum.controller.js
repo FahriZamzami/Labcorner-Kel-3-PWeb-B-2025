@@ -304,6 +304,10 @@ const exportRekapPDF = async (req, res) => {
     }
 };
 
+// Anda dapat mengganti keseluruhan fungsi showDetailPraktikum dengan yang ini.
+
+
+// ... (sisa fungsi lainnya tidak perlu diubah)
 module.exports = {
     tampilkanRekapNilai,
     exportRekapExcel,

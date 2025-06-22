@@ -85,7 +85,11 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Hapus</a>
+                                                <button 
+                                                    class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                                    onclick="showDeleteModal(<%= a.id %>)">
+                                                    Hapus
+                                                </button>
                                             </li>
                                         </ul>
                                     </div>
@@ -100,47 +104,68 @@
         </div>
     </div>
 
+    <!-- Modal Hapus Penugasan -->
+    <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Penghapusan</h3>
+            <p class="text-gray-600 mb-6">Yakin ingin menghapus penugasan ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <form id="deleteForm" method="POST">
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600">Ya, Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const buttons = document.querySelectorAll('.toggle-status-btn');
             const dropdownToggles = document.querySelectorAll('.dropdown > button');
+            const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+            const toggleButtons = document.querySelectorAll('.toggle-status-btn');
 
-            // Toggle dropdown visibility dan tutup dropdown lain
+            // Buka/tutup dropdown dan tutup dropdown lain
             dropdownToggles.forEach(button => {
-                button.addEventListener('click', e => {
+                button.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const menu = button.nextElementSibling;
-                    document.querySelectorAll('.dropdown-menu').forEach(m => {
+
+                    dropdownMenus.forEach(m => {
                         if (m !== menu) m.classList.add('hidden');
                     });
+
                     menu.classList.toggle('hidden');
                 });
             });
 
-            // Hindari penutupan saat klik di dalam menu
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            // Cegah dropdown tertutup saat klik di dalam menu
+            dropdownMenus.forEach(menu => {
                 menu.addEventListener('click', e => {
                     e.stopPropagation();
                 });
             });
 
-            // Tombol toggle status
-            buttons.forEach(button => {
+            // Tutup semua dropdown jika klik di luar
+            window.addEventListener('click', () => {
+                dropdownMenus.forEach(menu => menu.classList.add('hidden'));
+            });
+
+            // Tombol toggle status penugasan
+            toggleButtons.forEach(button => {
                 button.addEventListener('click', async (e) => {
                     e.preventDefault();
-                    e.stopPropagation(); // ← agar tidak trigger klik parent
+                    e.stopPropagation();
+
                     const id = button.dataset.id;
 
                     try {
                         const response = await fetch(`/api/assignments/${id}/toggle-status`, {
                             method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
+                            headers: { 'Content-Type': 'application/json' }
                         });
 
                         if (response.ok) {
-                            location.reload();
+                            location.reload(); // refresh jika sukses
                         } else {
                             const error = await response.json();
                             alert('Gagal mengubah status: ' + (error.message || 'Terjadi kesalahan.'));
@@ -150,12 +175,18 @@
                     }
                 });
             });
-
-            // Tutup dropdown jika klik di luar
-            window.addEventListener('click', () => {
-                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
-            });
         });
+
+        // Modal hapus penugasan
+        function showDeleteModal(id) {
+            const form = document.getElementById('deleteForm');
+            form.action = `/assignments/delete/${id}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
     </script>
 
 </body>

@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// PASTIKAN BLOK ENUM INI ADA DI ATAS MODEL ANDA
 enum Peran {
   admin
   mahasiswa
@@ -22,27 +23,26 @@ enum StatusAbsensi {
   Hadir
   Tidak_Hadir
 }
+// AKHIR DARI BLOK ENUM
+
 
 model user {
-  id           String       @id
-  username     String       @unique
-  kata_sandi   String
-  peran        Peran
-  dibuat_pada  DateTime     @default(now())
+  id            String        @id
+  username      String        @unique
+  kata_sandi    String
+  peran         Peran // Sekarang Prisma tahu apa itu 'Peran'
+  dibuat_pada   DateTime      @default(now())
 
-  mahasiswa    mahasiswa[]  // ← sebelumnya pendaftaran
-  jadwal       jadwal[]
-  modul        modul[]
-  pengumpulan  pengumpulan[]
-  pengumuman   pengumuman[] @relation("PengumumanPembuat")
-  absensi      absensi[]
-  asistenLab   asistenLab[]
+  mahasiswa     mahasiswa[]
+  pengumpulan   pengumpulan[]
+  pengumuman    pengumuman[]  @relation("PengumumanPembuat")
+  absensi       absensi[]
+  asistenLab    asistenLab[]
 }
 
 model lab {
-  id          Int           @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   nama_lab    String
-
   praktikum   praktikum[]
   asistenLab  asistenLab[]
 }
@@ -51,7 +51,6 @@ model asistenLab {
   id      Int    @id @default(autoincrement())
   user_id String
   lab_id  Int
-
   user    user   @relation(fields: [user_id], references: [id])
   lab     lab    @relation(fields: [lab_id], references: [id])
 
@@ -59,18 +58,18 @@ model asistenLab {
 }
 
 model praktikum {
-  id             Int           @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   nama_praktikum String
-  kode_masuk     String        @unique
+  kode_masuk     String       @unique
   lab_id         Int
-  dibuat_pada    DateTime      @default(now())
+  dibuat_pada    DateTime     @default(now())
 
-  lab            lab           @relation(fields: [lab_id], references: [id])
-  mahasiswa      mahasiswa[]   // ← sebelumnya pendaftaran
-  jadwal         jadwal[]
-  modul          modul[]
-  tugas          tugas[]
-  pengumuman     pengumuman[]
+  lab          lab          @relation(fields: [lab_id], references: [id])
+  mahasiswa    mahasiswa[]
+  jadwal       jadwal[]
+  modul        modul[]
+  tugas        tugas[]
+  pengumuman   pengumuman[]
 }
 
 model mahasiswa {
@@ -78,7 +77,6 @@ model mahasiswa {
   user_id        String
   praktikum_id   Int
   waktu_daftar   DateTime?
-
   user           user      @relation(fields: [user_id], references: [id])
   praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
 
@@ -91,39 +89,35 @@ model jadwal {
   tanggal        DateTime
   jam            DateTime
   ruangan        String?
-  user_id        String
+  materi         String?
   nama_pengajar  String?
-  dibuat_pada    DateTime?
+  dibuat_pada    DateTime  @default(now())
 
-  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
-  user           user      @relation(fields: [user_id], references: [id])
-  absensi        absensi[]
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+  absensi      absensi[]
 }
 
 model modul {
-  id             Int       @id @default(autoincrement())
-  praktikum_id   Int
-  judul          String
-  file_path      String
-  diunggah_oleh  String
-  diunggah_pada  DateTime?
-
-  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
-  user           user      @relation(fields: [diunggah_oleh], references: [id])
+  id            Int       @id @default(autoincrement())
+  praktikum_id  Int
+  judul         String
+  file_path     String
+  diunggah_pada DateTime  @default(now())
+  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
 }
 
 model tugas {
-  id               Int            @id @default(autoincrement())
+  id               Int           @id @default(autoincrement())
   praktikum_id     Int
   judul            String
   deskripsi        String?
   fileTugas        String?
   batas_waktu      DateTime
-  dibuat_pada      DateTime       @default(now())
-  status           StatusTugas    @default(open)
-  tutup_penugasan  Boolean        @default(false)
+  dibuat_pada      DateTime      @default(now())
+  status           StatusTugas   @default(open)
+  tutup_penugasan  Boolean       @default(false)
 
-  praktikum        praktikum      @relation(fields: [praktikum_id], references: [id])
+  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id])
   pengumpulan      pengumpulan[]
 }
 
@@ -141,22 +135,21 @@ model pengumpulan {
 }
 
 model pengumuman {
-  id            Int       @id @default(autoincrement())
-  praktikum_id  Int
-  isi           String
-  dibuat_oleh   String
-  dibuat_pada   DateTime?
+  id           Int       @id @default(autoincrement())
+  praktikum_id Int
+  isi          String
+  dibuat_oleh  String
+  dibuat_pada  DateTime?
 
-  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
-  pembuat       user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+  pembuat      user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
 }
 
 model absensi {
-  id        Int            @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   user_id   String
   jadwal_id Int
-  status    StatusAbsensi
-
-  user      user           @relation(fields: [user_id], references: [id])
-  jadwal    jadwal         @relation(fields: [jadwal_id], references: [id])
+  status    StatusAbsensi // Sekarang Prisma tahu apa itu 'StatusAbsensi'
+  user      user          @relation(fields: [user_id], references: [id])
+  jadwal    jadwal        @relation(fields: [jadwal_id], references: [id])
 }

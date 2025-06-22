@@ -2,15 +2,15 @@ const bcrypt = require('bcrypt');
 const prisma = require('../../prisma/client');
 
 const login = async (req, res) => {
-    const { username, kata_sandi } = req.body;
+    const { id, kata_sandi } = req.body;
 
     try {
         const user = await prisma.user.findUnique({
-            where: { username }
+            where: { id }
         });
 
         if (!user) {
-            return res.status(401).send('Username tidak ditemukan');
+            return res.status(401).send('ID tidak ditemukan');
         }
 
         const isPasswordValid = user.peran === 'admin'
@@ -40,11 +40,10 @@ const login = async (req, res) => {
                 return res.status(404).send('Data asisten tidak ditemukan');
             }
 
-            // Dapatkan detail lab & daftar praktikum (jika ada)
             const lab = await prisma.lab.findUnique({
                 where: { id: asisten.lab_id },
                 include: {
-                    praktikum: true // jika ada relasi ke tabel praktikum
+                    praktikum: true
                 }
             });
 
@@ -55,7 +54,7 @@ const login = async (req, res) => {
             return res.render('lab', {
                 user,
                 lab,
-                praktikumList: lab.praktikum // untuk ditampilkan di EJS
+                praktikumList: lab.praktikum
             });
         }
 

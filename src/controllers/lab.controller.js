@@ -1,22 +1,61 @@
 const prisma = require('../../prisma/client');
 
+// src/controllers/lab.controller.js
+
 const labPage = async (req, res) => {
     try {
-        // Ambil daftar praktikum beserta lab-nya
-        const praktikumList = await prisma.praktikum.findMany({
-            include: { lab: true },
-            orderBy: { dibuat_pada: 'asc' },
-        });
+        // Dapatkan informasi user yang login dari session
+        const user = req.session.user;
 
-        // Ambil nama lab dari salah satu praktikum (jika ada)
+        // Jika tidak ada user di session, kembalikan ke login
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        let praktikumList = [];
+
+        // ==== PERBAIKAN DI SINI ====
+        // Cek peran user dengan .toLowerCase() agar tidak case-sensitive
+        if (user.peran?.toLowerCase() === 'asisten') {
+            // --- LOGIKA UNTUK ASISTEN ---
+
+            // 1. Cari semua lab tempat asisten ini bertugas
+            const asistenLabs = await prisma.asistenLab.findMany({
+                where: { user_id: user.id },
+                select: { lab_id: true }
+            });
+
+            // 2. Jika asisten tidak ditugaskan di lab manapun, daftar praktikum akan kosong
+            if (asistenLabs.length > 0) {
+                const allowedLabIds = asistenLabs.map(al => al.lab_id);
+
+                // 3. Filter praktikum berdasarkan ID lab yang diizinkan
+                praktikumList = await prisma.praktikum.findMany({
+                    where: {
+                        lab_id: { in: allowedLabIds }
+                    },
+                    include: { lab: true },
+                    orderBy: { dibuat_pada: 'asc' },
+                });
+            }
+            
+        } else {
+            // --- LOGIKA UNTUK ADMIN / PERAN LAIN ---
+            // Ambil semua praktikum tanpa filter
+            praktikumList = await prisma.praktikum.findMany({
+                include: { lab: true },
+                orderBy: { dibuat_pada: 'asc' },
+            });
+        }
+
         const namaLab = praktikumList.length > 0 && praktikumList[0].lab
             ? praktikumList[0].lab.nama_lab
-            : 'Tidak Diketahui';
+            : 'Laboratorium';
 
         res.render('lab', {
             user: req.session.user,
             praktikumList,
-            lab: { nama_lab: namaLab } // agar bisa diakses di EJS sebagai lab.nama_lab
+            lab: { nama_lab: namaLab }
         });
     } catch (err) {
         console.error('❌ Error di labPage:', err);
@@ -44,17 +83,68 @@ const showHomeClassPage = async (req, res) => {
             return res.status(404).send('Praktikum tidak ditemukan');
         }
 
+        // Hitung jumlah mahasiswa
+        const studentCount = await prisma.mahasiswa.count({
+            where: { praktikum_id: kelasId }
+        });
+
+        // Ambil jadwal praktikum terdekat
+        const jadwalBerikutnya = await prisma.jadwal.findFirst({
+            where: {
+                praktikum_id: kelasId,
+                tanggal: { gte: new Date() }
+            },
+            orderBy: { tanggal: 'asc' }
+        });
+
+        const nextSchedule = jadwalBerikutnya
+            ? jadwalBerikutnya.tanggal.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            })
+            : 'Tidak ada jadwal';
+
+        // Ambil penugasan terakhir
+        const tugasTerakhir = await prisma.tugas.findFirst({
+            where: { praktikum_id: kelasId },
+            orderBy: { batas_waktu: 'desc' }
+        });
+
+        const latestAssignment = tugasTerakhir
+            ? {
+                title: tugasTerakhir.judul || 'Tanpa Judul',
+                deadlineDate: tugasTerakhir.batas_waktu?.toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }) || '-',
+                deadlineTime: tugasTerakhir.batas_waktu?.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).replace('.', ':') || '-',
+                status: tugasTerakhir.status || 'Dibuka'
+            }
+            : {
+                title: 'Belum ada penugasan',
+                deadlineDate: '-',
+                deadlineTime: '',
+                status: '-'
+            };
+
+        // Render halaman
         res.render('homeClass', {
             user: req.session.user,
-            praktikum,
-            studentCount: 94, // bisa diganti query count user per kelas
-            nextSchedule: "23 Juli 2025", // ganti dengan data jadwal
-            latestAssignment: {
-                title: "Tugas Praktikum 5",
-                deadlineDate: "Senin, 14 Juli 2025",
-                deadlineTime: "23:59",
-                status: "Dibuka"
-            }
+            praktikum: {
+                ...praktikum,
+                startDate: praktikum.dibuat_pada?.toLocaleDateString('id-ID') || '-',
+            },
+            studentCount,
+            nextSchedule,
+            latestAssignment
         });
 
     } catch (err) {

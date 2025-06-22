@@ -1,56 +1,59 @@
 <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4">
     <div class="p-4">
-        <h1 class="text-2xl font-bold mb-8 tracking-wider">LABCORNER</h1>
+        <a href="/lab"><h1 class="text-2xl font-bold mb-8 tracking-wider">LABCORNER</h1></a>
     </div>
     <nav class="flex-1 px-2">
         <ul class="space-y-3">
-        <li>
-            <a href="/lab"
-            class="<%= currentPath.startsWith('/lab') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-            <!-- ICON -->
-            <span class="font-medium">Home Lab</span>
-            </a>
-        </li>
+            <li>
+                <a href="/lab"
+                   class="<%= currentPath.startsWith('/lab') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /></svg>
+                    <span class="font-medium">Home Lab</span>
+                </a>
+            </li>
 
-        <li>
-            <a href="/kelas/<%= praktikum?.id || '' %>" class="<%= currentPath.startsWith('/kelas') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-            <!-- ICON -->
-            <span class="font-medium"><%= praktikum?.nama_praktikum || 'Praktikum' %></span>
-            </a>
-        </li>
+            <% if (typeof praktikum !== 'undefined' && praktikum) { %>
+                <hr class="border-t border-white/20 my-4">
+                <li>
+                    <a href="/kelas/<%= praktikum.id %>" class="<%= currentPath.startsWith('/kelas') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.66.537-1.197 1.197-1.197h.006c.66 0 1.197.537 1.197 1.197v7.506c0 .66-.537 1.197-1.197 1.197h-.006c-.66 0-1.197-.537-1.197-1.197V6.087zM6.75 6.087c0-.66.537-1.197 1.197-1.197h.006c.66 0 1.197.537 1.197 1.197v7.506c0 .66-.537 1.197-1.197 1.197h-.006C7.287 14.79 6.75 14.253 6.75 13.593V6.087z" /><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 6.087v10.55c0 .858.692 1.55 1.55 1.55h10.4c.858 0 1.55-.692 1.55-1.55V6.087" /></svg>
+                        <span class="font-medium"><%= praktikum.nama_praktikum %></span>
+                    </a>
+                </li>
 
-        <li>
-            <a href="/modul"
-            class="<%= currentPath.startsWith('/modul') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-            <!-- ICON -->
-            <span class="font-medium">Modul Materi</span>
-            </a>
-        </li>
+                <li>
+                    <a href="/praktikum/<%= praktikum.id %>/modul"
+                       class="<%= currentPath.includes('/modul') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                        <span class="font-medium">Modul Materi</span>
+                    </a>
+                </li>
 
-        <li>
-            <% const isAssignmentPage = currentPath.startsWith('/assignments') || currentPath.startsWith('/penugasan'); %>
-            <a href="/assignments"
-                class="<%= isAssignmentPage ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-                <!-- ICON -->
-                <span class="font-semibold">Penugasan</span>
-            </a>
-        </li>
+                <li>
+                    <% const isAssignmentPage = currentPath.startsWith('/assignments') || currentPath.startsWith('/penugasan'); %>
+                    <a href="/assignments"
+                       class="<%= isAssignmentPage ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span class="font-semibold">Penugasan</span>
+                    </a>
+                </li>
 
-        <li>
-            <a href="/jadwal"
-            class="<%= currentPath.startsWith('/jadwal') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-            <!-- ICON -->
-            <span class="font-medium">Jadwal Praktikum</span>
-            </a>
-        </li>
+                <li>
+                    <a href="/praktikum/<%= praktikum.id %>/jadwal"
+                       class="<%= currentPath.includes('/jadwal') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18M-4.5 12h22.5" /></svg>
+                        <span class="font-medium">Jadwal Praktikum</span>
+                    </a>
+                </li>
 
-        <li>
-            <a href="/mahasiswa"
-            class="<%= currentPath.startsWith('/mahasiswa') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-            <!-- ICON -->
-            <span class="font-medium">Daftar Mahasiswa</span>
-            </a>
-        </li>
-        </ul>
+                <li>
+                    <a href="/praktikum/<%= praktikum.id %>/mahasiswa"
+                       class="<%= currentPath.includes('/mahasiswa') || currentPath.includes('/absensi') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-2.305c.395-.429.744-1.12.744-1.845s-.349-1.416-.744-1.845a9.337 9.337 0 00-4.121-2.305 9.38 9.38 0 00-2.625.372M15 19.128v-3.857m0 3.857a3.375 3.375 0 00-2.625-3.375m2.625 3.375a3.375 3.375 0 01-2.625-3.375m0 0a3.375 3.375 0 01-2.625-3.375m2.625 3.375a3.375 3.375 0 00-2.625-3.375M9.75 6.375a3.375 3.375 0 00-3.375-3.375m3.375 3.375a3.375 3.375 0 01-3.375-3.375m0 0a3.375 3.375 0 00-3.375 3.375m3.375 3.375a3.375 3.375 0 01-3.375 3.375m0 0a3.375 3.375 0 003.375 3.375m-3.375-3.375a3.375 3.375 0 003.375 3.375" /></svg>
+                        <span class="font-medium">Daftar Mahasiswa</span>
+                    </a>
+                </li>
+            <% } %>
+            </ul>
     </nav>
 </aside>

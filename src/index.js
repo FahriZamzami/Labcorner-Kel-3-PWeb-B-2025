@@ -1,10 +1,11 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const fs = require('fs');
 
 const app = express();
 
-// ===== Controller Imports =====
+// ===== Import Controller =====
 const {
     getAllAssignments,
     editAssignmentForm,
@@ -19,31 +20,60 @@ const {
 } = require('./controllers/assignment.controller');
 
 const {
-  // ... sebelumnya
-    exportRekapPDF,
+    tampilkanRekapNilai,
     exportRekapExcel,
-    tampilkanRekapNilai
+    exportRekapPDF
 } = require('./controllers/praktikum.controller');
+
+const {
+    showRegisterPage,
+    handleFirstStep,
+    handleRegisterCreate
+} = require('./controllers/register.controller');
+
+const {
+    getModulPage,
+    uploadModul,
+    deleteModul
+} = require('./controllers/modul.controller');
+
+const {
+    getJadwalPage,
+    createJadwal,
+    getJadwalById,
+    updateJadwal,
+    deleteJadwal
+} = require('./controllers/jadwal.controller');
+
+// TAMBAHAN: Impor controller untuk Mahasiswa & Absensi
+const { getDaftarMahasiswaPage } = require('./controllers/mahasiswa.controller');
+const { getAbsensiPage, saveAbsensi, getDetailKehadiranPage } = require('./controllers/absensi.controller');
+
 
 const { login } = require('./controllers/authentication.controller');
 const { isAuthenticated } = require('./middlewares/auth');
 const upload = require('./middlewares/upload');
+const setCurrentPath = require('./middlewares/currentPage');
 const { labPage, showHomeClassPage } = require('./controllers/lab.controller');
+const apiRouter = require('./routes/router');
 
-const apiRouter = require('./routes/router'); // API REST routes (opsional)
 
-
-// ===== Middleware & Config =====
+// ===== Middleware & Konfigurasi =====
 app.use(session({
     secret: 'rahasia_super_aman',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: false }
 }));
 
-const fs = require('fs');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Route download file aman
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// ===== Route download file aman =====
 app.get('/download/:filename', (req, res) => {
     const filename = decodeURIComponent(req.params.filename);
     const filePath = path.join(__dirname, '..', 'public', 'uploads', filename);
@@ -57,55 +87,71 @@ app.get('/download/:filename', (req, res) => {
     }
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, '..', 'public')));
-
-// ===== Scheduler (Tutup Otomatis Penugasan) =====
+// ===== Scheduler =====
 require('./scheduler');
 
 
 // ===== ROUTES =====
+app.get('/', (req, res) => {
+    res.redirect('/login');
+});
 
 // === Auth ===
 app.get('/login', (req, res) => res.render('login'));
 app.post('/login', login);
 
-// 🔒 Auth middleware untuk semua route setelah login
+app.get('/register', showRegisterPage);
+app.post('/register', handleFirstStep);
+app.post('/register/create', handleRegisterCreate);
+
+// 🔒 Semua route setelah ini butuh login
 app.use(isAuthenticated);
-const setCurrentPath = require('./middlewares/currentPage');
 app.use(setCurrentPath);
 
-
-app.get('/assignments/create', createAssignmentForm);
-// === Assignment Routes ===
+// === Assignment ===
 app.get('/assignments', getAllAssignments);
-
+app.get('/assignments/create', createAssignmentForm);
 app.get('/assignments/:id/edit', editAssignmentForm);
-app.get('/penugasan/detail/:id', detailAssignment);
 app.post('/penugasan/edit/:id', upload.single('fileTugas'), updateAssignment);
-app.post('/penugasan/delete/:id', deleteAssignment);
+app.post('/assignments/delete/:id', deleteAssignment);
+app.get('/penugasan/detail/:id', detailAssignment);
 
 // === Pengumpulan (Submissions) ===
 app.get('/assignments/:id/pengumpulan', getPengumpulanByTugasId);
 app.get('/assignments/:id/files', getFilesByTugasId);
-app.get('/assignments/nilai/:id', beriNilaiForm);  // ✅ Tambah ini
-app.post('/assignments/nilai/:id', simpanNilai); // ✅ Tambah ini juga
+app.get('/assignments/nilai/:id', beriNilaiForm);
+app.post('/assignments/nilai/:id', simpanNilai);
 
+// === Rekap Nilai ===
 app.get('/praktikum/:id/rekap-nilai', tampilkanRekapNilai);
-app.get('/praktikum/:id/rekap-nilai/pdf', exportRekapPDF);     // ✅ route PDF
-app.get('/praktikum/:id/rekap-nilai/excel', exportRekapExcel); // ✅ route Excel
+app.get('/praktikum/:id/rekap-nilai/pdf', exportRekapPDF);
+app.get('/praktikum/:id/rekap-nilai/excel', exportRekapExcel);
 
 // === Lab & Kelas ===
 app.get('/lab', labPage);
 app.get('/kelas/:id', showHomeClassPage);
 
+// === Modul ===
+app.get('/praktikum/:praktikum_id/modul', getModulPage);
+app.post('/praktikum/:praktikum_id/modul/upload', upload.single('fileModul'), uploadModul);
+app.post('/modul/delete/:modul_id', deleteModul);
 
-// === API (Optional for RESTful JSON routes) ===
+// === Jadwal ===
+app.get('/praktikum/:praktikum_id/jadwal', getJadwalPage);
+app.post('/jadwal/create', createJadwal);
+app.post('/jadwal/update/:id', updateJadwal);
+app.post('/jadwal/delete/:id', deleteJadwal);
+app.get('/api/jadwal/:id', getJadwalById);
+
+// === Mahasiswa & Absensi === (TAMBAHAN BARU)
+app.get('/praktikum/:praktikum_id/mahasiswa', getDaftarMahasiswaPage);
+app.get('/praktikum/:praktikum_id/absensi', getAbsensiPage);
+app.post('/absensi/save', saveAbsensi);
+
+app.get('/praktikum/:praktikum_id/absensi/detail', getDetailKehadiranPage);
+
+// === API ===
 app.use('/api', apiRouter);
-
 
 // === Logout ===
 app.get('/logout', (req, res) => {

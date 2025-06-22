@@ -1,0 +1,134 @@
+// src/controllers/jadwal.controller.js
+
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+// Menampilkan halaman daftar jadwal & form
+const getJadwalPage = async (req, res) => {
+    try {
+        const praktikumId = parseInt(req.params.praktikum_id, 10);
+
+        const praktikum = await prisma.praktikum.findUnique({
+            where: { id: praktikumId },
+        });
+
+        if (!praktikum) {
+            return res.status(404).send('Praktikum tidak ditemukan');
+        }
+
+        const jadwalList = await prisma.jadwal.findMany({
+            where: { praktikum_id: praktikumId },
+            orderBy: { tanggal: 'asc' },
+        });
+
+        res.render('jadwalPraktikum', {
+            title: `Jadwal Praktikum - ${praktikum.nama_praktikum}`,
+            praktikum,
+            jadwalList,
+            // currentPath akan diurus oleh middleware
+        });
+    } catch (error) {
+        console.error('Error fetching jadwal page:', error);
+        res.status(500).send('Terjadi kesalahan pada server');
+    }
+};
+
+// Membuat jadwal baru
+const createJadwal = async (req, res) => {
+    try {
+        const { praktikum_id, tanggal, jam, materi, ruangan, nama_pengajar } = req.body;
+        
+        // Gabungkan tanggal dan jam menjadi satu objek DateTime yang valid untuk Prisma
+        // Contoh: '2025-06-25' dan '14:00' menjadi '2025-06-25T14:00:00.000Z'
+        const tanggalISO = new Date(`${tanggal}T${jam}`);
+
+        await prisma.jadwal.create({
+            data: {
+                praktikum_id: parseInt(praktikum_id, 10),
+                tanggal: tanggalISO,
+                jam: tanggalISO, // Kolom 'jam' juga diisi dengan ISO string yang sama
+                materi,
+                ruangan,
+                nama_pengajar,
+            },
+        });
+
+        res.redirect(`/praktikum/${praktikum_id}/jadwal`);
+    } catch (error) {
+        console.error('Error creating jadwal:', error);
+        res.status(500).send('Gagal membuat jadwal');
+    }
+};
+
+// Mengambil data satu jadwal untuk form edit (API Endpoint)
+const getJadwalById = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const jadwal = await prisma.jadwal.findUnique({
+            where: { id },
+        });
+        if (!jadwal) {
+            return res.status(404).json({ error: 'Jadwal tidak ditemukan' });
+        }
+        res.json(jadwal);
+    } catch (error) {
+        res.status(500).json({ error: 'Gagal mengambil data jadwal' });
+    }
+};
+
+
+// Memperbarui jadwal
+const updateJadwal = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const { praktikum_id, tanggal, jam, materi, ruangan, nama_pengajar } = req.body;
+
+        const tanggalISO = new Date(`${tanggal}T${jam}`);
+
+        await prisma.jadwal.update({
+            where: { id },
+            data: {
+                tanggal: tanggalISO,
+                jam: tanggalISO,
+                materi,
+                ruangan,
+                nama_pengajar,
+            },
+        });
+
+        res.redirect(`/praktikum/${praktikum_id}/jadwal`);
+    } catch (error) {
+        console.error('Error updating jadwal:', error);
+        res.status(500).send('Gagal memperbarui jadwal');
+    }
+};
+
+// Menghapus jadwal
+const deleteJadwal = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        
+        // Cari dulu jadwalnya untuk mendapatkan praktikum_id agar bisa redirect
+        const jadwal = await prisma.jadwal.findUnique({ where: { id } });
+        if (!jadwal) {
+            return res.status(404).send('Jadwal tidak ditemukan');
+        }
+
+        await prisma.jadwal.delete({
+            where: { id },
+        });
+
+        res.redirect(`/praktikum/${jadwal.praktikum_id}/jadwal`);
+    } catch (error) {
+        console.error('Error deleting jadwal:', error);
+        res.status(500).send('Gagal menghapus jadwal');
+    }
+};
+
+module.exports = {
+    getJadwalPage,
+    createJadwal,
+    getJadwalById,
+    updateJadwal,
+    deleteJadwal,
+};
