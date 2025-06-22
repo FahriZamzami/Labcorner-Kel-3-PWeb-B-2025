@@ -34,7 +34,10 @@ const {
 const {
     getModulPage,
     uploadModul,
-    deleteModul
+    deleteModul,
+    createPengumuman,
+    updatePengumuman,
+    deletePengumuman
 } = require('./controllers/modul.controller');
 
 const {
@@ -42,7 +45,8 @@ const {
     createJadwal,
     getJadwalById,
     updateJadwal,
-    deleteJadwal
+    deleteJadwal,
+    toggleJadwalStatus
 } = require('./controllers/jadwal.controller');
 
 // TAMBAHAN: Impor controller untuk Mahasiswa & Absensi
@@ -165,6 +169,11 @@ app.get('/praktikum/:praktikum_id/modul', getModulPage);
 app.post('/praktikum/:praktikum_id/modul/upload', upload.single('fileModul'), uploadModul);
 app.post('/modul/delete/:modul_id', deleteModul);
 
+// === Pengumuman (Informasi) ===
+app.post('/praktikum/:praktikum_id/pengumuman/create', createPengumuman);
+app.post('/pengumuman/update/:id', updatePengumuman);
+app.post('/pengumuman/delete/:id', deletePengumuman);
+
 // === Kuis ===
 app.get('/praktikum/:praktikum_id/kuis', getKuisPage);
 app.get('/praktikum/:praktikum_id/kuis/baru', showTambahKuisPage);
@@ -176,15 +185,16 @@ app.post('/kuis/:id/toggle-status', toggleKuisStatus);
 app.get('/kuis/:id/edit', showEditKuisPage);
 app.post('/kuis/:id/edit', updateKuis);
 app.get('/kuis/:id/daftar-soal', showDaftarSoalPage);
-app.get('/kuis/:kuis_id/nilai', showNilaiKuisPage);
-app.get('/kuis/:kuis_id/nilai/excel', exportNilaiExcel);
-app.get('/kuis/:kuis_id/nilai/pdf', exportNilaiPDF);
+app.get('/kuis/:id/nilai', showNilaiKuisPage);
+app.get('/kuis/:id/nilai/excel', exportNilaiExcel);
+app.get('/kuis/:id/nilai/pdf', exportNilaiPDF);
 
 // === Jadwal ===
 app.get('/praktikum/:praktikum_id/jadwal', getJadwalPage);
 app.post('/jadwal/create', createJadwal);
 app.post('/jadwal/update/:id', updateJadwal);
 app.post('/jadwal/delete/:id', deleteJadwal);
+app.post('/jadwal/toggle-status/:id', toggleJadwalStatus);
 app.get('/api/jadwal/:id', getJadwalById);
 
 // === Mahasiswa & Absensi === (TAMBAHAN BARU)

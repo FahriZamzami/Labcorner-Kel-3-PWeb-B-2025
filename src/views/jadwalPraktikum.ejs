@@ -36,6 +36,7 @@
                             <th class="px-5 py-3">Materi</th>
                             <th class="px-5 py-3">Ruangan</th>
                             <th class="px-5 py-3">Pengajar</th>
+                            <th class="px-5 py-3">Status</th>
                             <th class="px-5 py-3">Aksi</th>
                         </tr>
                     </thead>
@@ -48,6 +49,21 @@
                             <td class="px-5 py-4 text-sm"><%= jadwal.materi %></td>
                             <td class="px-5 py-4 text-sm"><%= jadwal.ruangan %></td>
                             <td class="px-5 py-4 text-sm"><%= jadwal.nama_pengajar %></td>
+                            <td class="px-5 py-4 text-sm">
+                                <form action="/jadwal/toggle-status/<%= jadwal.id %>" method="POST" class="inline">
+                                    <button type="submit" class="cursor-pointer">
+                                        <% if (jadwal.status === 'Selesai') { %>
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Selesai
+                                            </span>
+                                        <% } else { %>
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                Belum Mulai
+                                            </span>
+                                        <% } %>
+                                    </button>
+                                </form>
+                            </td>
                             <td class="px-5 py-4 text-sm flex space-x-3">
                                 <button onclick="openEditModal('<%= jadwal.id %>')" class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <form action="/jadwal/delete/<%= jadwal.id %>" method="POST" class="delete-form">

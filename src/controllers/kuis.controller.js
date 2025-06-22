@@ -87,7 +87,7 @@ const createKuis = async (req, res) => {
         });
 
         // Redirect to the page for adding questions to this new kuis
-        res.redirect(`/kuis/${newKuis.id}/soal/baru`);
+        res.redirect(`/kuis/${newKuis.id}/soal/tambah`);
 
     } catch (error) {
         console.error('Error creating kuis:', error);
@@ -97,7 +97,7 @@ const createKuis = async (req, res) => {
 
 const showTambahSoalPage = async (req, res) => {
     try {
-        const kuis_id = parseInt(req.params.kuis_id, 10);
+        const kuis_id = parseInt(req.params.id, 10);
         const kuis = await prisma.kuis.findUnique({
             where: { id: kuis_id },
             include: { praktikum: true },
@@ -119,15 +119,18 @@ const showTambahSoalPage = async (req, res) => {
 };
 
 const createSoal = async (req, res) => {
-    const kuis_id = parseInt(req.params.kuis_id, 10);
-    const { pertanyaan, tipe, jawaban_benar } = req.body;
+    const kuis_id = parseInt(req.params.id, 10);
+    const { pertanyaan, tipe, jawaban_benar, action } = req.body;
 
     try {
+        const kuis = await prisma.kuis.findUnique({ where: { id: kuis_id } });
+        if (!kuis) return res.status(404).send('Kuis tidak ditemukan');
+
         const data = {
             kuis_id,
             pertanyaan,
             tipe,
-            jawaban_benar: '', // default
+            jawaban_benar: '',
         };
 
         if (tipe === 'pilihan_ganda') {
@@ -140,19 +143,20 @@ const createSoal = async (req, res) => {
             data.opsi_d = opsiValues[3] || null;
             data.opsi_e = opsiValues[4] || null;
 
-            // Jawaban benar adalah teks dari opsi yang dipilih
             const indexJawabanBenar = parseInt(jawaban_benar, 10);
-            data.jawaban_benar = opsiValues[indexJawabanBenar];
+            data.jawaban_benar = opsiValues[indexJawabanBenar] || 'Tidak ada jawaban';
 
         } else if (tipe === 'essay') {
-            // Untuk essay, jawaban benar bisa dikosongkan atau diisi manual nanti
             data.jawaban_benar = '-'; 
         }
 
         await prisma.pertanyaan.create({ data });
 
-        // Redirect back to the same page to add another question
-        res.redirect(`/kuis/${kuis_id}/soal/baru`);
+        if (action === 'selesai') {
+            res.redirect(`/praktikum/${kuis.praktikum_id}/kuis`);
+        } else {
+            res.redirect(`/kuis/${kuis_id}/soal/tambah`);
+        }
 
     } catch (error) {
         console.error('Error creating soal:', error);
@@ -234,7 +238,7 @@ const updateKuis = async (req, res) => {
 
 const showDaftarSoalPage = async (req, res) => {
     try {
-        const kuis_id = parseInt(req.params.kuis_id, 10);
+        const kuis_id = parseInt(req.params.id, 10);
         const kuis = await prisma.kuis.findUnique({
             where: { id: kuis_id },
             include: {
@@ -264,7 +268,7 @@ const showDaftarSoalPage = async (req, res) => {
 
 const showNilaiKuisPage = async (req, res) => {
     try {
-        const kuis_id = parseInt(req.params.kuis_id, 10);
+        const kuis_id = parseInt(req.params.id, 10);
         const kuis = await prisma.kuis.findUnique({
             where: { id: kuis_id },
             include: {
@@ -303,7 +307,7 @@ const showNilaiKuisPage = async (req, res) => {
 };
 
 const exportNilaiExcel = async (req, res) => {
-    const kuis_id = parseInt(req.params.kuis_id, 10);
+    const kuis_id = parseInt(req.params.id, 10);
     try {
         const kuis = await prisma.kuis.findUnique({
             where: { id: kuis_id },
@@ -341,7 +345,7 @@ const exportNilaiExcel = async (req, res) => {
 };
 
 const exportNilaiPDF = async (req, res) => {
-    const kuis_id = parseInt(req.params.kuis_id, 10);
+    const kuis_id = parseInt(req.params.id, 10);
     try {
         const kuis = await prisma.kuis.findUnique({
             where: { id: kuis_id },

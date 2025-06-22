@@ -10,36 +10,37 @@ const prisma = new PrismaClient();
  * Mengambil data praktikum dan daftar modul yang terkait.
  */
 const getModulPage = async (req, res) => {
-    // Ambil ID dari parameter URL dan ubah menjadi Angka (Integer)
     const praktikumId = parseInt(req.params.praktikum_id, 10);
 
-    // Validasi apakah ID praktikum valid
     if (isNaN(praktikumId)) {
         return res.status(400).send('ID Praktikum tidak valid.');
     }
 
     try {
-        // 1. Ambil data spesifik praktikum menggunakan Prisma
         const praktikum = await prisma.praktikum.findUnique({
             where: { id: praktikumId }
         });
 
-        // Jika praktikum dengan ID tersebut tidak ditemukan, kirim error 404
         if (!praktikum) {
             return res.status(404).send('Praktikum tidak ditemukan');
         }
         
-        // 2. Ambil semua modul yang berelasi dengan praktikum_id, diurutkan dari yang terbaru
         const modules = await prisma.modul.findMany({
             where: { praktikum_id: praktikumId },
             orderBy: { diunggah_pada: 'desc' }
         });
+
+        const announcements = await prisma.pengumuman.findMany({
+            where: { praktikum_id: praktikumId },
+            orderBy: { dibuat_pada: 'desc' },
+            include: { pembuat: true } 
+        });
         
-        // 3. Render halaman EJS dan kirimkan data yang sudah didapat
         res.render('modul', {
-            praktikum: praktikum,
-            modules: modules,
-            title: `Modul ${praktikum.nama}` // Contoh menambah judul dinamis
+            praktikum,
+            modules,
+            announcements,
+            title: `Modul ${praktikum.nama_praktikum}`
         });
 
     } catch (error) {
@@ -133,9 +134,62 @@ const deleteModul = async (req, res) => {
     }
 };
 
+const createPengumuman = async (req, res) => {
+    const praktikumId = parseInt(req.params.praktikum_id, 10);
+    const { isi } = req.body;
+    const userId = req.session.user.id; 
+
+    try {
+        await prisma.pengumuman.create({
+            data: {
+                isi,
+                praktikum_id: praktikumId,
+                dibuat_oleh: userId,
+                dibuat_pada: new Date(),
+            }
+        });
+        res.redirect(`/praktikum/${praktikumId}/modul`);
+    } catch (error) {
+        console.error("Error membuat pengumuman:", error);
+        res.status(500).send("Gagal membuat pengumuman.");
+    }
+};
+
+const updatePengumuman = async (req, res) => {
+    const pengumumanId = parseInt(req.params.id, 10);
+    const { isi, praktikum_id } = req.body;
+
+    try {
+        await prisma.pengumuman.update({
+            where: { id: pengumumanId },
+            data: { isi }
+        });
+        res.redirect(`/praktikum/${praktikum_id}/modul`);
+    } catch (error) {
+        console.error("Error mengupdate pengumuman:", error);
+        res.status(500).send("Gagal mengupdate pengumuman.");
+    }
+};
+
+const deletePengumuman = async (req, res) => {
+    const pengumumanId = parseInt(req.params.id, 10);
+
+    try {
+        const pengumuman = await prisma.pengumuman.findUnique({ where: { id: pengumumanId } });
+        await prisma.pengumuman.delete({ where: { id: pengumumanId } });
+        res.redirect(`/praktikum/${pengumuman.praktikum_id}/modul`);
+    } catch (error) {
+        console.error("Error menghapus pengumuman:", error);
+        res.status(500).send("Gagal menghapus pengumuman.");
+    }
+};
+
 // Ekspor semua fungsi controller agar bisa digunakan oleh router
 module.exports = {
     getModulPage,
     uploadModul,
-    deleteModul
+    deleteModul,
+    createPengumuman,
+    updatePengumuman,
+    deletePengumuman
 };

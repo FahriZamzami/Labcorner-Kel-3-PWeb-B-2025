@@ -21,21 +21,44 @@
 
         <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
             
-            <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg mb-8">
+            <div class="bg-white rounded-xl shadow p-6">
                 <div class="flex items-center mb-4">
-                    <i class="fa-solid fa-circle-info text-purple-600 mr-3"></i>
-                    <h2 class="text-lg font-semibold text-gray-700">Informasi</h2>
+                    <i class="fas fa-info-circle text-purple-600 mr-3 text-xl"></i>
+                    <h2 class="text-xl font-bold text-gray-800">Informasi</h2>
                 </div>
-                <form action="#" method="POST" class="relative mb-4">
-                    <input type="text" placeholder="Tambahkan informasi..." class="w-full p-3 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition">
-                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 hover:text-purple-800 text-2xl"><i class="fa-solid fa-paper-plane"></i></button>
+
+                <form action="/praktikum/<%= praktikum.id %>/pengumuman/create" method="POST" class="flex items-center space-x-3">
+                    <input type="text" name="isi" placeholder="Tambahkan informasi baru untuk mahasiswa..."
+                        class="flex-grow w-full px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+                    <button type="submit"
+                        class="bg-purple-600 text-white rounded-lg px-4 py-2 hover:bg-purple-700 transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </form>
-                <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center text-sm">
-                    <p class="text-gray-800">Pertemuan Pertama - Senin, 9 Juni 2025</p>
-                    <div>
-                        <button class="text-blue-500 hover:text-blue-700 mr-2 font-medium">Edit</button>
-                        <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
-                    </div>
+
+                <hr class="my-6">
+
+                <div class="space-y-4">
+                    <% if (announcements.length > 0) { %>
+                        <% announcements.forEach(pengumuman => { %>
+                            <div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <p class="text-gray-800"><%= pengumuman.isi %></p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Diposting pada <%= new Date(pengumuman.dibuat_pada).toLocaleString('id-ID') %>
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-3 flex-shrink-0 ml-4">
+                                    <button onclick="openEditModal('<%= pengumuman.id %>', `<%= pengumuman.isi %>`)" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></button>
+                                    <form action="/pengumuman/delete/<%= pengumuman.id %>" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengumuman ini?');">
+                                        <button type="submit" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="text-center text-gray-500 py-4">Belum ada informasi yang ditambahkan.</p>
+                    <% } %>
                 </div>
             </div>
 
@@ -101,6 +124,22 @@
             </form>
         </div>
     </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-8 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6">Edit Informasi</h2>
+            <form id="editForm" method="POST">
+                <input type="hidden" name="praktikum_id" value="<%= praktikum.id %>">
+                <textarea name="isi" id="editIsi" rows="4" class="w-full px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 mb-4"></textarea>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeEditModal()" class="px-6 py-2 bg-gray-200 rounded-lg">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -125,6 +164,20 @@
                 });
             });
         });
+
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const editIsi = document.getElementById('editIsi');
+    
+        function openEditModal(id, currentIsi) {
+            editForm.action = `/pengumuman/update/${id}`;
+            editIsi.value = currentIsi;
+            editModal.classList.remove('hidden');
+        }
+    
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+        }
     </script>
 </body>
 </html>

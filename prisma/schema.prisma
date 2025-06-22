@@ -24,6 +24,11 @@ enum StatusAbsensi {
   Tidak_Hadir
 }
 
+enum StatusJadwal {
+  Selesai
+  Belum_Mulai
+}
+
 enum StatusKuis {
   aktif
   tidak_aktif
@@ -91,7 +96,7 @@ model mahasiswa {
   praktikum_id   Int
   waktu_daftar   DateTime?
   user           user      @relation(fields: [user_id], references: [id])
-  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, praktikum_id])
 }
@@ -105,8 +110,9 @@ model jadwal {
   materi         String?
   nama_pengajar  String?
   dibuat_pada    DateTime  @default(now())
+  status         StatusJadwal @default(Belum_Mulai)
 
-  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   absensi      absensi[]
 }
 
@@ -116,7 +122,7 @@ model modul {
   judul         String
   file_path     String
   diunggah_pada DateTime  @default(now())
-  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
+  praktikum     praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
 }
 
 model tugas {
@@ -130,7 +136,7 @@ model tugas {
   status           StatusTugas   @default(open)
   tutup_penugasan  Boolean       @default(false)
 
-  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id])
+  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   pengumpulan      pengumpulan[]
 }
 
@@ -143,7 +149,7 @@ model pengumpulan {
   nilai        Float?
   catatan      String?
 
-  tugas        tugas     @relation(fields: [tugas_id], references: [id])
+  tugas        tugas     @relation(fields: [tugas_id], references: [id], onDelete: Cascade)
   user         user      @relation(fields: [user_id], references: [id])
 }
 
@@ -154,7 +160,7 @@ model pengumuman {
   dibuat_oleh  String
   dibuat_pada  DateTime?
 
-  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   pembuat      user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
 }
 
@@ -164,7 +170,7 @@ model absensi {
   jadwal_id Int
   status    StatusAbsensi // Sekarang Prisma tahu apa itu 'StatusAbsensi'
   user      user          @relation(fields: [user_id], references: [id])
-  jadwal    jadwal        @relation(fields: [jadwal_id], references: [id])
+  jadwal    jadwal        @relation(fields: [jadwal_id], references: [id], onDelete: Cascade)
 }
 
 model kuis {
@@ -178,7 +184,7 @@ model kuis {
   status           StatusKuis  @default(tidak_aktif)
   dibuat_pada      DateTime    @default(now())
   
-  praktikum        praktikum   @relation(fields: [praktikum_id], references: [id])
+  praktikum        praktikum   @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   pertanyaan       pertanyaan[]
   jawaban_kuis     jawabanKuis[]
 }

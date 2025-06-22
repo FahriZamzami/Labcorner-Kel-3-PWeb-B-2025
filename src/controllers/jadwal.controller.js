@@ -25,7 +25,6 @@ const getJadwalPage = async (req, res) => {
             title: `Jadwal Praktikum - ${praktikum.nama_praktikum}`,
             praktikum,
             jadwalList,
-            // currentPath akan diurus oleh middleware
         });
     } catch (error) {
         console.error('Error fetching jadwal page:', error);
@@ -125,10 +124,34 @@ const deleteJadwal = async (req, res) => {
     }
 };
 
+const toggleJadwalStatus = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const jadwal = await prisma.jadwal.findUnique({ where: { id } });
+
+        if (!jadwal) {
+            return res.status(404).send('Jadwal tidak ditemukan');
+        }
+
+        const newStatus = jadwal.status === 'Selesai' ? 'Belum_Mulai' : 'Selesai';
+
+        await prisma.jadwal.update({
+            where: { id },
+            data: { status: newStatus },
+        });
+
+        res.redirect(`/praktikum/${jadwal.praktikum_id}/jadwal`);
+    } catch (error) {
+        console.error('Error toggling jadwal status:', error);
+        res.status(500).send('Gagal mengubah status jadwal');
+    }
+};
+
 module.exports = {
     getJadwalPage,
     createJadwal,
     getJadwalById,
     updateJadwal,
     deleteJadwal,
+    toggleJadwalStatus,
 };
