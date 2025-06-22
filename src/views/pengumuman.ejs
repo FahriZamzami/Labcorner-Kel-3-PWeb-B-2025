@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+    <style>
+        #modal-toggle:checked ~ .modal-backdrop { display: flex; }
+    </style>
+</head>
+<body class="bg-purple-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { currentPath: currentPath, praktikum: praktikum }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Pengumuman</h1>
+                    <p class="text-gray-500">Praktikum: <%= praktikum.nama_praktikum %></p>
+                </div>
+                <label for="modal-toggle" class="cursor-pointer bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300">
+                    <i class="fa-solid fa-plus mr-2"></i>Buat Pengumuman
+                </label>
+            </header>
+
+            <div class="space-y-6">
+                <% if (pengumumanList.length > 0) { %>
+                    <% pengumumanList.forEach(pengumuman => { %>
+                        <div class="bg-white rounded-lg shadow-md p-6 relative">
+                            <% if (user.id === pengumuman.dibuat_oleh || user.peran === 'admin') { %>
+                            <form action="/pengumuman/delete/<%= pengumuman.id %>" method="POST" class="delete-form absolute top-4 right-4">
+                                <button type="submit" class="text-gray-400 hover:text-red-600">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
+                            <% } %>
+
+                            <p class="text-gray-700 whitespace-pre-wrap"><%= pengumuman.isi %></p>
+                            <div class="text-right text-xs text-gray-400 mt-4 border-t pt-2">
+                                Dibuat oleh <strong><%= pengumuman.pembuat.username %></strong> pada <%= new Date(pengumuman.dibuat_pada).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short'}) %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="text-center py-16 bg-white rounded-lg shadow-md">
+                        <i class="fa-solid fa-bullhorn text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Belum ada pengumuman untuk praktikum ini.</p>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <input type="checkbox" id="modal-toggle" class="hidden">
+    <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Buat Pengumuman Baru</h3>
+                <label for="modal-toggle" class="cursor-pointer text-2xl text-gray-500 hover:text-gray-800">&times;</label>
+            </div>
+            <form action="/pengumuman/create" method="POST">
+                <input type="hidden" name="praktikum_id" value="<%= praktikum.id %>">
+                <div class="mb-4">
+                    <label for="isi" class="block text-sm font-medium text-gray-700 mb-1">Isi Pengumuman</label>
+                    <textarea name="isi" id="isi" rows="6" required class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ketik pengumuman Anda di sini..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <label for="modal-toggle" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md cursor-pointer hover:bg-gray-300">Batal</label>
+                    <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">Terbitkan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Anda yakin?',
+                        text: "Pengumuman yang dihapus tidak bisa dikembalikan!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6B7280',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then(result => {
+                        if (result.isConfirmed) form.submit();
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

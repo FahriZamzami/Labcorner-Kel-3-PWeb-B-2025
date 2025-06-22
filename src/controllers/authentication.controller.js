@@ -1,16 +1,15 @@
+// src/controllers/authentication.controller.js
+
 const bcrypt = require('bcrypt');
 const prisma = require('../../prisma/client');
 
 const login = async (req, res) => {
-    const { id, kata_sandi } = req.body;
-
     try {
-        const user = await prisma.user.findUnique({
-            where: { id }
-        });
+        const { id, kata_sandi } = req.body;
+        const user = await prisma.user.findUnique({ where: { id } });
 
         if (!user) {
-            return res.status(401).send('ID tidak ditemukan');
+            return res.status(401).send('ID atau password salah');
         }
 
         const isPasswordValid = user.peran === 'admin'
@@ -18,7 +17,7 @@ const login = async (req, res) => {
             : user.kata_sandi === kata_sandi;
 
         if (!isPasswordValid) {
-            return res.status(401).send('Password salah');
+            return res.status(401).send('ID atau password salah');
         }
 
         req.session.user = {
@@ -27,39 +26,19 @@ const login = async (req, res) => {
             peran: user.peran
         };
 
+        // Arahkan berdasarkan peran
         if (user.peran === 'admin') {
-            return res.render('admin', { user });
+            return res.redirect('/admin/dashboard'); // Ganti dengan URL dashboard admin Anda
         }
-
         if (user.peran === 'asisten') {
-            const asisten = await prisma.asistenLab.findFirst({
-                where: { user_id: user.id }
-            });
-
-            if (!asisten) {
-                return res.status(404).send('Data asisten tidak ditemukan');
-            }
-
-            const lab = await prisma.lab.findUnique({
-                where: { id: asisten.lab_id },
-                include: {
-                    praktikum: true
-                }
-            });
-
-            if (!lab) {
-                return res.status(404).send('Lab tidak ditemukan');
-            }
-
-            return res.render('lab', {
-                user,
-                lab,
-                praktikumList: lab.praktikum
-            });
+            return res.redirect('/lab');
         }
-
         if (user.peran === 'mahasiswa') {
-            return res.render('mahasiswa', { user });
+            // ===================================================
+            // #### PERBAIKAN DI SINI ####
+            // Arahkan ke /welcome, BUKAN /home
+            // ===================================================
+            return res.redirect('/pilihLab'); 
         }
 
         return res.status(403).send('Peran tidak dikenali');
