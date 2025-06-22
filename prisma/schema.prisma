@@ -36,6 +36,7 @@ model user {
   pengumpulan  pengumpulan[]
   pengumuman   pengumuman[]    @relation("PengumumanPembuat")
   absensi      absensi[]
+  downloadTracking downloadTracking[]
 }
 
 model lab {
@@ -58,6 +59,7 @@ model praktikum {
   modul            modul[]
   tugas            tugas[]
   pengumuman       pengumuman[]
+  downloadTracking downloadTracking[]
 }
 
 model pendaftaran {
@@ -95,6 +97,7 @@ model modul {
 
   praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
   user           user      @relation(fields: [diunggah_oleh], references: [id])
+  downloadTracking downloadTracking[]
 }
 
 model tugas {
@@ -143,4 +146,16 @@ model absensi {
 
   user      user           @relation(fields: [user_id], references: [id])
   jadwal    jadwal         @relation(fields: [jadwal_id], references: [id])
+}
+
+model downloadTracking {
+  id             Int       @id @default(autoincrement())
+  modul_id       Int
+  user_id        String
+  praktikum_id   Int
+  downloaded_at  DateTime  @default(now())
+
+  modul          modul     @relation(fields: [modul_id], references: [id])
+  user           user      @relation(fields: [user_id], references: [id])
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
 }

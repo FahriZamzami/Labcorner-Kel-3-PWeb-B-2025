@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Praktikum - LabCorner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .pertemuan-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .pertemuan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-50 min-h-screen">
+    <div class="flex min-h-screen">
+        <%- include('sidebar', { currentPage: currentPage }) %>
+
+        <main class="flex-1 p-6 lg:p-8 max-w-7xl mx-auto">
+            <!-- Header Section -->
+            <div class="mb-8 text-center lg:text-left">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full mb-4 lg:mb-6">
+                    <i class="fas fa-calendar-alt text-white text-2xl"></i>
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-3">Jadwal Praktikum</h1>
+                <p class="text-xl text-gray-600 mb-2">Data Mining</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-purple-500 to-indigo-500 mx-auto lg:mx-0 rounded-full"></div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6 card-hover border-l-4 border-purple-500">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-full">
+                            <i class="fas fa-calendar-check text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Pertemuan</p>
+                            <p class="text-2xl font-bold text-gray-900"><%= daftarJadwal.length %></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-6 card-hover border-l-4 border-indigo-500">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-indigo-100 rounded-full">
+                            <i class="fas fa-clock text-indigo-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Durasi Rata-rata</p>
+                            <p class="text-2xl font-bold text-gray-900">2 Jam</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jadwal Content -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="gradient-bg px-8 py-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white mb-2">📅 Daftar Pertemuan</h2>
+                            <p class="text-purple-100">Jadwal praktikum yang telah diatur</p>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-list-ul text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-8">
+                    <% if (daftarJadwal.length > 0) { %>
+                        <div class="space-y-6">
+                            <% daftarJadwal.forEach((jadwal, index) => { %>
+                                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl shadow-lg overflow-hidden card-hover border border-purple-100">
+                                    <!-- Header Pertemuan -->
+                                    <div class="pertemuan-card px-8 py-6">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                                    <span class="text-white font-bold text-lg"><%= index + 1 %></span>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-white">
+                                                        <%= jadwal.pertemuan %>
+                                                    </h3>
+                                                    <p class="text-purple-100 text-sm">Klik untuk melihat detail</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onclick="togglePertemuan(<%= index %>)" 
+                                                class="text-white hover:text-purple-200 transition-colors p-2 rounded-full hover:bg-white hover:bg-opacity-20"
+                                                id="toggle-<%= index %>"
+                                            >
+                                                <i class="fas fa-chevron-down text-xl" id="icon-<%= index %>"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Detail Pertemuan -->
+                                    <div class="hidden" id="detail-<%= index %>">
+                                        <div class="p-8 space-y-6">
+                                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                <div class="bg-purple-50 rounded-xl p-6 border border-purple-100">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-calendar text-white text-lg"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-medium text-purple-600 uppercase tracking-wide">Hari & Tanggal</p>
+                                                            <p class="text-lg font-semibold text-gray-900"><%= jadwal.tanggal_formatted %></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-100">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-clock text-white text-lg"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-medium text-indigo-600 uppercase tracking-wide">Pukul</p>
+                                                            <p class="text-lg font-semibold text-gray-900"><%= jadwal.jam_formatted %> WIB</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="bg-violet-50 rounded-xl p-6 border border-violet-100">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="w-12 h-12 bg-violet-500 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-map-marker-alt text-white text-lg"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-medium text-violet-600 uppercase tracking-wide">Ruangan</p>
+                                                            <p class="text-lg font-semibold text-gray-900"><%= jadwal.ruangan || 'Belum ditentukan' %></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="bg-fuchsia-50 rounded-xl p-6 border border-fuchsia-100">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="w-12 h-12 bg-fuchsia-500 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-user text-white text-lg"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-medium text-fuchsia-600 uppercase tracking-wide">Nama Asisten Lab</p>
+                                                            <p class="text-lg font-semibold text-gray-900"><%= jadwal.nama_pengajar || 'Belum ditentukan' %></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                                <div class="flex items-center space-x-4">
+                                                    <div class="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-info text-white text-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Dibuat pada</p>
+                                                        <p class="text-lg font-semibold text-gray-900"><%= jadwal.dibuat_pada_formatted %></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-16">
+                            <div class="w-24 h-24 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-calendar-times text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Belum ada jadwal</h3>
+                            <p class="text-gray-600 text-lg mb-6">Jadwal praktikum belum diatur oleh asisten lab</p>
+                            <div class="w-32 h-1 bg-gradient-to-r from-purple-500 to-indigo-500 mx-auto rounded-full"></div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function togglePertemuan(index) {
+            const detail = document.getElementById(`detail-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            if (detail.classList.contains('hidden')) {
+                detail.classList.remove('hidden');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                detail.classList.add('hidden');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+    </script>
+</body>
+</html> 
