@@ -7,7 +7,7 @@ const jadwalController = {
     try {
       const currentLab = req.session.currentLab;
       if (!currentLab) {
-        return res.redirect('/pilihLab');
+        return res.redirect('/dashboard-kelas');
       }
 
       const daftarJadwal = await prisma.jadwal.findMany({
@@ -54,9 +54,23 @@ const jadwalController = {
         }) : '-'
       }));
 
+      // Get praktikum info with lab data
+      const praktikum = await prisma.praktikum.findUnique({
+        where: { id: currentLab.id },
+        include: {
+          lab: true
+        }
+      });
+
+      // Update currentLab with complete data
+      const updatedCurrentLab = {
+        ...currentLab,
+        lab: praktikum.lab
+      };
+
       res.render('jadwal', {
         currentPage: 'jadwal',
-        currentLab: currentLab,
+        currentLab: updatedCurrentLab,
         daftarJadwal: jadwalFormatted
       });
 

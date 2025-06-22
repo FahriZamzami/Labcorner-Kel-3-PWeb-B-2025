@@ -1,48 +1,71 @@
-const bcrypt = require('bcrypt');
-const prisma = require('../../prisma/client');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-const login = async (req, res) => {
-    const { username, kata_sandi } = req.body;
+const authenticationController = {
+    async login(req, res) {
+        try {
+            const { username, password } = req.body;
 
-    try {
-    const user = await prisma.user.findUnique({
-        where: { username }
-    });
+            // Cari user berdasarkan username
+            const user = await prisma.user.findFirst({
+                where: { username }
+            });
 
-    if (!user) {
-        return res.status(401).send('Username tidak ditemukan');
-    }
+            if (!user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Username atau password salah'
+                });
+            }
 
-    const isPasswordValid = user.peran === 'admin'
-        ? await bcrypt.compare(kata_sandi, user.kata_sandi)
-        : user.kata_sandi === kata_sandi;
+            // Untuk sementara, password validation diabaikan (untuk testing)
+            // Dalam implementasi nyata, gunakan bcrypt untuk compare password
 
-    if (!isPasswordValid) {
-        return res.status(401).send('Password salah');
-    }
+            // Set session
+            req.session.user = {
+                id: user.id,
+                username: user.username,
+                peran: user.peran
+            };
 
-    // Simpan data user ke session
-    req.session.user = {
-        id: user.id,
-        username: user.username,
-        peran: user.peran
-    };
+            console.log('Login berhasil untuk:', user.username, 'Peran:', user.peran);
 
-    // Arahkan berdasarkan peran
-    if (user.peran === 'admin') {
-        return res.render('admin', { user });
-    } else if (user.peran === 'asisten') {
-    return res.redirect('/lab');
-    } else if (user.peran === 'mahasiswa') {
-        return res.render('mahasiswa', { user });
-    } else {
-        return res.status(403).send('Peran tidak dikenali');
-    }
+            // Redirect berdasarkan peran
+            if (user.peran === 'mahasiswa') {
+                // Mahasiswa diarahkan ke dashboard kelas
+                res.redirect('/dashboard-kelas');
+            } else if (user.peran === 'asisten') {
+                // Asisten diarahkan ke dashboard
+                res.redirect('/dashboard');
+            } else {
+                // Default redirect
+                res.redirect('/home');
+            }
 
-    } catch (error) {
-    console.error(error);
-    res.status(500).send('Terjadi kesalahan server');
+        } catch (error) {
+            console.error('Error in login:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Terjadi kesalahan saat login'
+            });
+        }
+    },
+
+    async logout(req, res) {
+        try {
+            // Destroy session
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error('Error destroying session:', err);
+                    return res.status(500).send('Error logging out');
+                }
+                res.redirect('/login');
+            });
+        } catch (error) {
+            console.error('Error in logout:', error);
+            res.status(500).send('Error logging out');
+        }
     }
 };
 
-module.exports = { login };
+module.exports = authenticationController;

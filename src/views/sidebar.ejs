@@ -1,34 +1,132 @@
 <aside class="w-64 bg-purple-900 text-white p-6">
-  <h1 class="text-3xl font-bold mb-8 text-center">LABCORNER</h1>
+  <div class="flex justify-center mb-8">
+    <img src="/assets/image/LabCorner.png" alt="Labcorner Logo" class="h-16 w-auto object-contain">
+  </div>
+  
+  <!-- Current Praktikum Info -->
+  <% if (typeof currentLab !== 'undefined' && currentLab) { %>
+    <div class="bg-purple-800 rounded-lg p-4 mb-6">
+      <div class="flex items-center mb-2">
+        <i class="fas fa-graduation-cap text-purple-300 mr-2"></i>
+        <span class="text-sm font-semibold text-purple-300">Praktikum Aktif</span>
+      </div>
+      <h3 class="text-white font-bold text-lg leading-tight">
+        <%= currentLab.nama_praktikum %>
+      </h3>
+      <% if (currentLab.lab && currentLab.lab.nama_lab) { %>
+        <p class="text-purple-200 text-sm mt-1">
+          <i class="fas fa-flask mr-1"></i>
+          <%= currentLab.lab.nama_lab %>
+        </p>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="bg-yellow-800 rounded-lg p-4 mb-6">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-triangle text-yellow-300 mr-2"></i>
+        <span class="text-sm font-semibold text-yellow-300">Belum Bergabung</span>
+      </div>
+      <p class="text-yellow-200 text-sm mt-1">
+        Silakan pilih praktikum terlebih dahulu
+      </p>
+    </div>
+  <% } %>
+  
   <ul class="space-y-4">
     <li>
       <a href="/modulMateri" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
-        <% if (currentPage === 'modulMateri') { %> bg-purple-700 <% } %>">
+        <% if (typeof currentPage !== 'undefined' && currentPage === 'modulMateri') { %> bg-purple-700 <% } %>">
         <i class="fas fa-book mr-3"></i>Modul Materi
       </a>
     </li>
     <li>
       <a href="/tugas" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
-        <% if (currentPage === 'tugas') { %> bg-purple-700 <% } %>">
+        <% if (typeof currentPage !== 'undefined' && currentPage === 'tugas') { %> bg-purple-700 <% } %>">
         <i class="fas fa-tasks mr-3"></i>Tugas
       </a>
     </li>
     <li>
       <a href="/jadwal" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
-        <% if (currentPage === 'jadwal') { %> bg-purple-700 <% } %>">
+        <% if (typeof currentPage !== 'undefined' && currentPage === 'jadwal') { %> bg-purple-700 <% } %>">
         <i class="fas fa-calendar-alt mr-3"></i>Jadwal Praktikum
       </a>
     </li>
     <li>
-      <a href="/kontak" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
-        <% if (currentPage === 'kontak') { %> bg-purple-700 <% } %>">
-        <i class="fas fa-envelope mr-3"></i>Kontak Lab
+      <a href="/rekapNilai" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
+        <% if (typeof currentPage !== 'undefined' && currentPage === 'rekapNilai') { %> bg-purple-700 <% } %>">
+        <i class="fas fa-chart-line mr-3"></i>Rekap Nilai
       </a>
     </li>
     <li class="pt-4 border-t border-purple-700">
-      <a href="/logout" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors">
+      <button onclick="confirmLogout()" class="w-full text-left py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors">
         <i class="fas fa-sign-out-alt mr-3"></i>Logout
-      </a>
+      </button>
     </li>
   </ul>
 </aside>
+
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+  <div class="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl transform transition-all">
+    <div class="text-center">
+      <!-- Icon -->
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+        <i class="fas fa-sign-out-alt text-3xl text-red-600"></i>
+      </div>
+      
+      <!-- Title -->
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">
+        Konfirmasi Keluar
+      </h3>
+      
+      <!-- Message -->
+      <p class="text-gray-600 mb-8 text-lg leading-relaxed">
+        Apakah Anda yakin ingin keluar dari sistem Labcorner? 
+        <br><br>
+        <span class="font-semibold text-gray-800">Semua data yang belum disimpan akan hilang.</span>
+      </p>
+      
+      <!-- Buttons -->
+      <div class="flex space-x-4">
+        <button onclick="closeLogoutModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl transition-colors duration-200">
+          <i class="fas fa-times mr-2"></i>
+          Batal
+        </button>
+        <button onclick="performLogout()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-200">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Ya, Keluar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmLogout() {
+  document.getElementById('logoutModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutModal').classList.add('hidden');
+  document.body.style.overflow = 'auto';
+}
+
+function performLogout() {
+  window.location.href = '/logout';
+}
+
+// Close modal when clicking outside
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeLogoutModal();
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLogoutModal();
+  }
+});
+</script>

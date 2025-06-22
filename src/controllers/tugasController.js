@@ -62,11 +62,11 @@ const tugasController = {
     try {
       const currentLab = req.session.currentLab;
       if (!currentLab) {
-        return res.redirect('/pilihLab');
+        return res.redirect('/dashboard-kelas');
       }
       
       const daftarTugas = await prisma.tugas.findMany({
-        orderBy: { batas_waktu: 'asc' }
+        orderBy: { judul: 'asc' }
       });
 
       const formattedTugas = daftarTugas.map(tugas => ({
@@ -76,10 +76,24 @@ const tugasController = {
         }) + ' WIB'
       }));
 
+      // Get praktikum info with lab data
+      const praktikum = await prisma.praktikum.findUnique({
+        where: { id: currentLab.id },
+        include: {
+          lab: true
+        }
+      });
+
+      // Update currentLab with complete data
+      const updatedCurrentLab = {
+        ...currentLab,
+        lab: praktikum.lab
+      };
+
       res.render('tugas', { 
         daftarTugas: formattedTugas, 
         currentPage: 'tugas',
-        currentLab: currentLab
+        currentLab: updatedCurrentLab
       });
     } catch (error) {
       console.error('[GET /] Error fetching tasks:', error);
@@ -94,7 +108,7 @@ const tugasController = {
     const currentLab = req.session.currentLab;
 
     if (!currentLab) {
-      return res.redirect('/pilihLab');
+      return res.redirect('/dashboard-kelas');
     }
 
     if (isNaN(tugasId)) {
@@ -112,11 +126,26 @@ const tugasController = {
           weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
         }) + ' WIB';
         const submittedFile = tugasDetail.pengumpulan.length > 0 ? tugasDetail.pengumpulan[0] : null;
+        
+        // Get praktikum info with lab data
+        const praktikum = await prisma.praktikum.findUnique({
+          where: { id: currentLab.id },
+          include: {
+            lab: true
+          }
+        });
+
+        // Update currentLab with complete data
+        const updatedCurrentLab = {
+          ...currentLab,
+          lab: praktikum.lab
+        };
+
         res.render('detailTugas', { 
           tugas: tugasDetail, 
           submittedFile: submittedFile, 
           currentPage: 'tugas',
-          currentLab: currentLab
+          currentLab: updatedCurrentLab
         });
       } else {
         res.status(404).send('Tugas tidak ditemukan');

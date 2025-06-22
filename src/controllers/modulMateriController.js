@@ -10,21 +10,14 @@ const modulMateriController = {
       const currentLab = req.session.currentLab;
       console.log('currentLab:', currentLab);
       
-      // Jika tidak ada currentLab, coba ambil praktikum pertama sebagai fallback
-      let praktikumId = null;
+      // Jika tidak ada currentLab, redirect ke dashboard-kelas
       if (!currentLab) {
-        console.log('No currentLab in session, trying to get first praktikum...');
-        const firstPraktikum = await prisma.praktikum.findFirst();
-        if (firstPraktikum) {
-          praktikumId = firstPraktikum.id;
-          console.log('Using first praktikum:', firstPraktikum.nama_praktikum);
-        } else {
-          console.log('No praktikum found in database');
-          return res.status(404).send('Tidak ada praktikum yang tersedia');
-        }
-      } else {
-        praktikumId = currentLab.id;
+        console.log('No currentLab in session, redirecting to dashboard-kelas');
+        return res.redirect('/dashboard-kelas');
       }
+
+      const praktikumId = currentLab.id;
+      console.log('Using praktikum ID:', praktikumId);
 
       // Fetch modul data from database
       const moduls = await prisma.modul.findMany({
@@ -64,14 +57,23 @@ const modulMateriController = {
         totalDownloads = 0;
       }
 
-      // Get praktikum info for display
+      // Get praktikum info for display with lab data
       const praktikum = await prisma.praktikum.findUnique({
-        where: { id: praktikumId }
+        where: { id: praktikumId },
+        include: {
+          lab: true
+        }
       });
+
+      // Update currentLab with complete data
+      const updatedCurrentLab = {
+        ...currentLab,
+        lab: praktikum.lab
+      };
 
       res.render('modulMateri', { 
         currentPage: 'modulMateri',
-        currentLab: currentLab || praktikum,
+        currentLab: updatedCurrentLab,
         moduls: moduls,
         totalDownloads: totalDownloads
       });
