@@ -1,5 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
+
+const statusFile = path.join(__dirname, '..', '..', 'status.json');
+
+// Helper baca status offline dari file
+function getStatusOffline() {
+  try {
+    const data = fs.readFileSync(statusFile, 'utf8');
+    const status = JSON.parse(data);
+    return status.isOffline;
+  } catch {
+    return false;
+  }
+}
 
 // Halaman Utama (Dashboard)
 router.get('/', (req, res) => {
@@ -30,11 +45,34 @@ router.post('/maintenance', (req, res) => {
   res.redirect('/');
 });
 
-// Matikan Website
-router.get('/matikan', (req, res) => res.render('matikan', { title: 'Matikan Website' }));
+// Halaman Matikan Website (form, kirim status ke view)
+router.get('/matikan', (req, res) => {
+  const isOffline = getStatusOffline();
+  res.render('matikan', { title: 'Matikan Website', isOffline });
+});
+
+// POST Matikan Website (set isOffline = true)
 router.post('/matikan', (req, res) => {
-  console.log("Website dimatikan");
-  res.redirect('/');
+  fs.writeFile(statusFile, JSON.stringify({ isOffline: true }), err => {
+    if (err) {
+      console.error('Gagal tulis status.json', err);
+      return res.status(500).send('Internal Server Error');
+    }
+    console.log('Website dimatikan');
+    res.redirect('/matikan');
+  });
+});
+
+// POST Hidupkan Website (set isOffline = false)
+router.post('/matikan/aktifkan', (req, res) => {
+  fs.writeFile(statusFile, JSON.stringify({ isOffline: false }), err => {
+    if (err) {
+      console.error('Gagal tulis status.json', err);
+      return res.status(500).send('Internal Server Error');
+    }
+    console.log('Website diaktifkan kembali');
+    res.redirect('/');
+  });
 });
 
 // Detail Tiap Lab
@@ -89,7 +127,6 @@ const labDetails = {
   }
 };
 
-// Route Lab Detail
 router.get('/lab/:nama', (req, res) => {
   const detail = labDetails[req.params.nama.toLowerCase()];
   if (!detail) return res.status(404).send('Lab tidak ditemukan');

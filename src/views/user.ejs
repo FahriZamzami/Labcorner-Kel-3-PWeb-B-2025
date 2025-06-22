@@ -4,251 +4,234 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daftar User - LabCorner</title>
-
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- jsPDF + autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
   <style>
-    .fade-in { animation: fadeIn 0.5s ease-out both; }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .animate-scale-in {
-      animation: scaleIn 0.3s ease-out both;
-    }
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    .preserve-3d { transform-style: preserve-3d; perspective: 1000px; }
+    .card-content { transform: rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0)); }
+    .form-input { 
+      @apply w-full bg-slate-100 text-slate-800 placeholder-slate-400 px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:border-purple-500; 
     }
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-purple-300 to-indigo-600 min-h-screen text-gray-900 font-[Inter]">
-
-<div class="max-w-6xl mx-auto px-6 py-12 space-y-10">
-
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row justify-between items-center gap-6 fade-in">
-    <h2 class="text-5xl font-extrabold text-white drop-shadow">📋 Daftar User</h2>
-    <button onclick="exportPDF()" class="bg-white text-purple-700 font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-purple-100 hover:text-purple-800 active:scale-95 transition-transform duration-300 text-lg">
-      📄 Ekspor PDF
-    </button>
-  </div>
-
-  <!-- Search -->
-  <div class="flex flex-col sm:flex-row justify-between items-center gap-6 fade-in">
-    <input id="searchUser" type="text" placeholder="🔍 Cari user..." class="form-input shadow w-full sm:w-1/2 text-lg px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-400 transition" />
-    <button onclick="resetSearch()" class="text-white text-base underline hover:text-purple-200 active:scale-95 transition-transform">🔁 Reset Pencarian</button>
-  </div>
-
-  <!-- Count -->
-  <p id="userCount" class="text-white/90 text-base mb-4 font-medium fade-in">Menampilkan 1 user</p>
-
-  <!-- Tabel -->
-  <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl overflow-x-auto fade-in transition-all">
-    <table class="w-full text-lg text-left text-gray-800" id="userTable">
-      <thead>
-        <tr class="bg-purple-100 text-gray-700 font-bold text-xl">
-          <th class="py-5 px-6">👤 Nama</th>
-          <th class="py-5 px-6">🆔 Username</th>
-          <th class="py-5 px-6">🎓 Peran</th>
-          <th class="py-5 px-6 text-center">⚙️ Aksi</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y text-base">
-        <tr class="hover:bg-purple-50 transition-all duration-200">
-          <td class="px-6 py-5 font-semibold">Aufa Lubis</td>
-          <td class="px-6 py-5">aufa123</td>
-          <td class="px-6 py-5">Admin</td>
-          <td class="px-6 py-5 text-center">
-            <button onclick="toggleEdit(0)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow transition-all transform hover:scale-105 active:scale-95 text-base">
-              ✏️ Edit
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div id="noResult" class="text-center text-red-600 py-6 hidden text-lg font-semibold">❌ Data user tidak ditemukan</div>
-  </div>
-
-  <!-- Editor -->
-  <div id="editSection" class="hidden bg-white/90 backdrop-blur rounded-2xl p-8 shadow-xl animate-scale-in">
-    <h3 class="text-2xl font-bold text-purple-700 mb-6">🛠️ Edit User</h3>
-    <form onsubmit="submitEdit(event)" class="space-y-6">
-      <div class="grid md:grid-cols-3 gap-6">
-        <input id="edit-nama" type="text" class="form-input text-lg px-4 py-2 rounded-lg" required />
-        <input id="edit-username" type="text" class="form-input text-lg px-4 py-2 rounded-lg" required />
-        <select id="edit-peran" class="form-input text-lg px-4 py-2 rounded-lg">
-          <option value="Admin">Admin</option>
-          <option value="Mahasiswa">Mahasiswa</option>
-          <option value="Asisten">Asisten</option>
-        </select>
-      </div>
-      <div class="text-right">
-        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-full text-lg shadow transition-transform transform hover:scale-105 active:scale-95">
-          💾 Simpan Perubahan
+<body class="bg-slate-50 min-h-screen text-slate-800 font-[Inter] overflow-x-hidden">
+  
+  <div class="relative max-w-7xl mx-auto px-6 py-12 space-y-10 z-10">
+    <header class="flex flex-col md:flex-row justify-between items-center gap-6">
+      <h2 class="text-5xl font-extrabold text-slate-900 drop-shadow-sm">📋 Daftar User</h2>
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <input id="searchInput" type="text" placeholder="🔍 Cari user..." class="w-full md:w-64 bg-white text-slate-700 placeholder-slate-400 px-5 py-3 rounded-full border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all duration-300 shadow-sm">
+        <button onclick="exportPDF()" class="bg-purple-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:bg-purple-700 active:scale-95 transition-all duration-300 whitespace-nowrap">
+          📄 Ekspor PDF
         </button>
       </div>
-    </form>
+    </header>
+
+    <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      </div>
+    <div id="noResult" class="text-center text-xl text-red-600 py-10 hidden font-semibold">❌ Data user tidak ditemukan</div>
   </div>
+  
+  <div id="toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform translate-x-[120%] transition-transform duration-500 z-50 text-lg"></div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-4 rounded-xl shadow-xl hidden transition-all duration-500 z-50 text-base">
-    Perubahan disimpan!
-  </div>
-</div>
+  <template id="userCardTemplate">
+    <div class="user-card preserve-3d transition-all duration-500">
+      <div class="card-content relative h-full bg-white border border-slate-200 rounded-2xl shadow-lg transition-all duration-300 transform-gpu">
+        <div class="spotlight absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300" style="background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.08) 0%, transparent 50%);"></div>
+        
+        <div class="card-display p-6 flex flex-col h-full transition-opacity duration-300">
+          <div class="flex items-center gap-4">
+            <div class="avatar w-16 h-16 bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700 rounded-full flex items-center justify-center text-3xl font-bold flex-shrink-0"></div>
+            <div class="overflow-hidden">
+              <h3 class="card-nama text-2xl font-bold text-slate-900 truncate"></h3>
+              <p class="card-username text-purple-600 truncate"></p>
+            </div>
+          </div>
+          <p class="text-lg mt-4"><strong class="font-semibold text-slate-500">Peran:</strong> <span class="card-peran font-medium text-slate-800"></span></p>
+          <div class="pt-4 mt-auto border-t border-slate-200 text-right">
+            <button class="edit-btn bg-slate-600 hover:bg-slate-700 text-white font-semibold px-5 py-2 rounded-full shadow transition-all transform hover:scale-105 active:scale-95 text-base">
+              ✏️ Edit
+            </button>
+          </div>
+        </div>
 
-<!-- Script -->
-<script>
-  let currentIndex = null;
+        <form class="card-edit p-6 space-y-4 absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300">
+          <div class="form-field"><input type="text" class="edit-nama form-input" placeholder="Nama Lengkap"></div>
+          <div class="form-field"><input type="text" class="edit-username form-input" placeholder="Username"></div>
+          <div class="form-field"><select class="edit-peran form-input">
+            <option value="Mahasiswa">Mahasiswa</option>
+            <option value="Asisten">Asisten</option>
+          </select></div>
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" class="cancel-btn bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-full transition-transform transform active:scale-95">Batal</button>
+            <button type="submit" class="save-btn bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full transition-transform transform active:scale-95">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </template>
 
-  function toggleEdit(index) {
-    currentIndex = index;
-    const row = document.querySelectorAll("#userTable tbody tr")[index];
-    document.getElementById("edit-nama").value = row.children[0].innerText;
-    document.getElementById("edit-username").value = row.children[1].innerText;
-    document.getElementById("edit-peran").value = row.children[2].innerText;
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DATA ADMIN DIHILANGKAN DARI SINI
+      let users = [
+        { id: 2, nama: "Nabil Fajrul Hakim", username: "nabil456", peran: "Asisten" },
+        { id: 3, nama: "Budi Santoso", username: "budi.san", peran: "Mahasiswa" },
+        { id: 4, nama: "Citra Lestari", username: "citra.l", peran: "Mahasiswa" },
+        { id: 5, nama: "Dewi Anggraini", username: "dewi.angg", peran: "Asisten" },
+      ];
 
-    document.getElementById("editSection").classList.remove("hidden");
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  }
+      const userGrid = document.getElementById('userGrid');
+      const searchInput = document.getElementById('searchInput');
+      const noResult = document.getElementById('noResult');
+      const template = document.getElementById('userCardTemplate');
 
-  function submitEdit(e) {
-    e.preventDefault();
-    const rows = document.querySelectorAll("#userTable tbody tr");
-    if (currentIndex !== null && rows[currentIndex]) {
-      rows[currentIndex].children[0].innerText = document.getElementById("edit-nama").value;
-      rows[currentIndex].children[1].innerText = document.getElementById("edit-username").value;
-      rows[currentIndex].children[2].innerText = document.getElementById("edit-peran").value;
-    }
+      const renderUsers = (userList) => {
+        userGrid.innerHTML = '';
+        if (userList.length === 0) {
+          noResult.classList.remove('hidden');
+          return;
+        }
+        noResult.classList.add('hidden');
+        userList.forEach((user, index) => {
+          const card = template.content.cloneNode(true).firstElementChild;
+          card.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s both`;
+          card.dataset.userId = user.id;
 
-    showToast("Perubahan disimpan!");
-    document.getElementById("editSection").classList.add("hidden");
-  }
+          card.querySelector('.card-nama').textContent = user.nama;
+          card.querySelector('.card-username').textContent = `@${user.username}`;
+          card.querySelector('.card-peran').textContent = user.peran;
+          card.querySelector('.avatar').textContent = user.nama.charAt(0);
+          card.querySelector('.edit-nama').value = user.nama;
+          card.querySelector('.edit-username').value = user.username;
+          card.querySelector('.edit-peran').value = user.peran;
 
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.classList.remove("hidden");
-    toast.style.opacity = "1";
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      setTimeout(() => toast.classList.add("hidden"), 500);
-    }, 2000);
-  }
+          card.querySelector('.edit-btn').addEventListener('click', () => toggleEditMode(card, true));
+          card.querySelector('.cancel-btn').addEventListener('click', () => toggleEditMode(card, false));
+          card.querySelector('form').addEventListener('submit', (e) => saveChanges(e, user.id));
+          
+          init3DCard(card);
+          userGrid.appendChild(card);
+        });
+      };
 
-  function resetSearch() {
-    document.getElementById("searchUser").value = "";
-    document.querySelectorAll("#userTable tbody tr").forEach(row => row.style.display = "");
-    document.getElementById("noResult").classList.add("hidden");
-    updateCount();
-  }
+      const toggleEditMode = (card, isEditing) => {
+          const displayView = card.querySelector('.card-display');
+          const editView = card.querySelector('.card-edit');
+          const cardContent = card.querySelector('.card-content');
+          const formFields = editView.querySelectorAll('.form-field');
 
-  document.getElementById("searchUser").addEventListener("input", function () {
-    const keyword = this.value.toLowerCase();
-    let found = false;
-    document.querySelectorAll("#userTable tbody tr").forEach(row => {
-      const match = row.innerText.toLowerCase().includes(keyword);
-      row.style.display = match ? "" : "none";
-      if (match) found = true;
+          if (isEditing) {
+              document.querySelectorAll('.user-card.is-editing').forEach(otherCard => {
+                  if (otherCard !== card) {
+                      toggleEditMode(otherCard, false);
+                  }
+              });
+          }
+
+          if (isEditing) {
+              card.classList.add('is-editing');
+              cardContent.classList.add('border-purple-500', 'shadow-2xl', 'shadow-purple-500/20');
+              displayView.classList.add('opacity-0', 'pointer-events-none');
+              editView.classList.remove('pointer-events-none', 'opacity-0');
+              
+              formFields.forEach((field, index) => {
+                  field.style.animation = `fadeIn 0.4s ease-out ${0.2 + index * 0.1}s both`;
+              });
+          } else {
+              card.classList.remove('is-editing');
+              cardContent.classList.remove('border-purple-500', 'shadow-2xl', 'shadow-purple-500/20');
+              editView.classList.add('opacity-0', 'pointer-events-none');
+              displayView.classList.remove('opacity-0', 'pointer-events-none');
+              formFields.forEach(field => field.style.animation = '');
+          }
+      };
+
+      const saveChanges = (e, userId) => {
+        e.preventDefault();
+        const card = e.target.closest('.user-card');
+        const updatedUser = {
+          nama: card.querySelector('.edit-nama').value,
+          username: card.querySelector('.edit-username').value,
+          peran: card.querySelector('.edit-peran').value,
+        };
+        
+        users = users.map(u => u.id === parseInt(card.dataset.userId) ? { ...u, ...updatedUser } : u);
+        
+        card.querySelector('.card-nama').textContent = updatedUser.nama;
+        card.querySelector('.card-username').textContent = `@${updatedUser.username}`;
+        card.querySelector('.card-peran').textContent = updatedUser.peran;
+        card.querySelector('.avatar').textContent = updatedUser.nama.charAt(0);
+        
+        toggleEditMode(card, false);
+        showToast('✅ Perubahan berhasil disimpan!');
+      };
+
+      searchInput.addEventListener('input', () => {
+        const keyword = searchInput.value.toLowerCase();
+        const filteredUsers = users.filter(u => 
+          u.nama.toLowerCase().includes(keyword) || 
+          u.username.toLowerCase().includes(keyword) || 
+          u.peran.toLowerCase().includes(keyword)
+        );
+        renderUsers(filteredUsers);
+      });
+
+      window.exportPDF = () => {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          const keyword = searchInput.value.toLowerCase();
+          const filteredUsers = users.filter(u => u.nama.toLowerCase().includes(keyword) || u.username.toLowerCase().includes(keyword));
+          doc.text("Daftar User - LabCorner", 14, 20);
+          doc.autoTable({
+              head: [['Nama', 'Username', 'Peran']],
+              body: filteredUsers.map(u => [u.nama, u.username, u.peran]),
+              startY: 30,
+              theme: "grid",
+              headStyles: { fillColor: [99, 102, 241] }
+          });
+          doc.save("daftar_user_labcorner.pdf");
+      };
+
+      const init3DCard = (card) => {
+        const cardContent = card.querySelector('.card-content');
+        const spotlight = card.querySelector('.spotlight');
+        card.addEventListener('mousemove', (e) => {
+            if (card.classList.contains('is-editing')) return;
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateY = -1 * ((x - rect.width / 2) / (rect.width / 2)) * 8;
+            const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * 8;
+            cardContent.style.setProperty('--rotate-x', `${rotateX}deg`);
+            cardContent.style.setProperty('--rotate-y', `${rotateY}deg`);
+            if (spotlight) {
+                spotlight.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(0,0,0,0.08) 0%, transparent 50%)`;
+            }
+        });
+        card.addEventListener('mouseenter', () => { if (!card.classList.contains('is-editing') && spotlight) spotlight.style.opacity = '1'; });
+        card.addEventListener('mouseleave', () => {
+            cardContent.style.setProperty('--rotate-x', '0deg');
+            cardContent.style.setProperty('--rotate-y', '0deg');
+            if (spotlight) spotlight.style.opacity = '0';
+        });
+      };
+      
+      const showToast = (msg) => {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.classList.remove("translate-x-[120%]");
+        setTimeout(() => toast.classList.add("translate-x-[120%]"), 2500);
+      };
+
+      renderUsers(users);
     });
-    document.getElementById("noResult").classList.toggle("hidden", found);
-    updateCount();
-  });
-
-  function updateCount() {
-    const visible = Array.from(document.querySelectorAll("#userTable tbody tr"))
-      .filter(row => row.style.display !== "none").length;
-    document.getElementById("userCount").textContent = `Menampilkan ${visible} user`;
-  }
-
-  window.onload = updateCount;
-
-  async function exportPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("p", "mm", "a4");
-
-    const title = "📋 Daftar User - LabCorner";
-    const subtitle = `📅 Dicetak pada: ${new Date().toLocaleDateString("id-ID", {
-      weekday: "long", year: "numeric", month: "long", day: "numeric"
-    })}`;
-
-    const headers = [["Nama", "Username", "Peran"]];
-    const rows = [];
-
-    document.querySelectorAll("#userTable tbody tr").forEach(row => {
-      if (row.style.display === "none") return;
-      const cols = row.querySelectorAll("td");
-      if (cols.length >= 3) {
-        rows.push([
-          cols[0].innerText.trim(),
-          cols[1].innerText.trim(),
-          cols[2].innerText.trim()
-        ]);
-      }
-    });
-
-    if (!rows.length) {
-      alert("❌ Tidak ada data user yang bisa diekspor.");
-      return;
-    }
-
-    // Header
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(40, 40, 60);
-    doc.text(title, 14, 20);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.setTextColor(80, 80, 80);
-    doc.text(subtitle, 14, 28);
-
-    doc.autoTable({
-      head: headers,
-      body: rows,
-      startY: 36,
-      theme: "grid",
-      headStyles: {
-        fillColor: [103, 58, 183],
-        textColor: 255,
-        fontSize: 11,
-        halign: "center"
-      },
-      bodyStyles: {
-        halign: "center",
-        textColor: [50, 50, 50],
-      },
-      alternateRowStyles: {
-        fillColor: [245, 240, 255],
-      },
-      styles: {
-        font: "helvetica",
-        fontSize: 10,
-        cellPadding: 5,
-        lineColor: [200, 200, 200],
-        lineWidth: 0.2,
-      },
-      didDrawPage: function (data) {
-        const pageSize = doc.internal.pageSize;
-        const pageHeight = pageSize.height || doc.internal.pageSize.getHeight();
-        const pageWidth = pageSize.width || doc.internal.pageSize.getWidth();
-
-        doc.setFontSize(9);
-        doc.setTextColor(120);
-        doc.text(`LabCorner © ${new Date().getFullYear()}`, 14, pageHeight - 10);
-        doc.text(`Halaman ${doc.internal.getNumberOfPages()}`, pageWidth - 40, pageHeight - 10);
-      }
-    });
-
-    doc.save("daftar_user_labcorner.pdf");
-  }
-</script>
-
+  </script>
 </body>
 </html>

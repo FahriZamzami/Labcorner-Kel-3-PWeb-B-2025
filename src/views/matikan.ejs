@@ -1,17 +1,180 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <title>Matikan Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 2rem;
+      box-shadow: 0 20px 60px rgb(220 38 38 / 0.3);
+      max-width: 460px;
+      width: 100%;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      user-select: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 30px 80px rgb(220 38 38 / 0.5);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      color: #b91c1c;
+      margin-bottom: 1rem;
+      user-select: text;
+      text-shadow: 0 1px 6px rgba(185, 28, 28, 0.5);
+    }
+
+    p {
+      font-size: 1.25rem;
+      color: #4b5563;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+      user-select: text;
+    }
+
+    button {
+      background: #b91c1c;
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 1rem 3rem;
+      border-radius: 9999px;
+      border: none;
+      box-shadow: 0 6px 15px rgb(185 28 28 / 0.4);
+      cursor: pointer;
+      transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.2s ease;
+      user-select: none;
+      outline-offset: 4px;
+    }
+    button:hover {
+      background: #991b1b;
+      box-shadow: 0 10px 30px rgb(185 28 28 / 0.6);
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    button:focus-visible {
+      outline: 3px solid #ef4444;
+      outline-offset: 6px;
+    }
+
+    /* Icon styles */
+    .icon-container {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 2.5rem auto;
+      position: relative;
+      animation: bounce 2.5s ease-in-out infinite;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    circle.icon-circle {
+      stroke: #ef4444;
+      stroke-width: 10;
+      opacity: 0.3;
+      fill: none;
+    }
+
+    /* Animasi menggambar path */
+    path.icon-path,
+    line.icon-line,
+    polyline.icon-polyline {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease;
+      animation-duration: 0.8s;
+    }
+
+    path.icon-path,
+    line.icon-line {
+      stroke: #ef4444;
+      animation-name: draw-cross;
+      animation-delay: 0.5s;
+    }
+
+    polyline.icon-polyline {
+      stroke: #22c55e;
+      animation-name: draw-check;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes draw-cross {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes draw-check {
+      to { stroke-dashoffset: 0; }
+    }
+  </style>
 </head>
-<body class="bg-red-100 text-gray-800 min-h-screen flex items-center justify-center">
-  <form action="/matikan" method="POST" class="bg-white p-10 rounded-xl shadow-xl w-full max-w-md text-center space-y-6">
-    <h2 class="text-3xl font-bold text-red-600">🚫 Matikan Website</h2>
-    <p class="text-gray-600">Setelah dimatikan, pengguna tidak bisa mengakses halaman web sampai diaktifkan kembali.</p>
-    <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition">
-      🔴 Matikan Sekarang
-    </button>
-  </form>
+<body>
+
+  <main class="card" role="main" aria-live="polite" aria-atomic="true" tabindex="-1">
+    <div class="icon-container" aria-hidden="true" role="img" aria-label="<%= !isOffline ? 'Icon tanda silang merah' : 'Icon tanda centang hijau' %>">
+      <% if (!isOffline) { %>
+        <svg viewBox="0 0 150 150" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" >
+          <circle class="icon-circle" cx="75" cy="75" r="70" />
+          <line class="icon-line" x1="45" y1="45" x2="105" y2="105" />
+          <line class="icon-line" x1="105" y1="45" x2="45" y2="105" />
+        </svg>
+      <% } else { %>
+        <svg viewBox="0 0 150 150" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" >
+          <circle class="icon-circle" cx="75" cy="75" r="70" />
+          <polyline class="icon-polyline" points="50 80 70 100 105 60" />
+        </svg>
+      <% } %>
+    </div>
+
+    <h1 tabindex="0"><%= !isOffline ? '🚫 Matikan Website' : '✅ Website Aktif' %></h1>
+
+    <% if (!isOffline) { %>
+      <p>Setelah dimatikan, pengguna tidak dapat mengakses website sampai diaktifkan kembali.</p>
+      <form action="/matikan" method="POST" role="form" aria-label="Form matikan website">
+        <button type="submit" aria-label="Matikan website sekarang" title="Matikan website sekarang">
+          🔴 Matikan Sekarang
+        </button>
+      </form>
+    <% } else { %>
+      <p>Website sedang dalam mode mati (maintenance).</p>
+      <form action="/matikan/aktifkan" method="POST" role="form" aria-label="Form hidupkan website">
+        <button type="submit" aria-label="Hidupkan website sekarang" title="Hidupkan website sekarang" style="background-color:#22c55e; box-shadow: 0 6px 15px rgba(34,197,94,0.4);">
+          🟢 Hidupkan Website
+        </button>
+      </form>
+    <% } %>
+  </main>
+
 </body>
 </html>

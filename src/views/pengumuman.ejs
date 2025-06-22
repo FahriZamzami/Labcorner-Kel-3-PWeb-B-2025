@@ -1,118 +1,231 @@
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen text-gray-800 font-[Inter]">
-  <div class="max-w-7xl mx-auto px-6 py-12 fade-in">
-    <h1 class="text-5xl font-extrabold text-white mb-12 drop-shadow-lg">📣 Buat Pengumuman</h1>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buat Pengumuman - LabCorner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.6s ease-out both',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent-color: #a78bfa; /* Violet-400 default */
+      --accent-bg: rgba(139, 92, 246, 0.1);
+      --accent-text: #7c3aed; /* Violet-600 */
+    }
+    .theme-lea { --accent-color: #60a5fa; --accent-bg: rgba(59, 130, 246, 0.1); --accent-text: #2563eb; }
+    .theme-labgis { --accent-color: #4ade80; --accent-bg: rgba(34, 197, 94, 0.1); --accent-text: #16a34a; }
+    .theme-lbi { --accent-color: #f472b6; --accent-bg: rgba(236, 72, 153, 0.1); --accent-text: #db2777; }
+    .theme-ldkom { --accent-color: #fbbf24; --accent-bg: rgba(245, 158, 11, 0.1); --accent-text: #d97706; }
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-10 items-start">
-      <!-- FORM -->
-      <form id="formPengumuman" action="/pengumuman" method="POST" class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-10 space-y-8 border border-white/20 transition-all duration-300 hover:shadow-3xl">
-        <!-- Judul -->
-        <div>
-          <label for="judul" class="block text-xl font-semibold text-gray-700 mb-2">📝 Judul Pengumuman</label>
-          <input type="text" id="judul" name="judul" placeholder="Contoh: Perpanjangan Deadline Tugas" class="form-input text-lg transition duration-300" required />
-        </div>
+    .preserve-3d { transform-style: preserve-3d; perspective: 1000px; }
+    .card-content { transform: rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0)); }
 
-        <!-- Isi -->
-        <div>
-          <label for="isi" class="block text-xl font-semibold text-gray-700 mb-2">📄 Isi Pengumuman</label>
-          <textarea id="isi" name="isi" rows="6" placeholder="Tulis isi pengumuman secara detail..." class="form-input resize-none text-lg transition duration-300" required></textarea>
-        </div>
+    .form-input {
+      @apply w-full bg-slate-100 text-slate-800 placeholder-slate-400 px-4 py-3 rounded-lg border-2 border-slate-200 focus:ring-2 focus:outline-none transition-all duration-300;
+    }
+    .form-input:focus {
+      border-color: var(--accent-color);
+      background-color: white;
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+    .bg-dots {
+      background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
 
-        <!-- Lab Tujuan -->
-        <div>
-          <label for="lab_tujuan" class="block text-xl font-semibold text-gray-700 mb-2">🏢 Lab Tujuan</label>
-          <select id="lab_tujuan" name="lab_tujuan" class="form-input text-lg transition duration-300" required>
-            <option value="">-- Pilih Lab --</option>
-            <option value="lea">LEA - Enterprise Application</option>
-            <option value="labgis">LABGIS - GIS & Mapping</option>
-            <option value="lbi">LBI - Business Intelligence</option>
-            <option value="ldkom">LDKOM - Dasar Komputasi</option>
-          </select>
-        </div>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-[Inter] overflow-x-hidden">
+  <div class="absolute inset-0 z-0 opacity-50 bg-dots"></div>
 
-        <!-- Tombol -->
-        <div class="flex justify-between items-center pt-4">
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-lg font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-            💾 Simpan Pengumuman
-          </button>
-          <span id="loader" class="hidden animate-spin border-4 border-indigo-300 border-t-white rounded-full w-8 h-8"></span>
-        </div>
-      </form>
+  <div class="relative max-w-7xl mx-auto px-6 py-12 z-10">
+    <div class="text-center animate-fade-in-up">
+        <h1 class="text-5xl font-extrabold text-slate-900 mb-4 drop-shadow-sm">📣 Creator Studio</h1>
+        <p class="text-xl text-slate-500">Rancang pengumuman Anda dengan presisi.</p>
+    </div>
 
-      <!-- PREVIEW -->
-      <div class="bg-white/80 backdrop-blur-lg p-8 rounded-3xl shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300">
-        <h3 class="text-2xl font-bold text-indigo-700 mb-6">🔍 Preview Pengumuman</h3>
-        <div class="space-y-4 text-lg">
-          <p><strong>📝 Judul:</strong> <span id="previewJudul" class="text-gray-700">-</span></p>
-          <p><strong>📄 Isi:</strong> <span id="previewIsi" class="text-gray-700">-</span></p>
-          <p><strong>🏢 Lab Tujuan:</strong> <span id="previewLab" class="text-gray-700">-</span></p>
+    <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+        <div class="space-y-6 animate-fade-in-up lg:sticky lg:top-12" style="animation-delay: 0.2s;">
+          <form id="formPengumuman" class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl p-8 space-y-8 border border-white/30">
+              <div>
+                <label for="judul" class="block text-xl font-semibold mb-2 text-slate-700">📝 Judul</label>
+                <input type="text" id="judul" name="judul" placeholder="Contoh: Perpanjangan Deadline Tugas" class="form-input text-lg" required />
+              </div>
+              <div>
+                <label for="isi" class="block text-xl font-semibold mb-2 text-slate-700">📄 Isi Pengumuman</label>
+                <textarea id="isi" name="isi" rows="8" placeholder="Tulis isi pengumuman secara detail..." class="form-input text-lg resize-none" required></textarea>
+                <div class="text-right text-sm text-slate-500 mt-2"><span id="charCount">0</span> / 500</div>
+              </div>
+               <div>
+                 <label for="lab_tujuan" class="block text-xl font-semibold mb-2 text-slate-700">🏢 Lab Tujuan</label>
+                 <select id="lab_tujuan" name="lab_tujuan" class="form-input text-lg" required>
+                    <option value="">-- Pilih Lab & Tema --</option>
+                    <option value="lea">LEA - Enterprise Application</option>
+                    <option value="labgis">LABGIS - GIS & Mapping</option>
+                    <option value="lbi">LBI - Business Intelligence</option>
+                    <option value="ldkom">LDKOM - Dasar Komputasi</option>
+                </select>
+            </div>
+          </form>
+           <div class="pt-2">
+                <button type="submit" form="formPengumuman" id="submitBtn" class="w-full text-white text-lg font-semibold px-6 py-4 rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.03] active:scale-100" style="background-color: var(--accent-text);">
+                    🚀 Publikasikan Pengumuman
+                </button>
+            </div>
         </div>
-      </div>
+        
+        <div class="preserve-3d animate-fade-in-up lg:sticky lg:top-12" style="animation-delay: 0.4s;">
+            <div id="previewCard" class="card-content w-full bg-white/70 backdrop-blur-xl border-2 rounded-2xl shadow-2xl transition-all duration-500 transform-gpu overflow-hidden" style="border-color: var(--accent-color); box-shadow: 0 0 40px -10px var(--accent-bg);">
+                <div class="spotlight absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300" style="background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0%, transparent 50%);"></div>
+                <header class="p-6 flex items-center gap-4 bg-white/50 border-b-2" style="border-color: var(--accent-color);">
+                    <div id="previewIcon" class="text-4xl transition-all duration-500 transform group-hover:scale-110">📢</div>
+                    <div>
+                        <h3 id="previewLab" class="text-2xl font-bold transition-colors duration-500" style="color: var(--accent-text);">Pengumuman</h3>
+                        <p class="text-sm text-slate-500">Oleh: <span class="font-medium">Admin</span> - <span id="previewTimestamp"></span></p>
+                    </div>
+                </header>
+                <main class="p-6">
+                    <h4 id="previewJudul" class="text-3xl font-extrabold text-slate-900 mb-4 min-h-[40px] leading-tight">Judul Anda</h4>
+                    <p id="previewIsi" class="text-slate-600 whitespace-pre-wrap min-h-[100px] text-lg leading-relaxed">Isi pengumuman akan muncul di sini...</p>
+                </main>
+            </div>
+        </div>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg hidden transition-all duration-500 z-50 text-lg opacity-0">
-    ✅ Pengumuman berhasil disimpan!
-  </div>
+  <div id="toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform translate-x-[120%] transition-transform duration-500 z-50 text-lg"></div>
 
-  <!-- Tailwind Custom Input -->
-  <style>
-    .form-input {
-      @apply w-full mt-1 px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white;
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .fade-in {
-      animation: fadeInUp 0.4s ease-out;
-    }
-  </style>
-
-  <!-- Script -->
   <script>
-    const judul = document.getElementById('judul');
-    const isi = document.getElementById('isi');
-    const lab = document.getElementById('lab_tujuan');
-    const previewJudul = document.getElementById('previewJudul');
-    const previewIsi = document.getElementById('previewIsi');
-    const previewLab = document.getElementById('previewLab');
-    const toast = document.getElementById('toast');
-    const loader = document.getElementById('loader');
-    const form = document.getElementById('formPengumuman');
+    document.addEventListener('DOMContentLoaded', () => {
+      const labInfo = {
+        lea: { nama: "Lab. Enterprise Application", ikon: "🧪", theme: "theme-lea" },
+        labgis: { nama: "Lab. GIS & Mapping", ikon: "🗺️", theme: "theme-labgis" },
+        lbi: { nama: "Lab. Business Intelligence", ikon: "📊", theme: "theme-lbi" },
+        ldkom: { nama: "Lab. Dasar Komputasi", ikon: "💡", theme: "theme-ldkom" }
+      };
 
-    [judul, isi, lab].forEach(input => input.addEventListener('input', updatePreview));
+      const form = document.getElementById('formPengumuman');
+      const submitBtn = document.getElementById('submitBtn');
+      const inputs = {
+        judul: document.getElementById('judul'),
+        isi: document.getElementById('isi'),
+        lab: document.getElementById('lab_tujuan')
+      };
+      const previews = {
+        card: document.getElementById('previewCard'),
+        icon: document.getElementById('previewIcon'),
+        lab: document.getElementById('previewLab'),
+        timestamp: document.getElementById('previewTimestamp'),
+        judul: document.getElementById('previewJudul'),
+        isi: document.getElementById('previewIsi')
+      };
+      const charCountEl = document.getElementById('charCount');
 
-    function updatePreview() {
-      previewJudul.textContent = judul.value || "-";
-      previewIsi.textContent = isi.value || "-";
-      previewLab.textContent = lab.options[lab.selectedIndex]?.text || "-";
-    }
+      const checkFormValidity = () => {
+        const isValid = inputs.judul.value.trim() && inputs.isi.value.trim() && inputs.lab.value;
+        submitBtn.disabled = !isValid;
+      };
+      
+      const updateTimestamp = () => {
+        previews.timestamp.textContent = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+      };
+      updateTimestamp(); // Panggil sekali di awal
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      loader.classList.remove('hidden');
+      inputs.judul.addEventListener('input', (e) => {
+        previews.judul.textContent = e.target.value || "Judul Anda";
+        checkFormValidity();
+      });
+      inputs.isi.addEventListener('input', (e) => {
+        previews.isi.textContent = e.target.value || "Isi pengumuman akan muncul di sini...";
+        charCountEl.textContent = e.target.value.length;
+        checkFormValidity();
+      });
+      inputs.lab.addEventListener('change', (e) => {
+        const selectedLabKey = e.target.value;
+        previews.card.classList.remove('theme-lea', 'theme-labgis', 'theme-lbi', 'theme-ldkom');
+        if (labInfo[selectedLabKey]) {
+            previews.card.classList.add(labInfo[selectedLabKey].theme);
+            previews.icon.textContent = labInfo[selectedLabKey].ikon;
+            previews.lab.textContent = labInfo[selectedLabKey].nama;
+        } else {
+            previews.icon.textContent = "📢";
+            previews.lab.textContent = "Pengumuman";
+        }
+        checkFormValidity();
+      });
 
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        showToast("✅ Pengumuman berhasil disimpan!");
-        form.reset();
-        updatePreview();
-      }, 1200);
+      form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          submitBtn.textContent = 'Mempublikasikan...';
+          submitBtn.disabled = true;
+          previews.card.classList.add('transition-all', 'duration-500', 'scale-105');
+
+          setTimeout(() => {
+              previews.card.style.transform += ' translateY(-150vh)';
+              previews.card.style.opacity = '0';
+              showToast("✅ Pengumuman berhasil dipublikasikan!");
+              
+              setTimeout(() => {
+                  form.reset();
+                  previews.judul.textContent = "Judul Anda";
+                  previews.isi.textContent = "Isi pengumuman akan muncul di sini...";
+                  previews.icon.textContent = "📢";
+                  previews.lab.textContent = "Pengumuman";
+                  previews.card.classList.remove('theme-lea', 'theme-labgis', 'theme-lbi', 'theme-ldkom');
+                  previews.card.style.transform = '';
+                  previews.card.style.opacity = '1';
+                  submitBtn.textContent = '🚀 Publikasikan Pengumuman';
+                  checkFormValidity();
+              }, 1000);
+          }, 1500);
+      });
+      
+      const showToast = (msg) => {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.classList.remove("translate-x-[120%]");
+        setTimeout(() => toast.classList.add("translate-x-[120%]"), 3000);
+      };
+
+      const card = document.getElementById('previewCard');
+      const spotlight = card.querySelector('.spotlight');
+      card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const rotateY = -1 * ((x - rect.width / 2) / (rect.width / 2)) * 4;
+          const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * 4;
+          card.style.setProperty('--rotate-x', `${rotateX}deg`);
+          card.style.setProperty('--rotate-y', `${rotateY}deg`);
+          if (spotlight) spotlight.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(0,0,0,0.04) 0%, transparent 60%)`;
+      });
+      card.addEventListener('mouseenter', () => { if (spotlight) spotlight.style.opacity = '1'; });
+      card.addEventListener('mouseleave', () => {
+          card.style.setProperty('--rotate-x', '0deg');
+          card.style.setProperty('--rotate-y', '0deg');
+          if (spotlight) spotlight.style.opacity = '0';
+      });
+
+      checkFormValidity();
     });
-
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.remove('hidden');
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-        setTimeout(() => toast.classList.add('hidden'), 300);
-      }, 2500);
-    }
   </script>
 </body>
+</html>

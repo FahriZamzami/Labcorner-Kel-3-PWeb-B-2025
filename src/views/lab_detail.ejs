@@ -1,121 +1,175 @@
-<body class="bg-gradient-to-br from-purple-300 to-indigo-600 min-h-screen text-gray-900 font-[Inter]">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= lab.nama || 'Detail Lab' %> - LabCorner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /*
+      =======================================================
+      SISTEM PEWARNAAN DINAMIS MENGGUNAKAN CSS VARIABLES
+      =======================================================
+      - Default theme adalah abu-abu netral.
+      - Class pada <body> (cth: .theme-lea) akan mengubah variabel ini.
+      - Semua elemen di bawahnya akan mengikuti tema secara otomatis.
+    */
+    :root {
+      --c-accent: #64748b; /* slate-500 */
+      --c-accent-strong: #1e293b; /* slate-800 */
+      --c-accent-soft-bg: #f1f5f9; /* slate-100 */
+    }
+    .theme-lea { /* Indigo / Biru */
+      --c-accent: #6366f1;
+      --c-accent-strong: #3730a3;
+      --c-accent-soft-bg: #e0e7ff;
+    }
+    .theme-labgis { /* Hijau / Teal */
+      --c-accent: #10b981;
+      --c-accent-strong: #047857;
+      --c-accent-soft-bg: #d1fae5;
+    }
+    .theme-lbi { /* Pink / Rose */
+      --c-accent: #ec4899;
+      --c-accent-strong: #be185d;
+      --c-accent-soft-bg: #fce7f3;
+    }
+    .theme-ldkom { /* Kuning / Oranye */
+      --c-accent: #f59e0b;
+      --c-accent-strong: #b45309;
+      --c-accent-soft-bg: #fef3c7;
+    }
 
-  <div class="max-w-7xl mx-auto px-6 md:px-12 py-16 bg-white/90 rounded-3xl shadow-2xl mt-12 mb-16 backdrop-blur-sm fade-in">
+    /* Helper classes untuk menggunakan variabel di atas */
+    .bg-accent { background-color: var(--c-accent); }
+    .text-accent { color: var(--c-accent); }
+    .text-accent-strong { color: var(--c-accent-strong); }
+    .border-accent { border-color: var(--c-accent); }
+    .hover\:bg-accent-soft:hover { background-color: var(--c-accent-soft-bg); }
+
+    /* Animasi */
+    .scroll-animate {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .scroll-animate.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen text-slate-800 font-[Inter] theme-<%= lab.id %>">
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+
+  <div class="space-y-12">
     
-    <!-- Judul -->
-    <div class="mb-12 text-center">
-      <h1 class="text-5xl font-extrabold text-purple-800 drop-shadow mb-3 animate-bounce-slow"><%= lab.icon %> <%= lab.nama %></h1>
-      <p class="text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in-slow"><%= lab.deskripsi %></p>
+    <div class="text-center scroll-animate">
+      <div class="text-6xl md:text-7xl mb-4 text-accent"><%= lab.icon %></div>
+      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3"><%= lab.nama %></h1>
+      <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto"><%= lab.deskripsi %></p>
     </div>
 
-    <!-- Info Jadwal & Dosen -->
-    <div class="grid md:grid-cols-2 gap-8 mb-14">
-      <div class="bg-purple-100/90 p-8 rounded-2xl shadow-lg border border-purple-200 transform hover:scale-[1.02] transition duration-300 ease-in-out">
-        <h3 class="text-2xl font-bold text-purple-800 mb-2">📅 Jadwal Kelas Praktikum</h3>
-        <p class="text-lg text-gray-800"><%= lab.jadwal %></p>
+    <div class="grid md:grid-cols-2 gap-8 scroll-animate" style="transition-delay: 100ms;">
+      <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <h3 class="text-2xl font-bold text-accent-strong mb-2">📅 Jadwal Praktikum</h3>
+        <p class="text-lg text-slate-600"><%= lab.jadwal %></p>
       </div>
-      <div class="bg-purple-100/90 p-8 rounded-2xl shadow-lg border border-purple-200 transform hover:scale-[1.02] transition duration-300 ease-in-out">
-        <h3 class="text-2xl font-bold text-purple-800 mb-2">👨‍🏫 Dosen Penanggung Jawab</h3>
-        <p class="text-lg text-gray-800"><%= lab.dosen %></p>
-      </div>
-    </div>
-
-    <!-- Statistik -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 text-center">
-      <div class="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-3xl shadow-xl border border-purple-300 hover:scale-105 transition-transform duration-300 ease-out">
-        <h4 class="text-xl font-semibold text-purple-900 mb-2">👥 Jumlah Asisten</h4>
-        <p class="text-4xl font-extrabold animate-count"><%= lab.jumlahAsisten %></p>
-      </div>
-      <div class="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-3xl shadow-xl border border-purple-300 hover:scale-105 transition-transform duration-300 ease-out">
-        <h4 class="text-xl font-semibold text-purple-900 mb-2">📚 Modul Praktikum</h4>
-        <p class="text-4xl font-extrabold animate-count"><%= lab.jumlahModul %></p>
-      </div>
-      <div class="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-3xl shadow-xl border border-purple-300 hover:scale-105 transition-transform duration-300 ease-out">
-        <h4 class="text-xl font-semibold text-purple-900 mb-2">🏫 Kelas Praktikum</h4>
-        <p class="text-4xl font-extrabold animate-count"><%= lab.jumlahKelas %></p>
+      <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <h3 class="text-2xl font-bold text-accent-strong mb-2">👨‍🏫 Dosen PJ</h3>
+        <p class="text-lg text-slate-600"><%= lab.dosen %></p>
       </div>
     </div>
 
-    <!-- Daftar Asisten -->
-    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-300 mb-12 hover:shadow-xl transition duration-300">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4">👨‍🔬 Daftar Asisten</h3>
-      <ul class="list-disc pl-6 text-gray-700 space-y-2 text-base">
-        <% lab.asisten.forEach(asisten => { %>
-          <li class="hover:translate-x-2 transition-all duration-200"><%= asisten %></li>
-        <% }) %>
-      </ul>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center scroll-animate" style="transition-delay: 200ms;">
+      <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+        <h4 class="text-xl font-semibold text-slate-500 mb-2">👥 Asisten</h4>
+        <p class="text-5xl font-extrabold text-accent-strong" data-count="<%= lab.jumlahAsisten %>">0</p>
+      </div>
+      <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+        <h4 class="text-xl font-semibold text-slate-500 mb-2">📚 Modul</h4>
+        <p class="text-5xl font-extrabold text-accent-strong" data-count="<%= lab.jumlahModul %>">0</p>
+      </div>
+      <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+        <h4 class="text-xl font-semibold text-slate-500 mb-2">🏫 Kelas</h4>
+        <p class="text-5xl font-extrabold text-accent-strong" data-count="<%= lab.jumlahKelas %>">0</p>
+      </div>
     </div>
 
-    <!-- Daftar Mahasiswa -->
-    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-300 mb-14 hover:shadow-xl transition duration-300">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4">🎓 Mahasiswa Terdaftar</h3>
-      <ul class="list-decimal pl-6 text-gray-700 space-y-2 text-base">
-        <% lab.mahasiswa.forEach(mhs => { %>
-          <li class="hover:translate-x-2 transition-all duration-200"><%= mhs %></li>
-        <% }) %>
-      </ul>
+    <div class="grid lg:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 scroll-animate" style="transition-delay: 300ms;">
+          <h3 class="text-2xl font-bold text-slate-800 mb-4">👨‍🔬 Daftar Asisten</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-2 text-lg">
+            <% lab.asisten.forEach(asisten => { %>
+              <li class="hover:text-accent-strong hover:font-semibold transition-all duration-200 hover\:bg-accent-soft rounded-md px-2 -mx-2"><%= asisten %></li>
+            <% }) %>
+          </ul>
+        </div>
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 scroll-animate" style="transition-delay: 400ms;">
+          <h3 class="text-2xl font-bold text-slate-800 mb-4">🎓 Mahasiswa Terdaftar</h3>
+          <ul class="list-decimal list-inside text-slate-600 space-y-2 text-lg">
+            <% lab.mahasiswa.forEach(mhs => { %>
+              <li class="hover:text-accent-strong hover:font-semibold transition-all duration-200 hover\:bg-accent-soft rounded-md px-2 -mx-2"><%= mhs %></li>
+            <% }) %>
+          </ul>
+        </div>
     </div>
 
-    <!-- Tombol Kembali -->
-    <div class="text-center">
-      <a href="/" class="inline-block bg-purple-700 hover:bg-purple-800 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition duration-200 hover:scale-105 active:scale-95">
+    <div class="text-center pt-6 scroll-animate" style="transition-delay: 500ms;">
+      <a href="/" class="inline-block bg-accent hover:opacity-90 text-white font-bold px-10 py-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
         ← Kembali ke Dashboard
       </a>
     </div>
 
   </div>
 
-  <style>
-    .fade-in {
-      animation: fadeInUp 0.5s ease-out both;
-    }
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const animateCountUp = (el) => {
+        const target = parseInt(el.dataset.count, 10);
+        if (isNaN(target)) return;
+        let current = 0;
+        const duration = 1500;
+        const stepTime = 16;
+        const totalSteps = duration / stepTime;
+        const increment = target / totalSteps;
 
-    @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        const updateCount = () => {
+          current += increment;
+          if (current < target) {
+            el.textContent = Math.ceil(current);
+            requestAnimationFrame(updateCount);
+          } else {
+            el.textContent = target;
+          }
+        };
+        requestAnimationFrame(updateCount);
+      };
 
-    .animate-bounce-slow {
-      animation: bounce 3s infinite;
-    }
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            const countUpElements = entry.target.querySelectorAll('[data-count]');
+            countUpElements.forEach(el => {
+                if (!el.classList.contains('has-animated')) {
+                    animateCountUp(el);
+                    el.classList.add('has-animated');
+                }
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
 
-    @keyframes bounce {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    .animate-fade-in-slow {
-      animation: fadeIn 2s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0 }
-      to { opacity: 1 }
-    }
-
-    .animate-count {
-      animation: countUp 1s ease-out;
-    }
-
-    @keyframes countUp {
-      0% {
-        transform: scale(0.9);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-  </style>
+      document.querySelectorAll('.scroll-animate').forEach(el => {
+        observer.observe(el);
+      });
+    });
+  </script>
 </body>
+</html>
