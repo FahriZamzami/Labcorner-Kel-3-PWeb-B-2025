@@ -5,27 +5,37 @@ const prisma = require('../lib/prisma');
 // Menampilkan halaman untuk membuat pengumuman
 exports.getCreateAnnouncementPage = async (req, res) => {
   try {
-    // Ambil daftar lab untuk ditampilkan di dropdown
-    const labs = await prisma.lab.findMany();
+    // Pengumuman dibuat untuk praktikum, jadi kita ambil daftar praktikum
+    const allPraktikum = await prisma.praktikum.findMany({
+        include: { lab: true } // Ambil info lab agar nama lebih jelas
+    });
+
     res.render('buat-pengumuman', {
       title: 'Buat Pengumuman Baru',
-      labs: labs
+      praktikum: allPraktikum // Kirim data praktikum ke EJS
     });
   } catch (error) {
       console.error(error);
-      res.status(500).send('Gagal mengambil data lab');
+      res.status(500).send('Gagal mengambil data praktikum');
   }
 };
 
-// Memproses data dari form pengumuman dan menyimpannya
+// Memproses pembuatan pengumuman baru
 exports.createAnnouncement = async (req, res) => {
-  const { judul, isi, lab_tujuan } = req.body;
+  // Asumsi: ID user yang membuat pengumuman didapat dari sesi login
+  // Di sini kita hardcode untuk contoh. Ganti dengan sistem autentikasi Anda.
+  const authorId = "admin"; // Ganti ini dengan req.user.id dari sistem login Anda
+
+  // Skema Anda tidak memiliki 'judul', hanya 'isi', jadi kita sesuaikan.
+  const { isi, praktikum_id } = req.body; 
+
   try {
-    await prisma.announcement.create({
+    await prisma.pengumuman.create({
       data: {
-        judul,
-        isi,
-        labId: lab_tujuan, // 'lab_tujuan' dari form adalah ID lab
+        isi: isi,
+        praktikum_id: parseInt(praktikum_id),
+        dibuat_oleh: authorId, // Ini adalah Foreign Key ke user.id (String)
+        dibuat_pada: new Date()
       },
     });
     res.status(201).json({ message: 'Pengumuman berhasil dipublikasikan' });

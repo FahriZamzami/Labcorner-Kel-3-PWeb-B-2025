@@ -3,74 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daftar User - LabCorner</title>
+  <title><%- title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <style>
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .form-input { @apply w-full bg-slate-100 text-slate-800 placeholder-slate-400 px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:border-purple-500; }
+    .bg-gradient-animated {
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
     }
-    .preserve-3d { transform-style: preserve-3d; perspective: 1000px; }
-    .card-content { transform: rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0)); }
-    .form-input { 
-      @apply w-full bg-slate-100 text-slate-800 placeholder-slate-400 px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none focus:border-purple-500; 
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
   </style>
 </head>
 
-<body class="bg-slate-50 min-h-screen text-slate-800 font-[Inter] overflow-x-hidden">
-  
-  <div class="relative max-w-7xl mx-auto px-6 py-12 space-y-10 z-10">
-    <header class="flex flex-col md:flex-row justify-between items-center gap-6">
-      <h2 class="text-5xl font-extrabold text-slate-900 drop-shadow-sm">📋 Daftar User</h2>
-      <div class="flex items-center gap-4 w-full md:w-auto">
-        <input id="searchInput" type="text" placeholder="🔍 Cari user..." class="w-full md:w-64 bg-white text-slate-700 placeholder-slate-400 px-5 py-3 rounded-full border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all duration-300 shadow-sm">
-        <button onclick="exportPDF()" class="bg-purple-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:bg-purple-700 active:scale-95 transition-all duration-300 whitespace-nowrap">
-          📄 Ekspor PDF
-        </button>
-      </div>
-    </header>
-
-    <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      </div>
-    <div id="noResult" class="text-center text-xl text-red-600 py-10 hidden font-semibold">❌ Data user tidak ditemukan</div>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 min-h-screen text-slate-800 font-[Inter]">
+  <!-- Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
   </div>
-  
-  <div id="toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform translate-x-[120%] transition-transform duration-500 z-50 text-lg"></div>
 
-  <template id="userCardTemplate">
-    <div class="user-card preserve-3d transition-all duration-500">
-      <div class="card-content relative h-full bg-white border border-slate-200 rounded-2xl shadow-lg transition-all duration-300 transform-gpu">
-        <div class="spotlight absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300" style="background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.08) 0%, transparent 50%);"></div>
-        
-        <div class="card-display p-6 flex flex-col h-full transition-opacity duration-300">
-          <div class="flex items-center gap-4">
-            <div class="avatar w-16 h-16 bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700 rounded-full flex items-center justify-center text-3xl font-bold flex-shrink-0"></div>
-            <div class="overflow-hidden">
-              <h3 class="card-nama text-2xl font-bold text-slate-900 truncate"></h3>
-              <p class="card-username text-purple-600 truncate"></p>
-            </div>
-          </div>
-          <p class="text-lg mt-4"><strong class="font-semibold text-slate-500">Peran:</strong> <span class="card-peran font-medium text-slate-800"></span></p>
-          <div class="pt-4 mt-auto border-t border-slate-200 text-right">
-            <button class="edit-btn bg-slate-600 hover:bg-slate-700 text-white font-semibold px-5 py-2 rounded-full shadow transition-all transform hover:scale-105 active:scale-95 text-base">
-              ✏️ Edit
-            </button>
+  <div class="relative max-w-7xl mx-auto px-6 py-8 space-y-8 z-10">
+    <!-- Header Section -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div class="flex items-center gap-6">
+          <a href="/" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+            <span class="text-xl">←</span>
+            <span>Kembali ke Dashboard</span>
+          </a>
+          <div>
+            <h2 class="text-6xl font-black text-slate-900 drop-shadow-sm bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">📋 Daftar User</h2>
+            <p class="text-slate-600 text-lg mt-2">Kelola semua user dalam sistem LabCorner</p>
           </div>
         </div>
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+          <div class="relative w-full sm:w-80">
+            <input id="searchInput" type="text" placeholder="🔍 Cari user berdasarkan nama, username, atau peran..." class="w-full bg-white/90 backdrop-blur-sm text-slate-700 placeholder-slate-400 px-6 py-4 rounded-2xl border-2 border-slate-200 focus:ring-4 focus:ring-purple-500/30 focus:outline-none focus:border-purple-500 transition-all duration-300 shadow-lg text-lg">
+          </div>
+          <div class="flex gap-3">
+            <a href="/user/tambah" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-6 py-4 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+              <span class="text-xl">➕</span>
+              <span>Tambah User</span>
+            </a>
+            <a href="/user/hapus" class="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold px-6 py-4 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+              <span class="text-xl">🗑️</span>
+              <span>Hapus User</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <form class="card-edit p-6 space-y-4 absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300">
-          <div class="form-field"><input type="text" class="edit-nama form-input" placeholder="Nama Lengkap"></div>
-          <div class="form-field"><input type="text" class="edit-username form-input" placeholder="Username"></div>
-          <div class="form-field"><select class="edit-peran form-input">
-            <option value="Mahasiswa">Mahasiswa</option>
-            <option value="Asisten">Asisten</option>
-          </select></div>
-          <div class="flex justify-end gap-3 pt-2">
-            <button type="button" class="cancel-btn bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-full transition-transform transform active:scale-95">Batal</button>
-            <button type="submit" class="save-btn bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full transition-transform transform active:scale-95">Simpan</button>
+    <!-- User Grid Section -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+      <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+      <div id="noResult" class="text-center py-16 hidden">
+        <div class="text-8xl mb-4">🔍</div>
+        <h3 class="text-3xl font-bold text-slate-700 mb-2">Data User Tidak Ditemukan</h3>
+        <p class="text-slate-500 text-lg">Coba ubah kata kunci pencarian Anda</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-50 text-lg font-semibold"></div>
+
+  <template id="userCardTemplate">
+    <div class="user-card transition-all duration-500">
+      <div class="card-content relative h-full bg-white/90 backdrop-blur-sm border-2 border-slate-200 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 group">
+        <div class="card-display p-8 flex flex-col h-full opacity-100 transition-opacity duration-300">
+          <div class="flex items-center gap-6 mb-6">
+            <div class="avatar w-20 h-20 bg-gradient-to-br from-purple-400 to-blue-500 text-white rounded-2xl flex items-center justify-center text-4xl font-black flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300"></div>
+            <div class="flex-1 min-w-0">
+              <h3 class="card-nama text-3xl font-black text-slate-900 truncate mb-2"></h3>
+              <p class="card-username text-xl text-purple-600 font-semibold truncate"></p>
+            </div>
+          </div>
+          <div class="mb-6">
+            <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
+              <span class="text-2xl">👤</span>
+              <div>
+                <p class="text-slate-500 text-sm font-medium">Peran</p>
+                <p class="card-peran text-lg font-bold text-slate-800"></p>
+              </div>
+            </div>
+          </div>
+          <div class="pt-6 mt-auto border-t-2 border-slate-100 text-right">
+            <button class="edit-btn bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">✏️ Edit User</button>
+          </div>
+        </div>
+        <form class="card-edit p-8 space-y-6 absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 bg-white/95 backdrop-blur-sm rounded-3xl">
+          <h4 class="text-2xl font-bold text-slate-900 mb-6">✏️ Edit User</h4>
+          <div class="form-field">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap</label>
+            <input type="text" class="edit-nama form-input text-lg py-3" placeholder="Masukkan nama lengkap">
+          </div>
+          <div class="form-field">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Username</label>
+            <input type="text" class="edit-username form-input text-lg py-3" placeholder="Masukkan username">
+          </div>
+          <div class="form-field">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Peran</label>
+            <select class="edit-peran form-input text-lg py-3">
+              <option value="mahasiswa">Mahasiswa</option>
+              <option value="asisten">Asisten</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="flex justify-end gap-4 pt-4">
+            <button type="button" class="cancel-btn bg-gray-500 hover:bg-gray-600 text-white font-bold px-6 py-3 rounded-2xl transform active:scale-95 transition-all">❌ Batal</button>
+            <button type="submit" class="save-btn bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-8 py-3 rounded-2xl transform active:scale-95 transition-all">💾 Simpan</button>
           </div>
         </form>
       </div>
@@ -79,157 +127,109 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // DATA ADMIN DIHILANGKAN DARI SINI
-      let users = [
-        { id: 2, nama: "Nabil Fajrul Hakim", username: "nabil456", peran: "Asisten" },
-        { id: 3, nama: "Budi Santoso", username: "budi.san", peran: "Mahasiswa" },
-        { id: 4, nama: "Citra Lestari", username: "citra.l", peran: "Mahasiswa" },
-        { id: 5, nama: "Dewi Anggraini", username: "dewi.angg", peran: "Asisten" },
-      ];
+      let users = <%- JSON.stringify(users || []) %>;
 
       const userGrid = document.getElementById('userGrid');
-      const searchInput = document.getElementById('searchInput');
       const noResult = document.getElementById('noResult');
-      const template = document.getElementById('userCardTemplate');
+      const searchInput = document.getElementById('searchInput');
 
-      const renderUsers = (userList) => {
+      // Render users to the grid
+      function renderUsers(userList) {
         userGrid.innerHTML = '';
         if (userList.length === 0) {
           noResult.classList.remove('hidden');
           return;
+        } else {
+          noResult.classList.add('hidden');
         }
-        noResult.classList.add('hidden');
-        userList.forEach((user, index) => {
-          const card = template.content.cloneNode(true).firstElementChild;
-          card.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s both`;
-          card.dataset.userId = user.id;
+        userList.forEach(user => {
+          const template = document.getElementById('userCardTemplate');
+          const clone = template.content.cloneNode(true);
+          clone.querySelector('.card-nama').textContent = user.fullName || '';
+          clone.querySelector('.card-username').textContent = `@${user.username}`;
+          clone.querySelector('.card-peran').textContent = user.peran;
+          clone.querySelector('.avatar').textContent = user.fullName ? user.fullName.charAt(0) : '';
+          const card = clone.querySelector('.user-card');
 
-          card.querySelector('.card-nama').textContent = user.nama;
-          card.querySelector('.card-username').textContent = `@${user.username}`;
-          card.querySelector('.card-peran').textContent = user.peran;
-          card.querySelector('.avatar').textContent = user.nama.charAt(0);
-          card.querySelector('.edit-nama').value = user.nama;
-          card.querySelector('.edit-username').value = user.username;
-          card.querySelector('.edit-peran').value = user.peran;
+          // Edit button
+          const editBtn = clone.querySelector('.edit-btn');
+          const cardEditForm = clone.querySelector('.card-edit');
+          const cardDisplay = clone.querySelector('.card-display');
+          const cancelBtn = clone.querySelector('.cancel-btn');
+          const saveBtn = clone.querySelector('.save-btn');
 
-          card.querySelector('.edit-btn').addEventListener('click', () => toggleEditMode(card, true));
-          card.querySelector('.cancel-btn').addEventListener('click', () => toggleEditMode(card, false));
-          card.querySelector('form').addEventListener('submit', (e) => saveChanges(e, user.id));
-          
-          init3DCard(card);
-          userGrid.appendChild(card);
+          editBtn.addEventListener('click', () => {
+            cardEditForm.style.opacity = '1';
+            cardEditForm.style.pointerEvents = 'auto';
+            cardDisplay.style.opacity = '0';
+            cardDisplay.style.pointerEvents = 'none';
+
+            // Fill form with current data
+            cardEditForm.querySelector('.edit-nama').value = user.fullName || '';
+            cardEditForm.querySelector('.edit-username').value = user.username;
+            cardEditForm.querySelector('.edit-peran').value = user.peran;
+          });
+
+          cancelBtn.addEventListener('click', () => {
+            cardEditForm.style.opacity = '0';
+            cardEditForm.style.pointerEvents = 'none';
+            cardDisplay.style.opacity = '1';
+            cardDisplay.style.pointerEvents = 'auto';
+          });
+
+          saveBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const updatedData = {
+              nama: cardEditForm.querySelector('.edit-nama').value,
+              username: cardEditForm.querySelector('.edit-username').value,
+              peran: cardEditForm.querySelector('.edit-peran').value,
+            };
+            try {
+              const response = await fetch(`/user/update/${user.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+              });
+              const result = await response.json();
+              if (!response.ok) throw new Error(result.message);
+
+              // Update local users array
+              users = users.map(u => u.id === user.id ? { ...u, fullName: updatedData.nama, username: updatedData.username, peran: updatedData.peran } : u);
+              renderUsers(users);
+              showToast('✅ User berhasil diperbarui', 'success');
+            } catch (error) {
+              showToast('❌ ' + error.message, 'error');
+            }
+          });
+
+          userGrid.appendChild(clone);
         });
-      };
+      }
 
-      const toggleEditMode = (card, isEditing) => {
-          const displayView = card.querySelector('.card-display');
-          const editView = card.querySelector('.card-edit');
-          const cardContent = card.querySelector('.card-content');
-          const formFields = editView.querySelectorAll('.form-field');
-
-          if (isEditing) {
-              document.querySelectorAll('.user-card.is-editing').forEach(otherCard => {
-                  if (otherCard !== card) {
-                      toggleEditMode(otherCard, false);
-                  }
-              });
-          }
-
-          if (isEditing) {
-              card.classList.add('is-editing');
-              cardContent.classList.add('border-purple-500', 'shadow-2xl', 'shadow-purple-500/20');
-              displayView.classList.add('opacity-0', 'pointer-events-none');
-              editView.classList.remove('pointer-events-none', 'opacity-0');
-              
-              formFields.forEach((field, index) => {
-                  field.style.animation = `fadeIn 0.4s ease-out ${0.2 + index * 0.1}s both`;
-              });
-          } else {
-              card.classList.remove('is-editing');
-              cardContent.classList.remove('border-purple-500', 'shadow-2xl', 'shadow-purple-500/20');
-              editView.classList.add('opacity-0', 'pointer-events-none');
-              displayView.classList.remove('opacity-0', 'pointer-events-none');
-              formFields.forEach(field => field.style.animation = '');
-          }
-      };
-
-      const saveChanges = (e, userId) => {
-        e.preventDefault();
-        const card = e.target.closest('.user-card');
-        const updatedUser = {
-          nama: card.querySelector('.edit-nama').value,
-          username: card.querySelector('.edit-username').value,
-          peran: card.querySelector('.edit-peran').value,
-        };
-        
-        users = users.map(u => u.id === parseInt(card.dataset.userId) ? { ...u, ...updatedUser } : u);
-        
-        card.querySelector('.card-nama').textContent = updatedUser.nama;
-        card.querySelector('.card-username').textContent = `@${updatedUser.username}`;
-        card.querySelector('.card-peran').textContent = updatedUser.peran;
-        card.querySelector('.avatar').textContent = updatedUser.nama.charAt(0);
-        
-        toggleEditMode(card, false);
-        showToast('✅ Perubahan berhasil disimpan!');
-      };
-
+      // Search functionality
       searchInput.addEventListener('input', () => {
-        const keyword = searchInput.value.toLowerCase();
-        const filteredUsers = users.filter(u => 
-          u.nama.toLowerCase().includes(keyword) || 
-          u.username.toLowerCase().includes(keyword) || 
-          u.peran.toLowerCase().includes(keyword)
+        const query = searchInput.value.toLowerCase();
+        const filteredUsers = users.filter(user =>
+          (user.fullName && user.fullName.toLowerCase().includes(query)) ||
+          user.username.toLowerCase().includes(query) ||
+          user.peran.toLowerCase().includes(query)
         );
         renderUsers(filteredUsers);
       });
 
-      window.exportPDF = () => {
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          const keyword = searchInput.value.toLowerCase();
-          const filteredUsers = users.filter(u => u.nama.toLowerCase().includes(keyword) || u.username.toLowerCase().includes(keyword));
-          doc.text("Daftar User - LabCorner", 14, 20);
-          doc.autoTable({
-              head: [['Nama', 'Username', 'Peran']],
-              body: filteredUsers.map(u => [u.nama, u.username, u.peran]),
-              startY: 30,
-              theme: "grid",
-              headStyles: { fillColor: [99, 102, 241] }
-          });
-          doc.save("daftar_user_labcorner.pdf");
-      };
+      // Toast notification
+      function showToast(message, type) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-0 transition-transform duration-500 z-50 text-lg font-semibold ${
+          type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
+        }`;
+        setTimeout(() => {
+          toast.className = 'fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-50 text-lg font-semibold';
+        }, 4000);
+      }
 
-      const init3DCard = (card) => {
-        const cardContent = card.querySelector('.card-content');
-        const spotlight = card.querySelector('.spotlight');
-        card.addEventListener('mousemove', (e) => {
-            if (card.classList.contains('is-editing')) return;
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const rotateY = -1 * ((x - rect.width / 2) / (rect.width / 2)) * 8;
-            const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * 8;
-            cardContent.style.setProperty('--rotate-x', `${rotateX}deg`);
-            cardContent.style.setProperty('--rotate-y', `${rotateY}deg`);
-            if (spotlight) {
-                spotlight.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(0,0,0,0.08) 0%, transparent 50%)`;
-            }
-        });
-        card.addEventListener('mouseenter', () => { if (!card.classList.contains('is-editing') && spotlight) spotlight.style.opacity = '1'; });
-        card.addEventListener('mouseleave', () => {
-            cardContent.style.setProperty('--rotate-x', '0deg');
-            cardContent.style.setProperty('--rotate-y', '0deg');
-            if (spotlight) spotlight.style.opacity = '0';
-        });
-      };
-      
-      const showToast = (msg) => {
-        const toast = document.getElementById("toast");
-        toast.textContent = msg;
-        toast.classList.remove("translate-x-[120%]");
-        setTimeout(() => toast.classList.add("translate-x-[120%]"), 2500);
-      };
-
+      // Initial render
       renderUsers(users);
     });
   </script>

@@ -7,50 +7,161 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Model untuk User
-model User {
-  id        Int      @id @default(autoincrement())
-  fullName  String
-  username  String   @unique
-  password  String
-  role      Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relasi: User ini milik lab mana? (opsional)
-  lab   Lab?   @relation(fields: [labId], references: [id])
-  labId String?
+// PASTIKAN BLOK ENUM INI ADA DI ATAS MODEL ANDA
+enum Peran {
+  admin
+  mahasiswa
+  asisten
 }
 
-// Model untuk Laboratorium
-model Lab {
-  id        String   @id @unique // Cth: "lea", "labgis"
-  nama      String
-  icon      String
-  deskripsi String
-  jadwal    String
-  dosen     String
-
-  // Relasi: Lab ini memiliki banyak user dan pengumuman
-  users         User[]
-  announcements Announcement[]
+enum StatusTugas {
+  open
+  close
 }
 
-// Model untuk Pengumuman
-model Announcement {
-  id        Int      @id @default(autoincrement())
-  judul     String
-  isi       String   @db.Text
-  createdAt DateTime @default(now())
+enum StatusAbsensi {
+  Hadir
+  Tidak_Hadir
+}
+// AKHIR DARI BLOK ENUM
 
-  // Relasi: Pengumuman ini untuk lab mana?
-  lab   Lab    @relation(fields: [labId], references: [id])
-  labId String
+
+model user {
+  id           String         @id
+  fullName     String?      // <-- TAMBAHKAN INI DENGAN TANDA TANYA
+  username     String         @unique
+  kata_sandi   String
+  peran        Peran
+  dibuat_pada   DateTime      @default(now())
+
+  mahasiswa     mahasiswa[]
+  pengumpulan   pengumpulan[]
+  pengumuman    pengumuman[]  @relation("PengumumanPembuat")
+  absensi       absensi[]
+  asistenLab    asistenLab[]
 }
 
-// Enum untuk peran user
-enum Role {
-  Admin
-  Asisten
-  Mahasiswa
+model lab {
+  id          Int      @id @default(autoincrement())
+  nama_lab    String   @unique
+  deskripsi   String?
+  jadwal      String?
+  dosen       String?
+  kapasitas   Int      @default(30)
+  status      String   @default("aktif")
+  dibuat_pada DateTime @default(now())
+  
+  praktikum   praktikum[]
+  asistenLab  asistenLab[]
+}
+
+model asistenLab {
+  id      Int    @id @default(autoincrement())
+  user_id String
+  lab_id  Int
+  user    user   @relation(fields: [user_id], references: [id])
+  lab     lab    @relation(fields: [lab_id], references: [id])
+
+  @@unique([user_id, lab_id])
+}
+
+model praktikum {
+  id             Int          @id @default(autoincrement())
+  nama_praktikum String
+  kode_masuk     String       @unique
+  lab_id         Int
+  dibuat_pada    DateTime     @default(now())
+
+  lab          lab          @relation(fields: [lab_id], references: [id])
+  mahasiswa    mahasiswa[]
+  jadwal       jadwal[]
+  modul        modul[]
+  tugas        tugas[]
+  pengumuman   pengumuman[]
+}
+
+model mahasiswa {
+  id             Int       @id @default(autoincrement())
+  user_id        String
+  praktikum_id   Int
+  waktu_daftar   DateTime?
+  user           user      @relation(fields: [user_id], references: [id])
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
+
+  @@unique([user_id, praktikum_id])
+}
+
+model jadwal {
+  id             Int       @id @default(autoincrement())
+  praktikum_id   Int
+  tanggal        DateTime
+  jam            DateTime
+  ruangan        String?
+  materi         String?
+  nama_pengajar  String?
+  dibuat_pada    DateTime  @default(now())
+
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
+  absensi      absensi[]
+}
+
+model modul {
+  id            Int       @id @default(autoincrement())
+  praktikum_id  Int
+  judul         String
+  file_path     String
+  diunggah_pada DateTime  @default(now())
+  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
+}
+
+model tugas {
+  id               Int           @id @default(autoincrement())
+  praktikum_id     Int
+  judul            String
+  deskripsi        String?
+  fileTugas        String?
+  batas_waktu      DateTime
+  dibuat_pada      DateTime      @default(now())
+  status           StatusTugas   @default(open)
+  tutup_penugasan  Boolean       @default(false)
+
+  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id])
+  pengumpulan      pengumpulan[]
+}
+
+model pengumpulan {
+  id           Int       @id @default(autoincrement())
+  tugas_id     Int
+  user_id      String
+  file_path    String?
+  waktu_kirim  DateTime?
+  nilai        Float?
+  catatan      String?
+
+  tugas        tugas     @relation(fields: [tugas_id], references: [id])
+  user         user      @relation(fields: [user_id], references: [id])
+}
+
+model pengumuman {
+  id           Int       @id @default(autoincrement())
+  judul        String    // Judul pengumuman
+  isi          String    // Isi pengumuman
+  prioritas    String    @default("sedang") // rendah, sedang, tinggi
+  target_lab   String?   // null = semua lab, atau nama lab spesifik
+  praktikum_id Int?      // ID praktikum (opsional, untuk pengumuman umum)
+  dibuat_oleh  String
+  dibuat_pada  DateTime  @default(now())
+  status       String    @default("aktif") // aktif, nonaktif
+
+  pembuat      user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
+  praktikum    praktikum? @relation(fields: [praktikum_id], references: [id])
+}
+
+model absensi {
+  id        Int           @id @default(autoincrement())
+  user_id   String
+  jadwal_id Int
+  status    StatusAbsensi // Sekarang Prisma tahu apa itu 'StatusAbsensi'
+  user      user          @relation(fields: [user_id], references: [id])
+  jadwal    jadwal        @relation(fields: [jadwal_id], references: [id])
 }

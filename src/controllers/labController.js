@@ -2,45 +2,73 @@
 
 const prisma = require('../lib/prisma');
 
-// Menampilkan halaman detail lab berdasarkan ID
 exports.getLabDetail = async (req, res) => {
   try {
-    const labId = req.params.id; // Cth: 'lea'
+    const labId = parseInt(req.params.id); // ID lab sekarang adalah Integer
+
     const labData = await prisma.lab.findUnique({
       where: { id: labId },
       include: {
-        users: { // Ambil semua user yang terhubung dengan lab ini
-          select: { fullName: true, role: true } 
+        // Ambil data asisten melalui tabel relasi 'asistenLab'
+        asistenLab: {
+          include: {
+            user: true // Ambil detail data user yang menjadi asisten
+          }
         },
-      },
+        // Ambil data mahasiswa melalui tabel 'praktikum' lalu 'mahasiswa'
+        praktikum: {
+          include: {
+            mahasiswa: {
+              include: {
+                user: true // Ambil detail data user yang menjadi mahasiswa
+              }
+            },
+            _count: { // Hitung jumlah modul & tugas
+                select: { modul: true, tugas: true }
+            }
+          }
+        }
+      }
     });
 
     if (!labData) {
-      return res.status(404).send('Lab tidak ditemukan');
+      return res.status(404).render('404', { title: 'Lab Tidak Ditemukan' });
     }
 
-    // Pisahkan user berdasarkan peran
-    const asisten = labData.users.filter(u => u.role === 'Asisten').map(u => u.fullName);
-    const mahasiswa = labData.users.filter(u => u.role === 'Mahasiswa').map(u => u.fullName);
+    // --- Memproses data agar mudah digunakan di EJS ---
 
-    // Siapkan data lengkap untuk view
-    const viewData = {
-      ...labData,
-      jumlahAsisten: asisten.length,
-      jumlahMahasiswa: mahasiswa.length,
-      asisten: asisten,
-      mahasiswa: mahasiswa,
-      // Data dummy untuk yang tidak ada di model
-      jumlahModul: 8 + Math.floor(Math.random() * 5),
-      jumlahKelas: 3 + Math.floor(Math.random() * 5),
-    };
+    // Mengambil daftar nama asisten
+    const asisten = labData.asistenLab.map(aslab => aslab.user.fullName);
     
+    // Mengambil daftar nama mahasiswa dari semua praktikum di lab ini
+    const mahasiswa = labData.praktikum.flatMap(p => p.mahasiswa.map(mhs => mhs.user.fullName));
+    const uniqueMahasiswa = [...new Set(mahasiswa)]; // Menghapus duplikat jika ada
+
+    // Menghitung total modul dan kelas (praktikum)
+    const jumlahModul = labData.praktikum.reduce((sum, p) => sum + p._count.modul, 0);
+    const jumlahKelas = labData.praktikum.length;
+
+    const viewData = {
+      id: labData.id,
+      nama: labData.nama_lab, // Sesuaikan dengan nama field di skema
+      icon: '🧪', // Ikon bisa disimpan di DB atau di-hardcode
+      deskripsi: 'Deskripsi detail untuk ' + labData.nama_lab, // Deskripsi bisa dari DB
+      jadwal: 'Jadwal detail untuk ' + labData.nama_lab, // Jadwal bisa dari DB
+      dosen: 'Dosen PJ untuk ' + labData.nama_lab, // Dosen bisa dari DB
+      jumlahAsisten: asisten.length,
+      jumlahModul: jumlahModul,
+      jumlahKelas: jumlahKelas,
+      asisten: asisten,
+      mahasiswa: uniqueMahasiswa
+    };
+
     res.render('detail-lab', {
-      title: `Detail ${labData.nama}`,
-      lab: viewData,
+      title: `Detail ${viewData.nama}`,
+      lab: viewData
     });
+
   } catch (error) {
     console.error(error);
-    res.status(500).send('Terjadi error di server');
+    res.status(500).send("Gagal mengambil data detail lab");
   }
-};
+};  

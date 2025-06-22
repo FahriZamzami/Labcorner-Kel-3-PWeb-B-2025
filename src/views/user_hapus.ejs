@@ -2,241 +2,229 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title><%= title || 'Dashboard LabCorner' %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%- title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            primary: '#6366f1', // Indigo-500
-            secondary: '#a855f7', // Purple-500
-            accent: '#ec4899' // Pink-500
-          },
-          animation: {
-            aurora: 'aurora 60s linear infinite',
-            'input-enter': 'input-enter 0.5s ease-out forwards',
-            'input-leave': 'input-leave 0.3s ease-in forwards',
-            'tag-in': 'tag-in 0.5s ease-out forwards'
-          },
-          keyframes: {
-            aurora: {
-              '0%': { transform: 'translate(0%, 0%) rotate(0deg)' },
-              '25%': { transform: 'translate(10%, -20%) rotate(20deg)' },
-              '50%': { transform: 'translate(-10%, 20%) rotate(-20deg)' },
-              '75%': { transform: 'translate(-5%, -10%) rotate(10deg)' },
-              '100%': { transform: 'translate(0%, 0%) rotate(0deg)' },
-            },
-            'input-enter': {
-              '0%': { opacity: '0', transform: 'translateY(20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0px)' },
-            },
-            'input-leave': {
-              '0%': { opacity: '1', transform: 'translateY(0px)' },
-              '100%': { opacity: '0', transform: 'translateY(-20px)' },
-            },
-            'tag-in': {
-               '0%': { opacity: '0', transform: 'scale(0.8) translateY(20px)' },
-               '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
-            }
-          }
-        }
-      }
+  <style>
+    .bg-gradient-animated {
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
     }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
 </head>
 
-<body class="bg-slate-50 min-h-screen text-slate-800 font-[Inter] overflow-hidden flex items-center justify-center">
-  
-  <div class="absolute inset-0 z-0 pointer-events-none opacity-40 overflow-hidden">
-      <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-200 rounded-full filter blur-3xl animate-aurora"></div>
-      <div class="absolute top-1/2 right-0 w-96 h-96 bg-indigo-200 rounded-full filter blur-3xl animate-aurora" style="animation-delay: -10s;"></div>
-      <div class="absolute bottom-[-20%] left-[15%] w-96 h-96 bg-pink-200 rounded-full filter blur-3xl animate-aurora" style="animation-delay: -20s;"></div>
+<body class="bg-gradient-to-br from-slate-50 via-red-50 to-pink-50 min-h-screen text-slate-800 font-[Inter]">
+  <!-- Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-40 left-40 w-80 h-80 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
   </div>
 
-  <div class="relative w-full max-w-2xl mx-auto px-6 py-12 z-10">
-    <h2 class="text-5xl font-extrabold text-slate-900 drop-shadow-sm text-center mb-12">👤 Tambah User Baru</h2>
-
-    <div class="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/30">
-        <div id="formContainer" class="overflow-hidden min-h-[70px]">
-            <div class="form-step" data-step="0">
-                <div class="input-group">
-                    <input type="text" id="nama" name="nama" class="form-input" placeholder=" " required />
-                    <label for="nama" class="floating-label">🧑 Siapa nama lengkap user?</label>
-                </div>
-            </div>
-            <div class="form-step hidden" data-step="1">
-                <div class="input-group">
-                    <input type="text" id="username" name="username" class="form-input" placeholder=" " required />
-                    <label for="username" class="floating-label">🆔 Buat username yang unik</label>
-                </div>
-            </div>
-             <div class="form-step hidden" data-step="2">
-                <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-input" placeholder=" " required />
-                    <label for="password" class="floating-label">🔒 Masukkan password</label>
-                </div>
-            </div>
-             <div class="form-step hidden" data-step="3">
-                <div class="input-group">
-                     <select name="peran" id="peran" class="form-input text-lg" required>
-                      <option value="" disabled selected>-- Pilih Peran --</option>
-                      <option value="mahasiswa">Mahasiswa</option>
-                      <option value="asisten">Asisten</option>
-                    </select>
-                    <label for="peran" class="floating-label active">👥 Apa perannya?</label>
-                </div>
-            </div>
+  <div class="relative max-w-7xl mx-auto px-6 py-8 space-y-8 z-10">
+    <!-- Header Section -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div class="flex items-center gap-6">
+          <a href="/" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+            <span class="text-xl">←</span>
+            <span>Kembali ke Dashboard</span>
+          </a>
+          <div>
+            <h2 class="text-6xl font-black text-slate-900 drop-shadow-sm bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">🗑️ Hapus User</h2>
+            <p class="text-slate-600 text-lg mt-2">Pilih user yang akan dihapus dari sistem</p>
+          </div>
         </div>
-
-        <div class="mt-8">
-            <h3 class="text-lg font-semibold text-slate-700 mb-4">Preview Data:</h3>
-            <div id="collectedData" class="flex flex-wrap gap-3 min-h-[50px] p-4 bg-slate-100/80 rounded-xl border border-slate-200">
-                </div>
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+          <div class="relative w-full sm:w-80">
+            <input id="searchInput" type="text" placeholder="🔍 Cari user untuk dihapus..." class="w-full bg-white/90 backdrop-blur-sm text-slate-700 placeholder-slate-400 px-6 py-4 rounded-2xl border-2 border-slate-200 focus:ring-4 focus:ring-red-500/30 focus:outline-none focus:border-red-500 transition-all duration-300 shadow-lg text-lg">
+          </div>
         </div>
+      </div>
+    </div>
 
-        <div class="mt-8 pt-6 border-t border-slate-200">
-            <button type="button" id="submitBtn" class="w-full bg-gradient-to-r from-primary to-secondary text-white text-lg font-semibold px-6 py-4 rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-primary/40 hover:scale-105 active:scale-100">
-              <span class="btn-text">Lengkapi semua data</span>
-            </button>
-        </div>
+    <!-- User Grid Section -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+      <div id="userGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+      <div id="noResult" class="text-center py-16 hidden">
+        <div class="text-8xl mb-4">🔍</div>
+        <h3 class="text-3xl font-bold text-slate-700 mb-2">Data User Tidak Ditemukan</h3>
+        <p class="text-slate-500 text-lg">Coba ubah kata kunci pencarian Anda</p>
+      </div>
     </div>
   </div>
 
-  <div id="toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg transform translate-x-[120%] transition-transform duration-500 z-50 text-lg"></div>
+  <!-- Confirmation Modal -->
+  <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+        <div class="text-center">
+          <div class="text-6xl mb-4">⚠️</div>
+          <h3 class="text-2xl font-bold text-slate-900 mb-4">Konfirmasi Hapus</h3>
+          <p class="text-slate-600 mb-6">Apakah Anda yakin ingin menghapus user <span id="deleteUserName" class="font-bold text-red-600"></span>?</p>
+          <p class="text-sm text-red-500 mb-6">⚠️ Tindakan ini tidak dapat dibatalkan!</p>
+          <div class="flex gap-4">
+            <button id="cancelDelete" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold px-6 py-3 rounded-2xl transition-all">❌ Batal</button>
+            <button id="confirmDelete" class="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold px-6 py-3 rounded-2xl transition-all">🗑️ Hapus</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <style>
-    .input-group { @apply relative; }
-    .form-input {
-      @apply w-full px-5 pt-6 pb-2 text-slate-800 text-lg bg-transparent border-b-2 border-slate-300 transition-all duration-300 focus:outline-none focus:border-primary;
-    }
-    .form-input:focus + .floating-label,
-    .form-input:not(:placeholder-shown) + .floating-label,
-    .floating-label.active {
-      @apply transform -translate-y-4 text-sm text-primary font-semibold;
-    }
-    .floating-label {
-      @apply absolute top-4 left-5 text-slate-500 text-lg transition-all duration-300 pointer-events-none;
-    }
-  </style>
+  <div id="toast" class="fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-50 text-lg font-semibold"></div>
+
+  <template id="userCardTemplate">
+    <div class="user-card transition-all duration-500">
+      <div class="card-content relative h-full bg-white/90 backdrop-blur-sm border-2 border-slate-200 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 group hover:border-red-200">
+        <div class="p-8 flex flex-col h-full">
+          <div class="flex items-center gap-6 mb-6">
+            <div class="avatar w-20 h-20 bg-gradient-to-br from-red-400 to-pink-500 text-white rounded-2xl flex items-center justify-center text-4xl font-black flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300"></div>
+            <div class="flex-1 min-w-0">
+              <h3 class="card-nama text-3xl font-black text-slate-900 truncate mb-2"></h3>
+              <p class="card-username text-xl text-red-600 font-semibold truncate"></p>
+            </div>
+          </div>
+          <div class="mb-6">
+            <div class="flex items-center gap-3 p-4 bg-red-50 rounded-2xl border-2 border-red-100">
+              <span class="text-2xl">👤</span>
+              <div>
+                <p class="text-slate-500 text-sm font-medium">Peran</p>
+                <p class="card-peran text-lg font-bold text-slate-800"></p>
+              </div>
+            </div>
+          </div>
+          <div class="pt-6 mt-auto border-t-2 border-slate-100 text-right">
+            <button class="delete-btn bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">🗑️ Hapus User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const steps = Array.from(document.querySelectorAll('.form-step'));
-        const inputs = {
-            nama: document.getElementById('nama'),
-            username: document.getElementById('username'),
-            password: document.getElementById('password'),
-            peran: document.getElementById('peran')
-        };
-        const collectedDataContainer = document.getElementById('collectedData');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = submitBtn.querySelector('.btn-text');
-        let currentStep = 0;
-        const formData = {};
+      let users = <%- JSON.stringify(users || []) %>;
+      let userToDelete = null;
 
-        const goToStep = (stepIndex) => {
-            if (stepIndex >= steps.length) {
-                btnText.textContent = '➕ Tambah User';
-                submitBtn.disabled = false;
-                return;
-            }
-            steps.forEach((step, index) => {
-                if (index === stepIndex) {
-                    step.classList.remove('hidden', 'animate-input-leave');
-                    step.classList.add('animate-input-enter');
-                    step.querySelector('input, select').focus();
-                } else {
-                    step.classList.add('hidden');
-                }
-            });
-            currentStep = stepIndex;
-        };
+      const userGrid = document.getElementById('userGrid');
+      const noResult = document.getElementById('noResult');
+      const searchInput = document.getElementById('searchInput');
+      const deleteModal = document.getElementById('deleteModal');
+      const deleteUserName = document.getElementById('deleteUserName');
+      const cancelDelete = document.getElementById('cancelDelete');
+      const confirmDelete = document.getElementById('confirmDelete');
 
-        const addDataTag = (key, value, icon) => {
-            const existingTag = document.querySelector(`[data-key="${key}"]`);
-            if(existingTag) existingTag.remove();
-
-            const tag = document.createElement('div');
-            tag.className = 'flex items-center gap-2 bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-full animate-tag-in text-sm font-semibold';
-            tag.dataset.key = key;
-            tag.innerHTML = `<span>${icon}</span><span class="font-medium">${value}</span>`;
-            collectedDataContainer.appendChild(tag);
-            formData[key] = value;
-        };
-        
-        const handleStepCompletion = (inputElement) => {
-             const key = inputElement.name;
-             let value = inputElement.value;
-             let icon = '';
-
-             switch(key) {
-                case 'nama': icon = '🧑'; break;
-                case 'username': icon = '🆔'; break;
-                case 'password': value = '••••••••'; icon = '🔒'; break;
-                case 'peran': value = inputElement.options[inputElement.selectedIndex].text; icon = '👥'; break;
-             }
-             
-             if (inputElement.value.trim() === '') return;
-             addDataTag(key, value, icon);
-             goToStep(currentStep + 1);
-        };
-        
-        Object.values(inputs).forEach(input => {
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && input.type !== 'select-one') {
-                    e.preventDefault();
-                    handleStepCompletion(e.target);
-                }
-            });
-            if (input.type === 'select-one') {
-                input.addEventListener('change', (e) => handleStepCompletion(e.target));
-            }
-        });
-
-        submitBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (submitBtn.disabled) return;
-            
-            btnText.textContent = 'Menyimpan...';
-            submitBtn.disabled = true;
-
-            setTimeout(() => {
-                btnText.innerHTML = `✓ Berhasil!`;
-                submitBtn.style.background = '#22c55e'; // Green-500
-                showToast("✅ User berhasil ditambahkan!");
-                
-                setTimeout(() => {
-                    collectedDataContainer.innerHTML = '';
-                    goToStep(0);
-                    // Reset form fields
-                    Object.values(inputs).forEach(input => { input.value = ''; });
-                    inputs.peran.selectedIndex = 0;
-                    
-                    document.querySelectorAll('.floating-label').forEach(label => {
-                        label.classList.remove('-translate-y-4', 'text-sm', 'text-primary', 'font-semibold');
-                    });
-                    
-                    submitBtn.disabled = true;
-                    btnText.textContent = 'Lengkapi semua data';
-                    submitBtn.style.background = '';
-                }, 2000);
-            }, 1200);
-        });
-
-        function showToast(msg) {
-          const toast = document.getElementById("toast");
-          toast.textContent = msg;
-          toast.classList.remove("translate-x-[120%]");
-          setTimeout(() => {
-            toast.classList.add("translate-x-[120%]");
-          }, 2500);
+      // Render users to the grid
+      function renderUsers(userList) {
+        userGrid.innerHTML = '';
+        if (userList.length === 0) {
+          noResult.classList.remove('hidden');
+          return;
+        } else {
+          noResult.classList.add('hidden');
         }
+        userList.forEach(user => {
+          const template = document.getElementById('userCardTemplate');
+          const clone = template.content.cloneNode(true);
+          clone.querySelector('.card-nama').textContent = user.fullName || '';
+          clone.querySelector('.card-username').textContent = `@${user.username}`;
+          clone.querySelector('.card-peran').textContent = user.peran;
+          clone.querySelector('.avatar').textContent = user.fullName ? user.fullName.charAt(0) : '';
+          const card = clone.querySelector('.user-card');
 
-        goToStep(0);
+          // Delete button
+          const deleteBtn = clone.querySelector('.delete-btn');
+          deleteBtn.addEventListener('click', () => {
+            userToDelete = user;
+            deleteUserName.textContent = user.fullName || user.username;
+            deleteModal.classList.remove('hidden');
+          });
+
+          userGrid.appendChild(clone);
+        });
+      }
+
+      // Search functionality
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        const filteredUsers = users.filter(user =>
+          (user.fullName && user.fullName.toLowerCase().includes(query)) ||
+          user.username.toLowerCase().includes(query) ||
+          user.peran.toLowerCase().includes(query)
+        );
+        renderUsers(filteredUsers);
+      });
+
+      // Modal controls
+      cancelDelete.addEventListener('click', () => {
+        deleteModal.classList.add('hidden');
+        userToDelete = null;
+      });
+
+      confirmDelete.addEventListener('click', async () => {
+        if (!userToDelete) return;
+
+        confirmDelete.disabled = true;
+        confirmDelete.textContent = '⏳ Menghapus...';
+
+        try {
+          const response = await fetch('/user/hapus', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: userToDelete.id })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showToast('✅ ' + result.message, 'success');
+            // Remove user from local array
+            users = users.filter(u => u.id !== userToDelete.id);
+            renderUsers(users);
+            deleteModal.classList.add('hidden');
+            userToDelete = null;
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          showToast('❌ ' + error.message, 'error');
+        } finally {
+          confirmDelete.disabled = false;
+          confirmDelete.textContent = '🗑️ Hapus';
+        }
+      });
+
+      // Close modal when clicking outside
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.classList.add('hidden');
+          userToDelete = null;
+        }
+      });
+
+      // Toast notification
+      function showToast(message, type) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-0 transition-transform duration-500 z-50 text-lg font-semibold ${
+          type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
+        }`;
+        setTimeout(() => {
+          toast.className = 'fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-50 text-lg font-semibold';
+        }, 4000);
+      }
+
+      // Initial render
+      renderUsers(users);
     });
   </script>
 </body>

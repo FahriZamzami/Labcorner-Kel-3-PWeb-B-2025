@@ -6,7 +6,7 @@ const expressLayouts = require('express-ejs-layouts');
 const indexRouter = require('./routes/index');
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware cek status offline sebelum route lain
 const statusFile = path.join(__dirname, '..', 'status.json');
@@ -51,6 +51,43 @@ app.use(checkSiteStatus);
 
 app.use('/', indexRouter);
 
-app.listen(port, () => {
-  console.log(`🚀 Server running on http://localhost:${port}`);
+// Global error handler middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  
+  // If it's an API route, return JSON error
+  if (req.path.startsWith('/api/')) {
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    });
+  }
+  
+  // For regular routes, render error page
+  res.status(500).render('error', {
+    title: 'Error',
+    message: 'Terjadi kesalahan pada server',
+    error: err.message
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({
+      success: false,
+      message: 'Endpoint tidak ditemukan'
+    });
+  }
+  
+  res.status(404).render('error', {
+    title: '404 Not Found',
+    message: 'Halaman tidak ditemukan',
+    error: 'Halaman yang Anda cari tidak ada'
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
