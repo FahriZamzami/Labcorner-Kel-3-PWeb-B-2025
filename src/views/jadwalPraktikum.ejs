@@ -28,44 +28,59 @@
                         </button>
                     </header>
 
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <table class="min-w-full leading-normal">
-                            <thead>
-                                <tr class="border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    <th class="px-5 py-3">No</th>
-                                    <th class="px-5 py-3">Hari & Tanggal</th>
-                                    <th class="px-5 py-3">Jam</th>
-                                    <th class="px-5 py-3">Materi</th>
-                                    <th class="px-5 py-3">Ruangan</th>
-                                    <th class="px-5 py-3">Pengajar</th>
-                                    <th class="px-5 py-3">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (jadwalList.length > 0) { %>
-                                    <% jadwalList.forEach((jadwal, index) => { %>
-                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                        <td class="px-5 py-4 text-sm"><%= index + 1 %></td>
-                                        <td class="px-5 py-4 text-sm"><%= new Date(jadwal.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></td>
-                                        <td class="px-5 py-4 text-sm"><%= new Date(jadwal.jam).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %> WIB</td>
-                                        <td class="px-5 py-4 text-sm"><%= jadwal.materi %></td>
-                                        <td class="px-5 py-4 text-sm"><%= jadwal.ruangan %></td>
-                                        <td class="px-5 py-4 text-sm"><%= jadwal.nama_pengajar %></td>
-                                        <td class="px-5 py-4 text-sm flex space-x-3">
-                                            <button onclick="openEditModal('<%= jadwal.id %>')" class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-pen-to-square"></i></button>
-                                            <form action="/jadwal/delete/<%= jadwal.id %>" method="POST" class="delete-form">
-                                                <button type="submit" class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                                <% } else { %>
-                                    <tr><td colspan="7" class="text-center py-10 text-gray-500">Belum ada jadwal yang dibuat.</td></tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-5 py-3">No</th>
+                            <th class="px-5 py-3">Hari & Tanggal</th>
+                            <th class="px-5 py-3">Jam</th>
+                            <th class="px-5 py-3">Materi</th>
+                            <th class="px-5 py-3">Ruangan</th>
+                            <th class="px-5 py-3">Pengajar</th>
+                            <th class="px-5 py-3">Status</th>
+                            <th class="px-5 py-3">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% jadwalList.forEach((jadwal, index) => { %>
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="px-5 py-4 text-sm"><%= index + 1 %></td>
+                            <td class="px-5 py-4 text-sm"><%= new Date(jadwal.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></td>
+                            <td class="px-5 py-4 text-sm"><%= new Date(jadwal.jam).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %> WIB</td>
+                            <td class="px-5 py-4 text-sm"><%= jadwal.materi %></td>
+                            <td class="px-5 py-4 text-sm"><%= jadwal.ruangan %></td>
+                            <td class="px-5 py-4 text-sm"><%= jadwal.nama_pengajar %></td>
+                            <td class="px-5 py-4 text-sm">
+                                <form action="/jadwal/toggle-status/<%= jadwal.id %>" method="POST" class="inline">
+                                    <button type="submit" class="cursor-pointer">
+                                        <% if (jadwal.status === 'Selesai') { %>
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Selesai
+                                            </span>
+                                        <% } else { %>
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                Belum Mulai
+                                            </span>
+                                        <% } %>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="px-5 py-4 text-sm flex space-x-3">
+                                <button onclick="openEditModal('<%= jadwal.id %>')" class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <form action="/jadwal/delete/<%= jadwal.id %>" method="POST" class="delete-form">
+                                    <button type="submit" class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                        <% if (jadwalList.length === 0) { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-10 text-gray-500">Belum ada jadwal yang dibuat.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
             </div>
         </main>
     </div>

@@ -27,13 +27,13 @@
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span class="font-semibold">Home Lab</span>
                 </a>
-                <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                <a href="/praktikum/<%= lab.id %>/jadwal" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2V5M16 2V5M3 8H21M5 22H19C20.1046 22 21 21.1046 21 20V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V20C3 21.1046 3.89543 22 5 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span class="font-medium">Jadwal Praktikum</span>
                 </a>
             </nav>
             <div class="mt-auto p-2">
-                <a href="#" class="flex items-center space-x-4 p-3 rounded-lg text-white/90 hover:bg-white/10 border-2 border-white/30">
+                <a href="/kelas/tambah" class="flex items-center space-x-4 p-3 rounded-lg text-white/90 hover:bg-white/10 border-2 border-white/30">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path></svg>
                     <span class="font-semibold">Tambah Kelas</span>
                 </a>
@@ -47,7 +47,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">LABCORNER</h2>
                 <div class="flex items-center space-x-5">
                     <img src="https://i.ibb.co/68q746Z/logo-web.png" alt="Logo" class="h-8 w-8 rounded-full">
-                    <button class="text-gray-500 relative">
+                    <button class="text-gray-500 relative" disabled>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                     </button>
                     <div class="relative">
@@ -80,10 +80,22 @@
                             <h3 class="text-xl font-bold text-gray-800 mt-4"><%= praktikum.nama_praktikum %></h3>
                             <p class="text-gray-600 font-semibold mb-6"><%= praktikum.kelas %></p>
 
-                            <a href="/kelas/<%= praktikum.id %>"
-                                class="inline-block bg-[#8B5CF6] text-white font-semibold px-10 py-2 rounded-full hover:bg-[#7C3AED] transition-colors">
-                                Buka
-                            </a>
+                            <div class="flex space-x-2">
+                                <a href="/kelas/<%= praktikum.id %>"
+                                    class="flex-1 bg-indigo-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-indigo-600 transition-colors text-sm">
+                                    Buka
+                                </a>
+                                <a href="/kelas/<%= praktikum.id %>/edit"
+                                    class="bg-yellow-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-yellow-600 transition-colors text-sm">
+                                    Edit
+                                </a>
+                                <form action="/kelas/<%= praktikum.id %>/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kelas ini?');">
+                                    <button type="submit"
+                                        class="bg-red-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-red-600 transition-colors text-sm">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     <% }) %>
                 <% } else { %>
@@ -93,5 +105,16 @@
         </main>
         </div>
     </div>
+
+    <script>
+        // Script untuk menampilkan pesan sukses dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const successMessage = urlParams.get('success');
+        if (successMessage) {
+            alert(successMessage);
+            // Hapus parameter dari URL agar pesan tidak muncul lagi saat refresh
+            window.history.replaceState({}, document.title, "/lab");
+        }
+    </script>
 </body>
 </html>
