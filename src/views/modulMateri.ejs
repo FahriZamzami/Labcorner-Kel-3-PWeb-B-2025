@@ -217,21 +217,21 @@
                       category = 'evaluasi';
                     }
                   %>
-                  <div class="modul-card bg-gradient-to-br <%= colorClass %> rounded-3xl shadow-xl overflow-hidden card-hover border-2 <%= borderClass %>" 
+                  <div class="modul-card bg-gradient-to-br <%= colorClass %> rounded-3xl shadow-xl overflow-hidden card-hover border-2 <%= borderClass %> flex flex-col" 
                        data-title="<%= modul.judul %>" data-description="" data-category="<%= category %>" data-size="">
-                    <div class="p-6">
+                    <div class="p-6 flex-1 flex flex-col">
                       <div class="flex items-center justify-between mb-4">
                         <div class="w-14 h-14 bg-white bg-opacity-40 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white border-opacity-50 shadow-lg">
                           <i class="fas fa-file-pdf text-gray-700 text-xl"></i>
                         </div>
                         <span class="bg-white bg-opacity-40 text-gray-700 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm border border-white border-opacity-50 shadow-sm">PDF</span>
                       </div>
-                      <h3 class="text-lg font-bold text-gray-800 mb-3 leading-tight"><%= modul.judul %></h3>
+                      <h3 class="text-lg font-bold text-gray-800 mb-3 leading-tight flex-1"><%= modul.judul %></h3>
                       <p class="text-gray-600 text-sm mb-5">Diunggah oleh: <%= modul.user ? modul.user.username : '-' %></p>
-                      <div class="flex items-center justify-between">
+                      <div class="flex items-center justify-between mt-auto">
                         <span class="text-gray-500 text-xs font-medium"><%= modul.file_path %></span>
                         <a href="/modulMateri/download/<%= modul.id %>" 
-                           class="bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-700 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 shadow-lg border border-white border-opacity-50 download-btn transform hover:scale-105">
+                           class="bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-700 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 shadow-lg border border-white border-opacity-50 download-btn transform hover:scale-105 whitespace-nowrap">
                           <span><i class="fas fa-download mr-2"></i>Download</span>
                         </a>
                       </div>

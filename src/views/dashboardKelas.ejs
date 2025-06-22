@@ -41,8 +41,27 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(74, 222, 128, 0.4);
         }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
         .search-container {
             position: relative;
+        }
+        .search-container input:focus + .search-icon {
+            color: #8b5cf6;
+        }
+        .search-icon {
+            transition: color 0.3s ease;
         }
         .search-results {
             position: absolute;
@@ -108,10 +127,15 @@
                 <div class="relative">
                     <input type="text" 
                            id="searchKelas" 
-                           placeholder="Cari kelas praktikum..." 
-                           class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none shadow-lg">
-                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
-                        <i class="fas fa-search text-gray-400 text-xl"></i>
+                           placeholder="Cari kelas praktikum, lab, atau kode akses..." 
+                           class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none shadow-lg transition-all duration-300">
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                        <button id="clearSearch" 
+                                class="text-gray-400 hover:text-gray-600 transition-colors hidden"
+                                onclick="clearSearch()">
+                            <i class="fas fa-times-circle text-xl"></i>
+                        </button>
+                        <i class="fas fa-search text-gray-400 text-xl search-icon"></i>
                     </div>
                 </div>
                 <div id="searchResults" class="search-results hidden"></div>
@@ -154,9 +178,6 @@
                             </div>
                             <h3 class="text-xl font-bold text-gray-800 mb-2"><%= kelas.nama_praktikum %></h3>
                             <p class="text-gray-600 mb-4"><%= kelas.lab.nama_lab %></p>
-                            <p class="text-sm text-gray-500 mb-4">
-                                Kode Akses: <span class="font-mono bg-gray-100 px-2 py-1 rounded"><%= kelas.kode_masuk %></span>
-                            </p>
                             
                             <% if (kelas.sudahTerdaftar) { %>
                                 <button data-praktikum-id="<%= kelas.id %>" 
@@ -239,6 +260,7 @@
         // Data kelas untuk pencarian
         const semuaKelas = JSON.parse(document.getElementById('kelasData').dataset.semuaKelas);
         let currentKodeMasuk = '';
+        let searchTimeout;
 
         // Event listeners untuk tombol
         document.addEventListener('DOMContentLoaded', function() {
@@ -258,24 +280,145 @@
                     showKodeMasukModal(namaKelas, kodeAkses);
                 });
             });
-        });
 
-        // Fungsi pencarian
-        document.getElementById('searchKelas').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.card-hover');
-            
-            cards.forEach(card => {
-                const title = card.querySelector('h3').textContent.toLowerCase();
-                const lab = card.querySelector('p').textContent.toLowerCase();
-                
-                if (title.includes(searchTerm) || lab.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+            // Event listener untuk clear search
+            document.getElementById('searchKelas').addEventListener('keyup', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    performSearch('');
                 }
             });
         });
+
+        // Fungsi pencarian dengan debouncing
+        document.getElementById('searchKelas').addEventListener('input', function(e) {
+            const searchTerm = e.target.value;
+            
+            // Clear timeout sebelumnya
+            clearTimeout(searchTimeout);
+            
+            // Set timeout baru untuk debouncing
+            searchTimeout = setTimeout(() => {
+                performSearch(searchTerm);
+            }, 300);
+        });
+
+        // Fungsi pencarian utama
+        function performSearch(searchTerm) {
+            const searchTermLower = searchTerm.toLowerCase().trim();
+            const cards = document.querySelectorAll('.card-hover');
+            const clearButton = document.getElementById('clearSearch');
+            let visibleCount = 0;
+            
+            // Tampilkan/sembunyikan clear button
+            if (searchTermLower !== '') {
+                clearButton.classList.remove('hidden');
+            } else {
+                clearButton.classList.add('hidden');
+            }
+            
+            cards.forEach(card => {
+                const titleElement = card.querySelector('h3');
+                const labElement = card.querySelector('p');
+                const kodeElement = card.querySelector('.font-mono');
+                
+                const title = titleElement.textContent;
+                const lab = labElement.textContent;
+                const kodeAkses = kodeElement.textContent;
+                
+                // Reset highlight
+                titleElement.innerHTML = title;
+                labElement.innerHTML = lab;
+                kodeElement.innerHTML = kodeAkses;
+                
+                // Cari berdasarkan nama praktikum, lab, atau kode akses
+                if (title.toLowerCase().includes(searchTermLower) || 
+                    lab.toLowerCase().includes(searchTermLower) || 
+                    kodeAkses.toLowerCase().includes(searchTermLower)) {
+                    
+                    card.style.display = 'block';
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                    visibleCount++;
+                    
+                    // Highlight hasil pencarian
+                    if (searchTermLower !== '') {
+                        highlightText(titleElement, searchTermLower);
+                        highlightText(labElement, searchTermLower);
+                        highlightText(kodeElement, searchTermLower);
+                    }
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                }
+            });
+            
+            // Tampilkan pesan jika tidak ada hasil
+            showNoResultsMessage(visibleCount, searchTermLower);
+            
+            // Update counter hasil pencarian
+            updateSearchCounter(visibleCount, cards.length, searchTermLower);
+        }
+
+        // Fungsi highlight text
+        function highlightText(element, searchTerm) {
+            const text = element.textContent;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            element.innerHTML = text.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+        }
+
+        // Fungsi tampilkan pesan tidak ada hasil
+        function showNoResultsMessage(visibleCount, searchTerm) {
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            
+            if (visibleCount === 0 && searchTerm !== '') {
+                if (!noResultsMessage) {
+                    const message = document.createElement('div');
+                    message.id = 'noResultsMessage';
+                    message.className = 'col-span-full bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in';
+                    message.innerHTML = `
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-6">
+                            <i class="fas fa-search text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Tidak ada hasil ditemukan</h3>
+                        <p class="text-gray-500 mb-4">Coba cari dengan kata kunci yang berbeda</p>
+                        <div class="text-sm text-gray-400">
+                            <p>Tips pencarian:</p>
+                            <ul class="mt-2 space-y-1">
+                                <li>• Nama praktikum (contoh: "PWEB", "GIS")</li>
+                                <li>• Nama lab (contoh: "PWEB", "LDKOM")</li>
+                                <li>• Kode akses (contoh: "pwebA2025")</li>
+                            </ul>
+                        </div>
+                    `;
+                    document.querySelector('.grid').appendChild(message);
+                }
+            } else {
+                if (noResultsMessage) {
+                    noResultsMessage.remove();
+                }
+            }
+        }
+
+        // Fungsi update counter hasil pencarian
+        function updateSearchCounter(visibleCount, totalCount, searchTerm) {
+            let counterElement = document.getElementById('searchCounter');
+            
+            if (searchTerm !== '') {
+                if (!counterElement) {
+                    counterElement = document.createElement('div');
+                    counterElement.id = 'searchCounter';
+                    counterElement.className = 'text-sm text-gray-600 mb-4 text-center';
+                    document.querySelector('.mb-8').appendChild(counterElement);
+                }
+                counterElement.textContent = `Menampilkan ${visibleCount} dari ${totalCount} kelas`;
+            } else {
+                if (counterElement) {
+                    counterElement.remove();
+                }
+            }
+        }
 
         // Fungsi modal kode masuk
         function showKodeMasukModal(namaKelas, kodeAkses) {
@@ -374,6 +517,12 @@
                 submitKodeMasuk();
             }
         });
+
+        // Fungsi clear search
+        function clearSearch() {
+            document.getElementById('searchKelas').value = '';
+            performSearch('');
+        }
     </script>
 </body>
 </html> 
