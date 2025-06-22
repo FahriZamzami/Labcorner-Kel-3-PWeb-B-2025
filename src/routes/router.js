@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../middlewares/upload');
+const { isAuthenticated } = require('../middlewares/auth');
 
 // === Assignment Routes ===
 const assignmentsController = require('../controllers/assignment.controller');
@@ -26,8 +27,8 @@ router.post('/login', authenticationController.login);
 
 // === Lab Routes ===
 const labController = require('../controllers/lab.controller');
-router.get('/lab', labController.labPage);
-router.get('/lab/:id', labController.showHomeClassPage);
+router.get('/lab', isAuthenticated, labController.labPage);
+router.get('/lab/:id', isAuthenticated, labController.showHomeClassPage);
 
 const registerController = require('../controllers/register.controller');
 router.get('/', registerController.showRegisterPage);           // Tampilkan halaman awal (step 1)

@@ -48,7 +48,21 @@ const {
 // TAMBAHAN: Impor controller untuk Mahasiswa & Absensi
 const { getDaftarMahasiswaPage } = require('./controllers/mahasiswa.controller');
 const { getAbsensiPage, saveAbsensi, getDetailKehadiranPage } = require('./controllers/absensi.controller');
-
+const { 
+    getKuisPage, 
+    showTambahKuisPage, 
+    createKuis, 
+    showTambahSoalPage, 
+    createSoal,
+    deleteKuis,
+    toggleKuisStatus,
+    showEditKuisPage,
+    updateKuis,
+    showDaftarSoalPage,
+    showNilaiKuisPage,
+    exportNilaiExcel,
+    exportNilaiPDF
+} = require('./controllers/kuis.controller');
 
 const { login } = require('./controllers/authentication.controller');
 const { isAuthenticated } = require('./middlewares/auth');
@@ -128,6 +142,21 @@ app.get('/praktikum/:id/rekap-nilai/pdf', exportRekapPDF);
 app.get('/praktikum/:id/rekap-nilai/excel', exportRekapExcel);
 
 // === Lab & Kelas ===
+const { 
+    showTambahKelasPage, 
+    createKelas,
+    showEditKelasPage,
+    updateKelas,
+    deleteKelas
+} = require('./controllers/tambahKelas.controller');
+
+// Urutan penting: Rute spesifik harus di atas rute dinamis
+app.get('/kelas/tambah', showTambahKelasPage);
+app.post('/kelas/create', createKelas);
+app.get('/kelas/:id/edit', showEditKelasPage);
+app.post('/kelas/:id/update', updateKelas);
+app.post('/kelas/:id/delete', deleteKelas);
+
 app.get('/lab', labPage);
 app.get('/kelas/:id', showHomeClassPage);
 
@@ -135,6 +164,21 @@ app.get('/kelas/:id', showHomeClassPage);
 app.get('/praktikum/:praktikum_id/modul', getModulPage);
 app.post('/praktikum/:praktikum_id/modul/upload', upload.single('fileModul'), uploadModul);
 app.post('/modul/delete/:modul_id', deleteModul);
+
+// === Kuis ===
+app.get('/praktikum/:praktikum_id/kuis', getKuisPage);
+app.get('/praktikum/:praktikum_id/kuis/baru', showTambahKuisPage);
+app.post('/kuis/create', createKuis);
+app.get('/kuis/:id/soal/tambah', showTambahSoalPage);
+app.post('/kuis/:id/soal/tambah', createSoal);
+app.post('/kuis/:id/delete', deleteKuis);
+app.post('/kuis/:id/toggle-status', toggleKuisStatus);
+app.get('/kuis/:id/edit', showEditKuisPage);
+app.post('/kuis/:id/edit', updateKuis);
+app.get('/kuis/:id/daftar-soal', showDaftarSoalPage);
+app.get('/kuis/:kuis_id/nilai', showNilaiKuisPage);
+app.get('/kuis/:kuis_id/nilai/excel', exportNilaiExcel);
+app.get('/kuis/:kuis_id/nilai/pdf', exportNilaiPDF);
 
 // === Jadwal ===
 app.get('/praktikum/:praktikum_id/jadwal', getJadwalPage);

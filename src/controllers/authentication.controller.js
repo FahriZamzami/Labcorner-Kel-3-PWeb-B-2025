@@ -27,42 +27,19 @@ const login = async (req, res) => {
             peran: user.peran
         };
 
-        if (user.peran === 'admin') {
-            return res.render('admin', { user });
+        // Redirect based on role to ensure the URL is correct
+        switch (user.peran) {
+            case 'admin':
+                return res.redirect('/lab'); // Redirect admin to lab/dashboard
+            case 'asisten':
+                return res.redirect('/lab'); // Redirect asisten to lab
+            case 'mahasiswa':
+                return res.redirect('/lab'); // Redirect mahasiswa to their dashboard/lab
+            default:
+                // If role is not recognized, deny access
+                return res.status(403).send('Peran tidak dikenali');
         }
 
-        if (user.peran === 'asisten') {
-            const asisten = await prisma.asistenLab.findFirst({
-                where: { user_id: user.id }
-            });
-
-            if (!asisten) {
-                return res.status(404).send('Data asisten tidak ditemukan');
-            }
-
-            const lab = await prisma.lab.findUnique({
-                where: { id: asisten.lab_id },
-                include: {
-                    praktikum: true
-                }
-            });
-
-            if (!lab) {
-                return res.status(404).send('Lab tidak ditemukan');
-            }
-
-            return res.render('lab', {
-                user,
-                lab,
-                praktikumList: lab.praktikum
-            });
-        }
-
-        if (user.peran === 'mahasiswa') {
-            return res.render('mahasiswa', { user });
-        }
-
-        return res.status(403).send('Peran tidak dikenali');
     } catch (error) {
         console.error("Login error:", error);
         return res.status(500).send('Terjadi kesalahan server: ' + error.message);

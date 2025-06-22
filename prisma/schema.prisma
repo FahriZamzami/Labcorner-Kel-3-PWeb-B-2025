@@ -23,6 +23,17 @@ enum StatusAbsensi {
   Hadir
   Tidak_Hadir
 }
+
+enum StatusKuis {
+  aktif
+  tidak_aktif
+}
+
+enum TipePertanyaan {
+  pilihan_ganda
+  benar_salah
+  essay
+}
 // AKHIR DARI BLOK ENUM
 
 
@@ -38,6 +49,7 @@ model user {
   pengumuman    pengumuman[]  @relation("PengumumanPembuat")
   absensi       absensi[]
   asistenLab    asistenLab[]
+  jawabanKuis   jawabanKuis[]
 }
 
 model lab {
@@ -70,6 +82,7 @@ model praktikum {
   modul        modul[]
   tugas        tugas[]
   pengumuman   pengumuman[]
+  kuis         kuis[]
 }
 
 model mahasiswa {
@@ -152,4 +165,64 @@ model absensi {
   status    StatusAbsensi // Sekarang Prisma tahu apa itu 'StatusAbsensi'
   user      user          @relation(fields: [user_id], references: [id])
   jadwal    jadwal        @relation(fields: [jadwal_id], references: [id])
+}
+
+model kuis {
+  id               Int         @id @default(autoincrement())
+  praktikum_id     Int
+  judul            String
+  deskripsi        String?
+  waktu_mulai      DateTime
+  waktu_selesai    DateTime
+  durasi_menit     Int         @default(60)
+  status           StatusKuis  @default(tidak_aktif)
+  dibuat_pada      DateTime    @default(now())
+  
+  praktikum        praktikum   @relation(fields: [praktikum_id], references: [id])
+  pertanyaan       pertanyaan[]
+  jawaban_kuis     jawabanKuis[]
+}
+
+model pertanyaan {
+  id               Int              @id @default(autoincrement())
+  kuis_id          Int
+  pertanyaan       String
+  tipe             TipePertanyaan
+  opsi_a           String?
+  opsi_b           String?
+  opsi_c           String?
+  opsi_d           String?
+  opsi_e           String?
+  jawaban_benar    String
+  poin             Int              @default(1)
+  urutan           Int?
+  
+  kuis             kuis            @relation(fields: [kuis_id], references: [id], onDelete: Cascade)
+  jawaban_pertanyaan jawabanPertanyaan[]
+}
+
+model jawabanKuis {
+  id               Int       @id @default(autoincrement())
+  kuis_id          Int
+  user_id          String
+  waktu_mulai      DateTime  @default(now())
+  waktu_selesai    DateTime?
+  total_poin       Float?
+  status           String    @default("sedang_berlangsung") // sedang_berlangsung, selesai, terlambat
+  
+  kuis             kuis      @relation(fields: [kuis_id], references: [id], onDelete: Cascade)
+  user             user      @relation(fields: [user_id], references: [id])
+  jawaban_pertanyaan jawabanPertanyaan[]
+}
+
+model jawabanPertanyaan {
+  id               Int         @id @default(autoincrement())
+  jawaban_kuis_id  Int
+  pertanyaan_id    Int
+  jawaban_user     String?
+  poin_didapat     Float?
+  waktu_jawab      DateTime    @default(now())
+  
+  jawaban_kuis     jawabanKuis @relation(fields: [jawaban_kuis_id], references: [id])
+  pertanyaan       pertanyaan  @relation(fields: [pertanyaan_id], references: [id])
 }
