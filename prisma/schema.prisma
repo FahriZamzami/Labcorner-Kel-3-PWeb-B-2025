@@ -13,7 +13,6 @@ enum Peran {
   asisten
 }
 
-
 enum StatusTugas {
   open
   close
@@ -30,19 +29,18 @@ model user {
   kata_sandi   String
   peran        Peran
   dibuat_pada  DateTime        @default(now())
-
   pendaftaran  pendaftaran[]
   jadwal       jadwal[]
   modul        modul[]
   pengumpulan  pengumpulan[]
   pengumuman   pengumuman[]    @relation("PengumumanPembuat")
   absensi      absensi[]
+  nilai        nilai[]
 }
 
 model lab {
   id        Int         @id @default(autoincrement())
   nama_lab  String
-
   praktikum praktikum[]
 }
 
@@ -51,7 +49,6 @@ model praktikum {
   nama_praktikum String
   lab_id         Int
   dibuat_pada    DateTime      @default(now())
-
   lab            lab           @relation(fields: [lab_id], references: [id])
   pendaftaran    pendaftaran[]
   jadwal         jadwal[]
@@ -65,7 +62,6 @@ model pendaftaran {
   user_id      String
   praktikum_id Int
   waktu_daftar DateTime?
-
   user         user      @relation(fields: [user_id], references: [id])
   praktikum    praktikum @relation(fields: [praktikum_id], references: [id])
 }
@@ -78,11 +74,12 @@ model jadwal {
   ruangan        String?
   user_id        String
   nama_pengajar  String?
+  semester       String?
   dibuat_pada    DateTime?
-
   praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
   user           user      @relation(fields: [user_id], references: [id])
   absensi        absensi[]
+  nilai          nilai[]
 }
 
 model modul {
@@ -92,32 +89,20 @@ model modul {
   file_path      String
   diunggah_oleh  String
   diunggah_pada  DateTime?
-
   praktikum      praktikum @relation(fields: [praktikum_id], references: [id])
   user           user      @relation(fields: [diunggah_oleh], references: [id])
 }
 
 model tugas {
-
   id            Int            @id @default(autoincrement())
-=======
-  id            Int       @id @default(autoincrement())
-
   praktikum_id  Int
   judul         String
   deskripsi     String?
   fileTugas     String?
   batas_waktu   DateTime
-
   dibuat_pada   DateTime       @default(now())
   status        StatusTugas    @default(open)
-
   praktikum     praktikum      @relation(fields: [praktikum_id], references: [id])
-
-  dibuat_pada   DateTime  @default(now())
-
-  praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
-
   pengumpulan   pengumpulan[]
 }
 
@@ -129,7 +114,6 @@ model pengumpulan {
   waktu_kirim  DateTime?
   nilai        Float?
   catatan      String?
-
   tugas        tugas     @relation(fields: [tugas_id], references: [id])
   user         user      @relation(fields: [user_id], references: [id])
 }
@@ -140,7 +124,6 @@ model pengumuman {
   isi           String
   dibuat_oleh   String
   dibuat_pada   DateTime?
-
   praktikum     praktikum @relation(fields: [praktikum_id], references: [id])
   pembuat       user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
 }
@@ -150,7 +133,17 @@ model absensi {
   user_id   String
   jadwal_id Int
   status    StatusAbsensi
-
   user      user           @relation(fields: [user_id], references: [id])
   jadwal    jadwal         @relation(fields: [jadwal_id], references: [id])
+}
+
+model nilai {
+  id          Int      @id @default(autoincrement())
+  user_id     String
+  jadwal_id   Int
+  jenis       String
+  skor        Float
+  dibuat_pada DateTime @default(now())
+  user        user     @relation(fields: [user_id], references: [id])
+  jadwal      jadwal   @relation(fields: [jadwal_id], references: [id])
 }

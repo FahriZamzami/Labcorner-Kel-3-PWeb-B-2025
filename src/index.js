@@ -38,6 +38,8 @@ app.post('/login', login);
 
 // Proteksi semua route selanjutnya
 app.use(isAuthenticated);
+
+// Mahasiswa routes
 app.use('/mahasiswa', mahasiswaRouter);
 
 // API route utama
@@ -61,10 +63,6 @@ app.get('/logout', (req, res) => {
     res.redirect('/login');
   });
 });
-
-// // Redirect shortcut (tanpa prefix /api)
-// app.get('/mahasiswa', (req, res) => res.redirect('/api/mahasiswa'));
-// app.get('/mahasiswa/rekap', (req, res) => res.redirect('/api/mahasiswa/rekap'));
 
 // Start server
 app.listen(port, () => {

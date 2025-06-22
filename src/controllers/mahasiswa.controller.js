@@ -1,104 +1,167 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// 🟣 Halaman Rekap Kehadiran Mahasiswa
+// 🟣 Halaman Rekap Kehadiran Mahasiswa (semua data)
 const getDaftarMahasiswa = async (req, res) => {
   try {
-    const mahasiswa = await prisma.user.findMany({
+    const mahasiswaData = await prisma.user.findMany({
       where: { peran: 'mahasiswa' },
       include: { absensi: true }
     });
 
-    const data = mahasiswa.map((mhs) => {
+    const data = mahasiswaData.map((mhs) => {
       const hadir = mhs.absensi.filter(a => a.status === 'Hadir').length;
       const tidakHadir = mhs.absensi.filter(a => a.status === 'Tidak_Hadir').length;
       return { nama: mhs.username, hadir, tidakHadir };
     });
 
-    res.render('daftarmahasiswa', { data, keyword: '', sort: 'desc' });
+    const allJadwal = await prisma.jadwal.findMany({
+      select: { semester: true },
+      distinct: ['semester']
+    });
+    const semesters = allJadwal.map(j => j.semester).filter(s => s);
+
+    res.render('daftarmahasiswa', { 
+      data, 
+      keyword: '', 
+      semesters,
+      selectedSemester: 'all'
+    });
   } catch (error) {
     console.error('❌ Gagal ambil data:', error);
-    res.status(500).send('Gagal memuat data');
+    res.render('daftarmahasiswa', { 
+      data: [], 
+      keyword: '', 
+      semesters: [],
+      selectedSemester: 'all'
+    });
   }
 };
 
-// 🔍 Pencarian pada halaman rekap
+// 🔍 Pencarian rekap kehadiran + sort berdasarkan jumlah hadir
 const searchMahasiswaRekap = async (req, res) => {
   const keyword = req.query.q || '';
-  const sort = req.query.sort || 'desc';
+  const semester = req.query.semester || 'all';
 
   try {
-    const result = await prisma.user.findMany({
-      where: {
-        peran: 'mahasiswa',
-        username: {
-          contains: keyword,
-          mode: 'insensitive'
+    let whereClause = {
+      peran: 'mahasiswa',
+      username: {
+        contains: keyword,
+        mode: 'insensitive'
+      }
+    };
+
+    if (semester && semester !== 'all') {
+      whereClause.absensi = {
+        some: {
+          jadwal: {
+            semester: semester
+          }
         }
-      },
+      };
+    }
+
+    const result = await prisma.user.findMany({
+      where: whereClause,
       include: { absensi: true }
     });
 
-    let data = result.map((mhs) => {
+    const data = result.map((mhs) => {
       const hadir = mhs.absensi.filter(a => a.status === 'Hadir').length;
       const tidakHadir = mhs.absensi.filter(a => a.status === 'Tidak_Hadir').length;
-      return { nama: mhs.username, hadir, tidakHadir };
+      return {
+        nama: mhs.username,
+        hadir,
+        tidakHadir
+      };
     });
 
-    data.sort((a, b) => sort === 'asc' ? a.hadir - b.hadir : b.hadir - a.hadir);
+    const allJadwal = await prisma.jadwal.findMany({
+      select: { semester: true },
+      distinct: ['semester']
+    });
+    const semesters = allJadwal.map(j => j.semester).filter(s => s);
 
-    res.render('daftarmahasiswa', { data, keyword, sort });
+    res.render('daftarmahasiswa', { 
+      data, 
+      keyword, 
+      semesters,
+      selectedSemester: semester
+    });
   } catch (error) {
     console.error('❌ Gagal cari rekap:', error);
-    res.status(500).send('Error');
+    res.render('daftarmahasiswa', {
+      data: [],
+      keyword,
+      semesters: [],
+      selectedSemester: semester
+    });
   }
 };
 
-// 🔄 Input/update status (asisten lab)
+// 🔎 Pencarian mahasiswa berdasarkan nama dan semester
 const searchMahasiswa = async (req, res) => {
   const keyword = req.query.q || '';
+  const semester = req.query.semester;
 
   try {
-    const semester = req.query.semester;
-    
-const result = await prisma.user.findMany({
-  where: {
-    peran: 'mahasiswa',
-    username: {
-      contains: keyword,
-      mode: 'insensitive'
-    },
-    absensi: {
-      some: {
-        jadwal: {
-          semester: semester ? semester : undefined
+    let whereClause = {
+      peran: 'mahasiswa',
+      username: {
+        contains: keyword,
+        mode: 'insensitive'
+      }
+    };
+
+    // Jika ada semester, kita cari berdasarkan jadwal yang terkait
+    if (semester && semester !== 'all') {
+      whereClause.absensi = {
+        some: {
+          jadwal: {
+            semester: semester
+          }
+        }
+      };
+    }
+
+    const result = await prisma.user.findMany({
+      where: whereClause,
+      include: {
+        absensi: {
+          include: { jadwal: true }
         }
       }
-    }
-  },
-  include: { absensi: { include: { jadwal: true } } }
-});
+    });
 
     const mahasiswa = result.map((mhs) => ({
       id: mhs.id,
       nama: mhs.username,
-      status: '-' // placeholder
+      status: '-' // placeholder, nanti bisa diisi status terakhir misalnya
     }));
 
-    res.render('mahasiswa', { mahasiswa });
+    // Ambil daftar semester untuk dropdown
+    const allJadwal = await prisma.jadwal.findMany({
+      select: { semester: true },
+      distinct: ['semester']
+    });
+    const semesters = allJadwal.map(j => j.semester).filter(s => s);
+
+    res.render('mahasiswa', { mahasiswa, semesters, selectedSemester: semester });
   } catch (error) {
     console.error('❌ Gagal cari mahasiswa:', error);
-    res.render('mahasiswa', { mahasiswa: [] });
+    res.render('mahasiswa', { mahasiswa: [], semesters: [], selectedSemester: '' });
   }
 };
 
+// 🎓 Ambil data absensi berdasarkan semester
 const getMahasiswaBySemester = async (req, res) => {
   const { semester } = req.query;
 
   try {
+    // Karena tidak ada field semester di jadwal, kita ambil semua absensi mahasiswa
     const absensiData = await prisma.absensi.findMany({
       where: {
-        jadwal: { semester },
         user: { peran: 'mahasiswa' }
       },
       include: { user: true }
@@ -117,6 +180,7 @@ const getMahasiswaBySemester = async (req, res) => {
   }
 };
 
+// 🔁 Update status absensi mahasiswa
 const updateStatusMahasiswa = async (req, res) => {
   const absensiId = parseInt(req.params.id);
   const { status } = req.body;

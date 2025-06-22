@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rekap Laboratorium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .fade-slide {
+      animation: fadeSlide 0.5s ease-in-out;
+    }
+    @keyframes fadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#A188E3] min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4">
+      <div class="text-2xl font-bold tracking-wide mb-8">LABCORNER</div>
+      <nav class="flex flex-col gap-4">
+        <a href="/mahasiswa/laboratorium" class="flex items-center gap-3 p-3 text-white/80 hover:bg-white/10 rounded-lg">
+          <span>Daftar Laboratorium</span>
+        </a>
+        <a href="/logout" class="flex items-center gap-3 p-3 text-white/80 hover:bg-white/10 rounded-lg mt-auto">
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-y-auto">
+      <header class="flex justify-between items-center px-6 py-4 bg-white shadow">
+        <h1 class="text-xl font-bold text-[#6D28D9]">Rekap Laboratorium</h1>
+        <div class="text-sm text-gray-600">
+          Selamat datang, <%= req.session.user?.username %>
+        </div>
+      </header>
+
+      <main class="p-8 space-y-6">
+        <div class="bg-white p-6 rounded-xl shadow-xl fade-slide">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">
+            <%= lab.praktikum?.nama_praktikum || 'Laboratorium' %> — 
+            <%= lab.tanggal.toLocaleDateString('id-ID') %>
+          </h2>
+          
+          <!-- Absensi Section -->
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Absensi</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="bg-green-100 p-4 rounded-lg text-center">
+                <div class="text-2xl font-bold text-green-600"><%= absensi.hadir %></div>
+                <div class="text-sm text-green-700">Hadir</div>
+              </div>
+              <div class="bg-yellow-100 p-4 rounded-lg text-center">
+                <div class="text-2xl font-bold text-yellow-600"><%= absensi.izin %></div>
+                <div class="text-sm text-yellow-700">Izin</div>
+              </div>
+              <div class="bg-orange-100 p-4 rounded-lg text-center">
+                <div class="text-2xl font-bold text-orange-600"><%= absensi.sakit %></div>
+                <div class="text-sm text-orange-700">Sakit</div>
+              </div>
+              <div class="bg-red-100 p-4 rounded-lg text-center">
+                <div class="text-2xl font-bold text-red-600"><%= absensi.alfa %></div>
+                <div class="text-sm text-red-700">Alfa</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nilai Section -->
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Nilai</h3>
+            <% if (nilai && nilai.length > 0) { %>
+              <div class="space-y-3">
+                <% nilai.forEach(n => { %>
+                  <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span class="font-medium text-gray-700"><%= n.jenis %></span>
+                    <span class="text-lg font-bold text-purple-600"><%= n.skor %></span>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <p class="text-gray-500 text-center py-4">Belum ada nilai yang tersedia.</p>
+            <% } %>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html> 

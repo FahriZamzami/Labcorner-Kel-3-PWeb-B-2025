@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Materi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 font-sans">
+
+    <div class="flex min-h-screen">
+      <%- include('sidebar', { currentPage: 'modulMateri' }) %>
+
+      <main class="flex-1 p-8">
+        <h2 class="text-2xl font-semibold text-purple-800 mb-4">📘 Modul Materi</h2>
+        <p>Ini adalah halaman untuk materi yang bisa dipelajari. Selamat belajar!</p>
+      </main>
+    </div>
+
+  </body>
+</html>

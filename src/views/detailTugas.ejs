@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas: <%= tugas.judul %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Optional: Tambahkan styling kustom di sini jika diperlukan */
+    </style>
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <div class="flex min-h-screen">
+      <%- include('sidebar', { currentPage: 'tugas' }) %>
+
+      <main class="flex-1 p-8">
+        <h2 class="text-3xl font-bold mb-6 text-purple-800"><%= tugas.judul %></h2>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+          <p class="text-gray-700 mb-4"><%= tugas.deskripsi || 'Tidak ada deskripsi untuk tugas ini.' %></p>
+          <p class="text-sm text-gray-600 mb-4">
+            <span class="font-semibold">Jatuh Tempo:</span> <%= tugas.batas_waktu_formatted %>
+          </p>
+          <p class="text-sm text-gray-600 mb-4">
+            <span class="font-semibold">Status Tugas:</span>
+            <% if (tugas.status === 'open') { %>
+              <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Buka</span>
+            <% } else { %>
+              <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tutup</span>
+            <% } %>
+          </p>
+
+          <% if (tugas.fileTugas) { %>
+            <div class="mb-4 border-t pt-4 mt-4">
+              <p class="font-semibold text-purple-700 mb-2">File Instruksi Tugas</p>
+              <a href="/uploads/<%= tugas.fileTugas %>" target="_blank" class="flex items-center text-blue-600 hover:underline">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0113 3.414L16.586 7A2 2 0 0118 8.414V16a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2 0h4l-4 4V4z" clip-rule="evenodd" />
+                </svg>
+                Unduh Instruksi (<%= tugas.fileTugas.split('-').slice(1).join('-') %>)
+              </a>
+            </div>
+          <% } %>
+
+          <h3 class="text-xl font-semibold mb-4 text-purple-800 border-t pt-4 mt-4">Status Pengumpulan Anda</h3>
+
+          <% if (submittedFile) { %>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+              <strong class="font-bold">Sudah Dikumpulkan!</strong>
+              <p class="block sm:inline">
+                File Anda:
+                <a href="/uploads/<%= submittedFile.file_path %>" target="_blank" class="underline hover:no-underline">
+                    <%= submittedFile.file_path.split('-').slice(1).join('-') %>
+                </a>
+              </p>
+              <p class="text-sm">Dikumpulkan pada: <%= new Date(submittedFile.waktu_kirim).toLocaleString('id-ID', {
+                  day: '2-digit', month: 'long', year: 'numeric',
+                  hour: '2-digit', minute: '2-digit', hour12: false
+                }) %> WIB</p>
+              <% if (submittedFile.nilai !== null) { %>
+                <p class="text-sm font-bold mt-2">Nilai: <%= submittedFile.nilai %></p>
+              <% } %>
+              <% if (submittedFile.catatan) { %>
+                <p class="text-sm italic">Catatan: <%= submittedFile.catatan %></p>
+              <% } %>
+              <div class="mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <a href="/tugas/<%= tugas.id %>/unduh" class="bg-green-600 text-white text-center px-4 py-2 rounded hover:bg-green-700">Unduh File Anda</a>
+                <button onclick="deleteSubmission(<%= tugas.id %>)" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Hapus Pengumpulan</button>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4">
+              <strong class="font-bold">Belum Dikumpulkan</strong>
+              <span class="block sm:inline">Anda belum mengumpulkan tugas ini.</span>
+            </div>
+
+            <% if (tugas.status === 'open') { %>
+              <h3 class="text-xl font-semibold mb-4 text-purple-800 border-t pt-4 mt-4">Unggah Tugas Anda</h3>
+              <form id="uploadForm" action="/tugas/<%= tugas.id %>/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                  <label for="file" class="block text-gray-700 text-sm font-bold mb-2">Pilih File:</label>
+                  <input type="file" id="file" name="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                </div>
+                <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md shadow-md hover:bg-purple-800">Kumpulkan Tugas</button>
+              </form>
+            <% } else { %>
+                <div class="bg-gray-100 border border-gray-400 text-gray-700 px-4 py-3 rounded relative mb-4 mt-4">
+                    <strong class="font-bold">Tugas Telah Ditutup</strong>
+                    <span class="block sm:inline">Anda tidak dapat lagi mengumpulkan tugas ini.</span>
+                </div>
+            <% } %>
+
+          <% } %>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Event listener untuk form upload
+      document.getElementById('uploadForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Mencegah submit default form
+
+        const formData = new FormData(this); // Mengambil data form
+        const url = this.action; // Mengambil URL dari atribut action form
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            body: formData // Mengirim FormData
+          });
+
+          const data = await response.json(); // Menguraikan respons JSON
+
+          if (response.ok) { // Jika respons HTTP 2xx
+            alert(data.message);
+            window.location.reload(); // Muat ulang halaman untuk menampilkan status terbaru
+          } else {
+            // Jika ada error dari server (misal: status 400, 500)
+            alert('Error: ' + (data.message || 'Gagal mengunggah file.'));
+          }
+        } catch (error) {
+          console.error('Error saat upload:', error);
+          alert('Terjadi kesalahan saat berkomunikasi dengan server.');
+        }
+      });
+
+      // Fungsi untuk menghapus pengumpulan tugas
+      async function deleteSubmission(tugasId) {
+        if (!confirm('Apakah Anda yakin ingin menghapus pengumpulan tugas ini? Tindakan ini tidak dapat dibatalkan.')) {
+          return; // Batalkan jika pengguna tidak yakin
+        }
+
+        try {
+          const response = await fetch(`/tugas/${tugasId}/hapus`, {
+            method: 'DELETE' // Menggunakan metode HTTP DELETE
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert(data.message);
+            window.location.reload(); // Muat ulang halaman
+          } else {
+            alert('Error: ' + (data.message || 'Gagal menghapus pengumpulan.'));
+          }
+        } catch (error) {
+          console.error('Error saat menghapus:', error);
+          alert('Terjadi kesalahan saat berkomunikasi dengan server.');
+        }
+      }
+    </script>
+  </body>
+</html>

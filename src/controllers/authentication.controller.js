@@ -29,20 +29,21 @@ const login = async (req, res) => {
     };
 
     // Arahkan berdasarkan peran
-    if (user.peran === 'admin') {
-        return res.render('admin', { user });
-    } else if (user.peran === 'asisten') {
-    return res.redirect('/lab');
-    } else if (user.peran === 'mahasiswa') {
-        return res.render('mahasiswa', { user });
-    } else {
-        return res.status(403).send('Peran tidak dikenali');
-    }
+  if (user.peran === 'admin') {
+  return res.render('admin', { user });
+} else if (user.peran === 'asisten') {
+  return res.redirect('/lab');
+} else if (user.peran === 'mahasiswa') {
+  return res.redirect('/mahasiswa/laboratorium');
+} else {
+  return res.status(403).send('Peran tidak dikenali');
+}
 
     } catch (error) {
     console.error(error);
     res.status(500).send('Terjadi kesalahan server');
     }
 };
+
 
 module.exports = { login };

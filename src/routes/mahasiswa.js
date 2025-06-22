@@ -10,5 +10,7 @@ const cekMahasiswa = (req, res, next) => {
 
 router.get('/laboratorium', cekMahasiswa, mahasiswaLab.getDaftarLab);
 router.get('/laboratorium/:id', cekMahasiswa, mahasiswaLab.getDetailLab);
+router.get('/rekap-absensi', cekMahasiswa, mahasiswaLab.getRekapAbsensi);
+router.get('/rekap-nilai', cekMahasiswa, mahasiswaLab.getRekapNilai);
 
 module.exports = router;
